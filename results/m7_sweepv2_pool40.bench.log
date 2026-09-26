@@ -1,0 +1,66 @@
+seller env verified: safe 0 40 (container a04a023b629c)
+
+requests=50000  open loop @ 833.33/s  tickets=100  request_ids sent >1 time=8442
+responses: {200: 133, 409: 19204, 'QueueTimeout': 30661, 'ReadTimeout': 2}
+transport failures: never sent=30661  sent, no answer=2
+throughput: 501.6 req/s over 99.67s (storm only)   max in-flight: 2000 (sum of per-worker maxima [250, 250, 250, 250, 250, 250, 250, 250]) (connection cap 2000)
+arrivals delivered: 836.4/s over 59.78s (target 833.33/s over 60.00s)
+  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure
+buyer CPU per 1s sample, per worker process (max queued in any worker: 3126):
+  worker 0: p50=  18%  max= 108%  seconds >= 90%: 2 of 99
+  worker 1: p50=  18%  max= 108%  seconds >= 90%: 1 of 99
+  worker 2: p50=  18%  max= 109%  seconds >= 90%: 1 of 99
+  worker 3: p50=  18%  max= 107%  seconds >= 90%: 2 of 99
+  worker 4: p50=  18%  max= 107%  seconds >= 90%: 2 of 99
+  worker 5: p50=  18%  max= 112%  seconds >= 90%: 1 of 99
+  worker 6: p50=  18%  max= 109%  seconds >= 90%: 1 of 99
+  worker 7: p50=  18%  max= 111%  seconds >= 90%: 1 of 99
+latency ms           n      p50      p99      max
+  all           50000  30002.4  41045.3  59404.1
+  200             133   3212.5   4761.2  11132.4
+  409           19204  39364.6  41410.3  59404.1
+  QueueTimeout  30661  30002.3  30007.1  30035.1
+  ReadTimeout       2  44805.9  48703.9  48703.9
+  sched lag     50000      1.2     56.8    368.2
+  queue wait    50000  30000.5  30002.6  30034.2
+  send lag      50000  30001.5  30006.0  30035.1
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)
+seller container unchanged during run
+
+===== docker stats: mean / max CPU per container =====
+  ticket_stampede-buyer-run-0d517087d2c6   mean  151.7%  max  365.1%
+  ticket_stampede-db-1                     mean   40.0%  max   72.1%
+  ticket_stampede-seller-1                 mean   72.4%  max   92.2%
+  m7_sweepv2_pool40_sampler                mean    2.0%  max    2.5%
+===== pg sampler =====
+samples=1039  busy samples=877 (any seller session not idle)
+mean sessions per busy sample, by category:
+  waiting_lock                              37.70
+  idle in transaction                        1.03
+  idle                                       0.59
+  active:IO:WALSync                          0.36
+  active:Client:ClientRead                   0.18
+  active:cpu:-                               0.14
+  active:LWLock:LockManager                  0.00
+  active:IO:WALWrite                         0.00
+  active:IO:DataFileImmediateSync            0.00
+sessions waiting on Lock (count -> % of busy samples):
+    0 ->   0.8%
+    3 ->   0.1%
+    8 ->   0.1%
+   21 ->   0.1%
+   32 ->   0.1%
+   34 ->   0.1%
+   37 ->   6.3%
+   38 ->  75.5%
+   39 ->  16.9%
+busy samples with exactly one root blocker: 98.5%
+root blocker's own state (how the lock holder spends its time): {'idle in transaction': 447, 'active:IO:WALSync': 270, 'waiting_lock': 88, 'active:cpu:-': 53, 'active:Client:ClientRead': 19, 'active:IO:WALWrite': 2}
+mean ungranted locks by type: {'tuple': 36.73, 'transactionid': 0.95}

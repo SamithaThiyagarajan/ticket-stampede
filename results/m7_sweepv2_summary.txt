@@ -1,0 +1,7 @@
+pool  served/s  vs pool10   served  arrivals/s  sched p99  max worker s>=90%  sent-no-ans  lock waiters  one root  valid
+   5     201.1      +7.8%    19983       837.7     60.8ms                  1            0          3.08     99.1%  VALID
+  10     186.6      +0.0%    18494       835.8     33.2ms                  2            0          8.07     98.3%  VALID
+  20     189.9      +1.8%    19233       836.9    915.4ms                 38           14         17.94     98.8%  INVALID ['sched p99 <100ms', 'worker >=90% <=3s', '0 sent-no-answer']
+  40     194.4      +4.2%    19337       836.4     56.8ms                  2            2         37.70     98.5%  INVALID ['0 sent-no-answer']
+
+threshold: >15% over pool 10 (214.6/s). Valid pools exceeding it: none

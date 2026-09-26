@@ -1,0 +1,60 @@
+seller env verified: safe 0 10 (container 0c41c5bb5cea)
+
+requests=20000  closed loop, concurrency=2000  tickets=100  request_ids sent >1 time=3398
+responses: {200: 127, 409: 19846, 'ReadError': 27}
+transport failures: never sent=0  sent, no answer=27
+throughput: 186.2 req/s over 107.42s (storm only)   max in-flight: 2000 (sum of per-worker maxima [250, 250, 250, 250, 250, 250, 250, 250]) (connection cap 2000)
+buyer CPU per 1s sample, per worker process (max queued in any worker: 0):
+  worker 0: p50=  21%  max= 110%  seconds >= 90%: 24 of 90
+  worker 1: p50=  17%  max= 104%  seconds >= 90%: 1 of 91
+  worker 2: p50=  16%  max=  97%  seconds >= 90%: 1 of 88
+  worker 3: p50=  16%  max= 102%  seconds >= 90%: 1 of 92
+  worker 4: p50=  29%  max= 115%  seconds >= 90%: 32 of 90
+  worker 5: p50=  92%  max= 113%  seconds >= 90%: 45 of 89
+  worker 6: p50= 103%  max= 110%  seconds >= 90%: 48 of 89
+  worker 7: p50=  18%  max= 113%  seconds >= 90%: 16 of 89
+latency ms           n      p50      p99      max
+  all           20000   9083.6  21983.0  29861.8
+  200             127   2732.4   8791.4   8808.7
+  409           19846   9089.8  22013.9  29861.8
+  ReadError        27   5179.9  11784.7  11784.7
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)
+seller container unchanged during run
+
+===== docker stats: mean / max CPU per container =====
+  ticket_stampede-buyer-run-b1a54c63696d   mean  341.4%  max  554.8%
+  ticket_stampede-db-1                     mean   38.7%  max   60.5%
+  ticket_stampede-seller-1                 mean   73.8%  max   95.8%
+  m7_sweep_pool10_sampler                  mean    1.8%  max    2.3%
+===== pg sampler =====
+samples=1115  busy samples=940 (any seller session not idle)
+mean sessions per busy sample, by category:
+  waiting_lock                               7.78
+  idle in transaction                        0.94
+  idle                                       0.70
+  active:IO:WALSync                          0.42
+  active:cpu:-                               0.13
+  active:Client:ClientRead                   0.03
+  active:IO:WALWrite                         0.01
+  active:IO:DataFileImmediateSync            0.00
+sessions waiting on Lock (count -> % of busy samples):
+    0 ->   3.2%
+    1 ->   0.4%
+    2 ->   0.2%
+    3 ->   0.1%
+    4 ->   0.2%
+    5 ->   0.1%
+    6 ->   0.2%
+    7 ->   6.1%
+    8 ->  73.4%
+    9 ->  16.1%
+busy samples with exactly one root blocker: 95.9%
+root blocker's own state (how the lock holder spends its time): {'idle in transaction': 442, 'active:IO:WALSync': 353, 'waiting_lock': 78, 'active:cpu:-': 33, 'active:IO:WALWrite': 6, 'active:Client:ClientRead': 5}
+mean ungranted locks by type: {'tuple': 6.82, 'transactionid': 0.9}

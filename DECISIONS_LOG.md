@@ -128,7 +128,53 @@
   - CPU (docker stats mean/max): seller 72%/89%, db 42%/58%, buyer container 137%/306% across 8 processes.
   - Report fix: the `throughput` line counts QueueTimeouts as completions (508 req/s — misleading); added `served by server` line (226.0/s). Verdict unchanged on recheck.
 
+- **M7 secondary — 50k / 60s / 50ms** (`results/m7_50k_50ms.*`), prediction recorded before running (delay only on the 100 success paths → ~5s extra lock time early, post-sellout rate unchanged, ~−1,100 served, sale 5–8s):
+
+  | | 0ms | 50ms |
+  |---|---|---|
+  | 100th sale by | 3.12s | 6.88s |
+  | served by server | 22,175 | 21,364 (−811) |
+  | served/s per 20s window | 199 231 234 231 214 | 155 228 235 233 217 |
+  | 8–9 lock waiters / one root blocker | 96.8% / 98.4% | 96.5% / 98.8% |
+  | correctness | 5/5 PASS | 5/5 PASS |
+  | client | arrivals 836.5/s, 0 s ≥90% | arrivals 835.9/s, max 77%, 0 s ≥90% |
+
+  → Prediction held. At 50k the 50ms work only matters until sell-out; post-sellout capacity is set by the sold-out path through the lock.
+- **Experiment-control error #2 (mine), caught before any result was used:** first sweep command hard-coded `bench.sh … 0 10` instead of `0 $P`, so the "pool 5" run was actually pool 10, plus a `sed` that relabelled the env file instead of failing. Stopped mid-run; all its files deleted. `bench.sh` verifies the seller against its *arguments*, so it cannot catch a wrong argument → sweep loop now also asserts the recorded pool equals the loop variable.
+- **Pool sweep, closed loop @ 2000 concurrency — CLIENT-CONTAMINATED, not valid as causal evidence** (`results/m7_sweep_pool{5,10}.*`):
+
+  | pool | throughput | ReadErrors | worker CPU ≥90% (per worker, s) | mean lock waiters | one root blocker |
+  |---|---|---|---|---|---|
+  | 5 | 178.3/s | 46 | w0:45 w1:24 w2:1 w3:2 w4:49 w5:30 w6:33 w7:24 | 2.97 (mode 3) | 96.1% |
+  | 10 | 186.2/s | 27 | w0:24 w1:1 w2:1 w3:1 w4:32 w5:45 w6:48 w7:16 | 7.78 (mode 8) | 95.9% |
+
+  - Pool 10 closed loop gives 186/s vs 226/s in the validated open-loop baseline at the same pool, and some workers are saturated for long mid-run stretches with unexplained ReadErrors (seller logged nothing) → fails the "client not the bottleneck" criterion. Cause unknown (hypothesis: different connection churn in closed loop), not investigated.
+  - DB-side observations still consistent with H1 (waiters ≈ pool − 2; single root blocker ~96%; same holder breakdown), but throughput comparison is contaminated. Pools 20/40 not run.
+
+- **Pool sweep v2 — criteria recorded BEFORE any run** (decision by the user): same workload as the valid baseline (50k open loop @ 833.33/s, 8 workers, cap 2000, 0ms, in-network, seed 1), `DB_POOL_SIZE` ∈ {5, 10, 20, 40}; pool 10 is re-run as the comparison point.
+  - **Metric:** `served by server` req/s (first send → last answer).
+  - **Material improvement threshold:** > 15% above the pool-10 re-run.
+  - **Client-clean criteria (all required, else run INVALID for the causal conclusion):** arrivals delivered within ±2% of 833.33/s; sched lag p99 < 100ms; no worker ≥90% CPU for more than 3 s (connection-ramp allowance); 0 "sent, no answer" transport failures; seller container unchanged; recorded pool size equals the intended pool (checked outside `bench.sh`).
+  - **H1 predicts:** all valid pools within 15% of pool 10; mean lock waiters grow ≈ pool − 2.
+
+- **Pool sweep v2 RESULTS** (`results/m7_sweepv2_*`, evaluated by `scripts/sweep_eval.py` against the criteria above; summary `results/m7_sweepv2_summary.txt`):
+
+  | pool | served/s | vs pool 10 | lock waiters (mean) | one root blocker | client-clean |
+  |---|---|---|---|---|---|
+  | 5 | 201.1 | +7.8% | 3.08 | 99.1% | VALID |
+  | 10 | 186.6 | — | 8.07 | 98.3% | VALID |
+  | 20 | 189.9 | (+1.8%) | 17.94 | 98.8% | INVALID: sched p99 915ms, a worker ≥90% for 38s, 14 ReadError |
+  | 40 | 194.4 | (+4.2%) | 37.70 | 98.5% | INVALID: 2 ReadTimeout (sent-no-answer) |
+
+  - All 4 runs: 5/5 invariant checks PASS.
+  - **Pre-registered conclusion: no valid pool exceeded the threshold (214.6/s).** But only pools 5 and 10 are valid, so the upward direction (20, 40) is **not established by valid runs**. Invalid runs' numbers are shown in parentheses and not used; for the record, neither would have crossed the threshold.
+  - **Strongest valid causal evidence is downward:** halving the pool (10 → 5) did not reduce throughput (201 vs 187). If the pool were the limiter, pool 5 should be roughly half.
+  - **Lock waiters track pool size almost exactly (≈ pool − 2)** — 3.08, 8.07, 17.94, 37.70 — with a single root blocker in 98–99% of samples at every size. Extra connections become extra waiters on the same row.
+  - **Run-to-run variance is larger than the threshold:** identical config (pool 10) gave 226.0/s in the baseline and 186.6/s in the rerun (−17%). So the 15% threshold cannot resolve small effects; the sweep supports "no large/proportional gain from more connections", not "exactly flat". Cause of the variance unknown (host/Docker load?). Pool 20's client degradation is also unexplained — the same client config was clean in 5 other 50k runs.
+
 ## Open questions / to revisit
+- **Run-to-run variance (−17% on identical config)** and occasional client degradation (pool 20) — unexplained. Needs repeated runs per config before any fine-grained claim.
+- **What should the WAL question's answer be backed by?** Sold-out path (`FOR UPDATE` + `SELECT` + `COMMIT`) shows the holder in `WALSync` 41% of the time. To demonstrate (not assert) before explaining.
 - ~~Transport errors~~ → resolved by D25 (Windows-side client path).
 - **Client send-lag jitter (0–27ms):** hypothesis = Windows ~15.6ms timer resolution. At 833/s arrivals would leave in bursts of ~13 rather than evenly. Average rate holds; burstiness must be reported with the 50k run.
 - DB pool size (`DB_POOL_SIZE=10`) caps how many requests are inside the race window at once. The concurrency the DB sees is the pool size, not the client count. Matters for M3 and M7.
