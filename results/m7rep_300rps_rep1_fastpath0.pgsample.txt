@@ -1,0 +1,19 @@
+samples=940  busy samples=812 (any seller session not idle)
+mean sessions per busy sample, by category:
+  waiting_lock                               8.08
+  idle in transaction                        0.87
+  idle                                       0.49
+  active:IO:WALSync                          0.39
+  active:cpu:-                               0.16
+  active:Client:ClientRead                   0.01
+  active:IO:WALWrite                         0.00
+sessions waiting on Lock (count -> % of busy samples):
+    1 ->   0.1%
+    2 ->   0.1%
+    6 ->   0.5%
+    7 ->   5.0%
+    8 ->  79.1%
+    9 ->  15.1%
+busy samples with exactly one root blocker: 99.4%
+root blocker's own state (how the lock holder spends its time): {'idle in transaction': 408, 'active:IO:WALSync': 299, 'waiting_lock': 53, 'active:cpu:-': 49, 'active:IO:WALWrite': 4, 'active:Client:ClientRead': 4}
+mean ungranted locks by type: {'transactionid': 0.94, 'tuple': 7.1}

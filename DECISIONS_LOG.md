@@ -207,6 +207,34 @@
   - Reconciliation with the invalid 833/s run (if replicated): the lock is a significant ceiling around ~200–230/s; removing it moves the ceiling above 300/s; at 833/s a further ceiling appears (seller CPU reached 100% max even at 300/s → leading suspect), masked by client contamination.
   - fastpath=0 at 300/s served 196/s vs 226/s in the 833/s baseline — consistent with the known run-to-run variance.
 
+- **300/s A/B replication — PRE-REGISTERED before running:** 3 × FASTPATH=0 and 3 × FASTPATH=1, alternating (0,1,0,1,0,1), identical setup to the A/B above (18k @ 300/s, 8 workers, cap 2000, 0ms, pool 10, seed 1), no code changes. Client-clean and keeps-up criteria unchanged. **Confirmed** iff each side has ≥ 2 valid runs AND every valid FASTPATH=0 run falls behind AND every valid FASTPATH=1 run keeps up. Invalid runs are reported, not dropped. The original A/B pair is not counted in the replication.
+
+- **300/s A/B replication RESULTS** (`results/m7rep_300rps_*`, summary `results/m7rep_300rps_summary.txt`): **all 6 runs client-clean** (0 excluded).
+
+  | | FASTPATH=0 rep1 / rep2 / rep3 | FASTPATH=1 rep1 / rep2 / rep3 |
+  |---|---|---|
+  | served/s | 210.2 / 215.5 / 213.2 — all FALL BEHIND | 300.3 / 300.3 / 300.3 — all KEEP UP |
+  | QueueTimeouts | 0 / 0 / 0 | 0 / 0 / 0 |
+  | 409 latency p50 | 13,984 / 13,080 / 16,254 ms | 13.1 / 11.0 / 8.6 ms |
+  | 409 latency p99 | 25,490 / 23,331 / 24,243 ms | 1,076 / 933 / 800 ms |
+  | mean lock waiters (busy) | 8.08 / 8.09 / 8.08 | 1.38 / 1.01 / 1.23 |
+  | pg busy samples | 812/940, 775/873, 761/907 | 65/651, 84/674, 69/657 |
+  | seller CPU max | 98 / 96 / 98% | 103 / 104 / 95% |
+  | db CPU mean | 41 / 42 / 40% | 27 / 27 / 25% |
+  | correctness | 5/5 each | 5/5 each |
+
+  - **Pre-registered rule satisfied → CONFIRMED: the sale-row lock is a significant throughput ceiling (~210–215/s on this machine); the lock-free sold-out path removes it** (keeps up with 300/s, 409 p50 ~10ms).
+  - This revises the earlier correction: the pool sweep alone could not show it, but the A/B does. The 833/s fast-path run's lack of gain is attributed to a *further* ceiling above 300/s plus client contamination — to be tested, not assumed.
+  - Seller CPU reaches ~100% (one core) with the fast path at only 300/s → seller process is the leading suspect for the next ceiling.
+
+- **Seller profile at 833/s, fast path on** (`results/m7prof_833rps_fastpath1.*`; 25k arrivals/30s — not a benchmark). py-spy 100Hz, 20s, `--idle`, from a separate container sharing the seller's PID namespace (seller image/code untouched). Summarized by `scripts/profile_summary.py`: main thread only (executor idle threads excluded, 3,998 samples).
+  - **Event loop busy 86.9%** of sampled time (idle in `select` 13.1%); seller CPU max 106%; Postgres nearly idle (busy samples 90/792, mean lock waiters 0.93, db CPU mean 26%).
+  - **Busy time is HTTP/framework/event-loop overhead, not the database:** inclusive — FastAPI/Starlette 59.6%, asyncpg 16.9%, app handler 13.0%, access logging 9.6%. Self — asyncio loop/sockets 34.4% (socket `write` alone 11.9%), uvicorn/**h11 pure-Python HTTP parser** 24.6%, framework 14.2%, logging 6.9%, asyncpg 6.4%.
+  - Answer rate under profiling ≈ 290–377/s per 5s window (profiler overhead + client not clean: sched p99 117ms, 5 hot s, 46 ReadTimeout → run INVALID as a benchmark; correctness 5/5 PASS).
+  - **Conclusion: with the lock removed from the sold-out path, the next ceiling is the single seller process's per-request CPU (HTTP parsing + ASGI framework + event loop), with the database having large headroom.**
+  - Caveats: py-spy pauses the process per sample (proportions, not absolute speed); one run.
+  - Found: buyer image was stale (built before the `served by server` report line); JSON format unaffected, `run_eval.py` computes from JSON. Rebuild before the next run.
+
 ## Open questions / to revisit
 - **Where do the ~8s per 409 go with the fast path on?** Candidate tests: (1) arrival rate the client can sustain (e.g. 300/s) with fast path 0 vs 1 — if fast-path capacity > 226/s, it keeps up where baseline cannot; (2) py-spy on the seller during load; (3) server-side timing of pool-acquire vs handler.
 - **Run-to-run variance (−17% on identical config)** and occasional client degradation (pool 20) — unexplained. Needs repeated runs per config before any fine-grained claim.

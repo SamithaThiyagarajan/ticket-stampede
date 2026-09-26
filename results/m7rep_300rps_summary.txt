@@ -1,0 +1,66 @@
+
+=== m7rep_300rps_rep1_fastpath0   [seller env verified: safe 0 10 0 (container c32f295b804c)]
+  arrivals delivered 300.4/s   sched lag p99 4.5ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 18000 of 18000 = 210.2/s   QueueTimeouts 0   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 291/s)
+  latency ms 200: n=   118  p50    847.1  p99   1167.0
+  latency ms 409: n= 17882  p50  13984.4  p99  25490.1
+  latency ms all served: p50  13890.1  p99  25488.6
+  seller CPU mean 77% max 98%   db CPU mean 41% max 58%
+  pg: busy samples 812/940, mean lock waiters (busy) 8.08
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m7rep_300rps_rep2_fastpath0   [seller env verified: safe 0 10 0 (container 5f93471f60ff)]
+  arrivals delivered 300.3/s   sched lag p99 4.2ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 18000 of 18000 = 215.5/s   QueueTimeouts 0   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 291/s)
+  latency ms 200: n=   117  p50    653.3  p99   1041.8
+  latency ms 409: n= 17883  p50  13079.9  p99  23331.4
+  latency ms all served: p50  13028.8  p99  23328.5
+  seller CPU mean 78% max 96%   db CPU mean 42% max 60%
+  pg: busy samples 775/873, mean lock waiters (busy) 8.09
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m7rep_300rps_rep3_fastpath0   [seller env verified: safe 0 10 0 (container c873f1579a86)]
+  arrivals delivered 300.3/s   sched lag p99 5.4ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 18000 of 18000 = 213.2/s   QueueTimeouts 0   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 291/s)
+  latency ms 200: n=   118  p50   1161.1  p99   2490.8
+  latency ms 409: n= 17882  p50  16254.2  p99  24243.3
+  latency ms all served: p50  16161.3  p99  24240.4
+  seller CPU mean 77% max 98%   db CPU mean 40% max 61%
+  pg: busy samples 761/907, mean lock waiters (busy) 8.08
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m7rep_300rps_rep1_fastpath1   [seller env verified: safe 0 10 1 (container f40b9fb5c026)]
+  arrivals delivered 300.3/s   sched lag p99 3.8ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 18000 of 18000 = 300.3/s   QueueTimeouts 0   -> KEEPS UP (needs 0 QueueTimeouts and >= 291/s)
+  latency ms 200: n=   119  p50    791.4  p99   1244.0
+  latency ms 409: n= 17881  p50     13.1  p99   1075.9
+  latency ms all served: p50     13.2  p99   1083.6
+  seller CPU mean 71% max 103%   db CPU mean 27% max 51%
+  pg: busy samples 65/651, mean lock waiters (busy) 1.38
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m7rep_300rps_rep2_fastpath1   [seller env verified: safe 0 10 1 (container 4ba85ea613dc)]
+  arrivals delivered 300.4/s   sched lag p99 2.9ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 18000 of 18000 = 300.3/s   QueueTimeouts 0   -> KEEPS UP (needs 0 QueueTimeouts and >= 291/s)
+  latency ms 200: n=   121  p50    786.7  p99   1127.8
+  latency ms 409: n= 17879  p50     11.0  p99    933.2
+  latency ms all served: p50     11.1  p99    950.5
+  seller CPU mean 73% max 104%   db CPU mean 27% max 57%
+  pg: busy samples 84/674, mean lock waiters (busy) 1.01
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m7rep_300rps_rep3_fastpath1   [seller env verified: safe 0 10 1 (container 59f5da4d2b0a)]
+  arrivals delivered 300.4/s   sched lag p99 2.4ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 18000 of 18000 = 300.3/s   QueueTimeouts 0   -> KEEPS UP (needs 0 QueueTimeouts and >= 291/s)
+  latency ms 200: n=   118  p50    696.9  p99   1441.2
+  latency ms 409: n= 17882  p50      8.6  p99    800.3
+  latency ms all served: p50      8.6  p99    859.0
+  seller CPU mean 73% max 95%   db CPU mean 25% max 44%
+  pg: busy samples 69/657, mean lock waiters (busy) 1.23
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

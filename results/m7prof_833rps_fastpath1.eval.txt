@@ -1,0 +1,11 @@
+
+=== m7prof_833rps_fastpath1   [seller env verified: safe 0 10 1 (container 583eeb4add4b)]
+  arrivals delivered 837.7/s   sched lag p99 116.9ms   max worker s>=90%: 5   sent-no-answer: 46
+  CLIENT: NOT CLEAN ['sched p99 <100ms', 'worker >=90% <=3s', '0 sent-no-answer']
+  served 19373 of 25000 = 291.5/s   QueueTimeouts 5581   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 808/s)
+  latency ms 200: n=   127  p50   5415.9  p99  15151.3
+  latency ms 409: n= 19246  p50  25383.4  p99  44231.7
+  latency ms all served: p50  25223.0  p99  44223.2
+  seller CPU mean 73% max 106%   db CPU mean 26% max 56%
+  pg: busy samples 90/792, mean lock waiters (busy) 0.93
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

@@ -1,0 +1,27 @@
+main-thread samples: 1998  idle (in select): 261 (13.1%)  busy: 1737 (86.9%)
+
+busy time by SELF frame (where the CPU was):
+   34.4%  asyncio loop / sockets
+   24.6%  uvicorn/h11/httptools HTTP
+   14.2%  fastapi/starlette framework
+    6.9%  logging (access log)
+    6.4%  asyncpg driver
+    2.4%  other: urllib/parse.py
+    2.1%  json
+    1.2%  other: copy.py
+    1.1%  pydantic validation
+    0.9%  other: re/__init__.py
+    0.8%  other: _weakrefset.py
+    0.7%  other: <frozen _collections_abc>
+
+busy time INCLUSIVE (stack passes through):
+  100.0%  asyncio loop / sockets
+  100.0%  uvicorn/h11/httptools HTTP
+  100.0%  other: uvicorn
+  100.0%  other: click/core.py
+   59.6%  fastapi/starlette framework
+   16.9%  asyncpg driver
+   13.0%  app.py handler
+    9.6%  logging (access log)
+    2.4%  other: urllib/parse.py
+    2.1%  json

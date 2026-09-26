@@ -1,0 +1,33 @@
+
+requests=25000  open loop @ 833.33/s  tickets=100  request_ids sent >1 time=4222
+responses: {200: 127, 409: 19246, 'ReadTimeout': 46, 'QueueTimeout': 5581}
+transport failures: never sent=5581  sent, no answer=46
+throughput: 375.2 req/s over 66.63s (storm only)   max in-flight: 2000 (sum of per-worker maxima [250, 250, 250, 250, 250, 250, 250, 250]) (connection cap 2000)
+arrivals delivered: 837.7/s over 29.84s (target 833.33/s over 30.00s)
+  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure
+buyer CPU per 1s sample, per worker process (max queued in any worker: 1971):
+  worker 0: p50=  26%  max= 111%  seconds >= 90%: 5 of 64
+  worker 1: p50=  28%  max= 104%  seconds >= 90%: 5 of 64
+  worker 2: p50=  28%  max= 112%  seconds >= 90%: 4 of 64
+  worker 3: p50=  28%  max= 109%  seconds >= 90%: 4 of 64
+  worker 4: p50=  28%  max= 116%  seconds >= 90%: 5 of 64
+  worker 5: p50=  28%  max= 106%  seconds >= 90%: 5 of 64
+  worker 6: p50=  29%  max= 104%  seconds >= 90%: 3 of 63
+  worker 7: p50=  27%  max= 126%  seconds >= 90%: 5 of 64
+latency ms           n      p50      p99      max
+  all           25000  30001.1  43783.6  52514.7
+  200             127   5415.9  15151.3  21052.4
+  409           19246  25383.4  44231.7  52514.7
+  QueueTimeout   5581  30002.6  30013.4  30038.5
+  ReadTimeout      46  36196.3  48939.8  48939.8
+  sched lag     25000      1.5    116.9    330.5
+  queue wait    25000  24231.5  30002.5  30037.7
+  send lag      25000  24232.9  30007.0  30038.5
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)
