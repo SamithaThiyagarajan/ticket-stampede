@@ -1,24 +1,35 @@
 #!/usr/bin/env bash
 # One instrumented benchmark run with a verified seller configuration.
-#   [FASTPATH=0|1] scripts/bench.sh NAME WORK_DELAY_MS DB_POOL_SIZE [buyer args...]
+#   [FASTPATH=0|1] [WORKERS=n] scripts/bench.sh NAME WORK_DELAY_MS DB_POOL_SIZE [buyer args...]
 # FASTPATH (default 1) = SOLDOUT_FASTPATH; 0 reproduces the M7 baseline code path.
+# WORKERS (default 1) = uvicorn worker processes (WEB_CONCURRENCY).
 # Writes results/NAME.{txt,json.gz,pgsample.jsonl,pgsample.txt,dockerstats.csv,env}
 set -euo pipefail
 export MSYS_NO_PATHCONV=1          # Git Bash on Windows would rewrite /results/... paths
 cd "$(dirname "$0")/.."
 NAME=$1 DELAY=$2 POOL=$3; shift 3
 FASTPATH=${FASTPATH:-1}
+WORKERS=${WORKERS:-1}
 R=results/$NAME
 
 # Seller config is set explicitly on every run; never inherited from the shell.
 SELLER_MODE=safe WORK_DELAY_MS=$DELAY DB_POOL_SIZE=$POOL SELLER_SCHEMA= SOLDOUT_FASTPATH=$FASTPATH \
-  docker compose up -d --force-recreate seller >/dev/null 2>&1
+  SELLER_WORKERS=$WORKERS docker compose up -d --force-recreate seller >/dev/null 2>&1
 sleep 3
-ENV=$(docker compose exec -T seller printenv SELLER_MODE WORK_DELAY_MS DB_POOL_SIZE SOLDOUT_FASTPATH | tr '\n' ' ')
+ENV=$(docker compose exec -T seller printenv SELLER_MODE WORK_DELAY_MS DB_POOL_SIZE SOLDOUT_FASTPATH WEB_CONCURRENCY | tr '\n' ' ')
 SELLER_ID=$(docker compose ps -q seller)
-WANT="safe $DELAY $POOL $FASTPATH "
+WANT="safe $DELAY $POOL $FASTPATH $WORKERS "
 [ "$ENV" = "$WANT" ] || { echo "ABORT: seller env is '$ENV', wanted '$WANT'"; exit 1; }
-echo "seller env verified: $ENV(container ${SELLER_ID:0:12})" | tee "$R.env"
+# Verify the ACTUAL worker count, not just the setting: each worker opens a full pool
+# (min_size = max_size) at startup, so live seller connections must equal WORKERS x POOL.
+WANT_CONNS=$(( WORKERS * POOL ))
+for _ in $(seq 30); do
+  CONNS=$(docker compose exec -T db psql -U tickets -tAc \
+    "select count(*) from pg_stat_activity where datname='tickets' and backend_type='client backend' and pid<>pg_backend_pid()")
+  [ "$CONNS" = "$WANT_CONNS" ] && break; sleep 1
+done
+[ "$CONNS" = "$WANT_CONNS" ] || { echo "ABORT: $CONNS seller DB connections, wanted $WANT_CONNS (= $WORKERS workers x $POOL)"; exit 1; }
+echo "seller env verified: $ENV(container ${SELLER_ID:0:12}; $CONNS DB connections = $WORKERS workers x $POOL)" | tee "$R.env"
 
 docker compose run --rm -T --no-deps --name "${NAME}_sampler" --entrypoint python buyer \
   pgsample.py --duration 1800 --out "/$R.pgsample.jsonl" >/dev/null 2>&1 &

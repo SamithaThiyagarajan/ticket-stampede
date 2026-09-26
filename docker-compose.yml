@@ -21,6 +21,7 @@ services:
       SELLER_SCHEMA: ${SELLER_SCHEMA:-}
       SOLDOUT_FASTPATH: ${SOLDOUT_FASTPATH:-1}
       WORK_DELAY_MS: ${WORK_DELAY_MS:-50}
+      WEB_CONCURRENCY: ${SELLER_WORKERS:-1}   # uvicorn worker processes
     ports:
       - "8000:8000"
     depends_on:

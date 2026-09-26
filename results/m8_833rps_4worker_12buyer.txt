@@ -1,0 +1,38 @@
+
+requests=25000  open loop @ 833.33/s  tickets=100  request_ids sent >1 time=4222
+responses: {200: 130, 409: 23108, 'ReadError': 55, 'QueueTimeout': 1707}
+transport failures: never sent=1707  sent, no answer=55
+throughput: 391.7 req/s over 63.83s (storm only)   max in-flight: 2004 (sum of per-worker maxima [167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167]) (connection cap 2000)
+arrivals delivered: 812.3/s over 30.78s (target 833.33/s over 30.00s)
+served by server: 23238 responses, 364.5/s over 63.76s (first send -> last answer)
+  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure
+buyer CPU per 1s sample, per worker process (max queued in any worker: 1107):
+  worker 0: p50=  94%  max= 103%  seconds >= 90%: 32 of 48
+  worker 1: p50=  98%  max= 105%  seconds >= 90%: 41 of 49
+  worker 2: p50=  97%  max= 104%  seconds >= 90%: 40 of 51
+  worker 3: p50=  94%  max= 104%  seconds >= 90%: 35 of 52
+  worker 4: p50=  97%  max= 104%  seconds >= 90%: 35 of 49
+  worker 5: p50=  96%  max= 104%  seconds >= 90%: 37 of 50
+  worker 6: p50=  97%  max= 103%  seconds >= 90%: 38 of 50
+  worker 7: p50=  94%  max= 103%  seconds >= 90%: 36 of 48
+  worker 8: p50=  97%  max= 104%  seconds >= 90%: 43 of 50
+  worker 9: p50=  97%  max= 103%  seconds >= 90%: 39 of 51
+  worker 10: p50=  96%  max= 103%  seconds >= 90%: 36 of 51
+  worker 11: p50=  96%  max= 103%  seconds >= 90%: 38 of 49
+latency ms           n      p50      p99      max
+  all           25000  20064.7  38907.3  54086.5
+  200             130   1875.9   3581.2   7707.7
+  409           23108  18797.5  39003.1  54086.5
+  QueueTimeout   1707  30268.3  30965.4  31080.3
+  ReadError        55  25061.7  40521.7  40521.7
+  sched lag     25000    175.5   2862.0   3321.9
+  queue wait    25000  14257.5  30212.7  30470.5
+  send lag      25000  14594.7  30476.9  31080.3
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)

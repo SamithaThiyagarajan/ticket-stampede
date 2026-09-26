@@ -1,0 +1,11 @@
+
+=== m8_client_833rps_1seller_8buyer   [seller env verified: safe 0 10 1 (container 1b2bfaed4d13)]
+  arrivals delivered 837.2/s   sched lag p99 50.2ms   max worker s>=90%: 3   sent-no-answer: 22
+  CLIENT: NOT CLEAN ['0 sent-no-answer']
+  served 23571 of 25000 = 361.7/s   QueueTimeouts 1407   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 808/s)
+  latency ms 200: n=   123  p50   2639.1  p99   8094.1
+  latency ms 409: n= 23448  p50  19623.8  p99  38847.1
+  latency ms all served: p50  19539.1  p99  38844.0
+  seller CPU mean 84% max 105%   db CPU mean 26% max 58%
+  pg: busy samples 79/760, mean lock waiters (busy) 2.04
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

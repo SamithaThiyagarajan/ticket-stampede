@@ -235,7 +235,41 @@
   - Caveats: py-spy pauses the process per sample (proportions, not absolute speed); one run.
   - Found: buyer image was stale (built before the `served by server` report line); JSON format unaffected, `run_eval.py` computes from JSON. Rebuild before the next run.
 
+- **M8 client-capacity validation — PRE-REGISTERED before running:** current seller unchanged (1 uvicorn worker, fastpath=1, pool 10, 0ms); 25,000 arrivals @ 833.33/s (30s), 8 buyer workers, cap 2000, seed 1. Same client-clean criteria (arrivals ±2%, sched p99 <100ms, no worker ≥90% >3s, 0 sent-no-answer, seller unchanged). Scope: shows whether the buyer delivers arrivals cleanly while the seller is saturated (backpressure); it cannot show the buyer handles 833 *answers*/s — that is re-checked on every multi-worker run. If the buyer degrades there, add buyer workers stepwise (measured), keeping buyer + seller + db within 16 CPUs.
+
+- **M8 client-capacity RESULT** (`results/m8_client_833rps_1seller_8buyer.*`): arrivals 837.2/s; sched lag p99 50.2ms; max worker hot seconds 3 (limit ≤3); buyer container CPU mean 298% / max 712% across 8 processes (~37% each); served 23,571 (361.7/s), 1,407 QueueTimeouts; 5/5 correctness PASS. **Strict verdict: NOT CLEAN** (22 sent-no-answer). Diagnosis: all 22 are `ReadTimeout` at exactly 30.0s after send; slowest answered request 29.2s; seller logged exactly 23,571 `/buy` = client-received (the 22 were never answered); 0 late-confirmed sales. → **The buyer is not the bottleneck; the errors are server-side saturation.** No extra buyer workers needed yet.
+  - **Criterion flaw exposed (not changed by me):** "0 sent-no-answer" also fires when a saturated server fails to answer within the timeout, so every saturated single-worker run at 833/s is INVALID by construction. Proposed refinement for the user to decide: early transport failures (ReadError / RemoteProtocolError / timeouts well before the limit) → client/network → INVALID; `ReadTimeout` at the full timeout with client CPU/lag clean → server outcome, reported as unanswered (like QueueTimeout), not invalidating. Until decided, runs are reported under the strict rule plus this breakdown.
+- **M8 multi-worker seller:** `Dockerfile` no longer hard-codes `--workers 1`; uvicorn reads `WEB_CONCURRENCY` (compose: `${SELLER_WORKERS:-1}` → default still 1 worker). `app.py` untouched. Each worker has its own pool → DB connections = 10 × W (confound, recorded). `bench.sh` sets + verifies `WEB_CONCURRENCY` and verifies the **actual** worker count via live seller DB connections = W × POOL. Functional check at W=4: parent + 4 server processes, 40 connections, all branches correct.
+- **M8 before/after — PRE-REGISTERED before running:** workload identical to the client-capacity test (25,000 @ 833.33/s, 8 buyer workers, cap 2000, 0ms, pool 10 per worker, fastpath=1, seed 1). W = 1 (fresh, post-change regression/baseline), 2, 4. Report per run: strict validity + error breakdown; served/s, 200s, 409s, QueueTimeouts, p50/p99, seller/db CPU, lock waiters, buyer CPU/lag, 5 checks.
+  - **Prediction (hypothesis under test):** served/s rises with W until another bottleneck (Postgres CPU, lock contention, host CPU, or the buyer) takes over; all 5 invariants pass at every W. Expected: W=2 ≈ 1.6–2× W=1; W=4 may reach the 833/s arrival rate (then only "keeps up" can be claimed — the arrival rate caps measurable throughput). A buyer that degrades as answers speed up → that run INVALID, add buyer workers stepwise.
+
+- **M8 before/after RESULTS (8 buyer workers) — ALL THREE INVALID** (`results/m8_833rps_{1,2,4}worker.*`, summary `results/m8_833rps_summary.txt`):
+
+  | seller workers (verified conns) | 1 (10) | 2 (20) | 4 (40) |
+  |---|---|---|---|
+  | client (strict) | NOT CLEAN: 5 hot s; 37 sent-no-answer (all ReadTimeout @30s) | NOT CLEAN: arrivals 772.5/s, sched p99 3,860ms, 48 hot s, 51 early ReadError | NOT CLEAN: sched p99 4,120ms, 41 hot s, 21 early ReadError |
+  | buyer CPU mean/max (8 procs) | 243/819% | 800/873% | 668/867% |
+  | served/s | 341.8 | 285.3 | 492.0 |
+  | QueueTimeouts | 2,660 | 5,844 | 0 |
+  | 409 latency p50/p99 | 21.7s / 40.4s | 22.8s / 45.7s | 13.6s / 25.0s |
+  | seller CPU mean/max | 78/105% | 95/210% | 164/355% |
+  | db CPU mean/max | 27/54% | 28/73% | 44/143% |
+  | lock waiters (busy) | 1.03 | 3.84 | 8.11 |
+  | correctness | 5/5 | 5/5 | 5/5 |
+
+  - As the seller speeds up, the 8-worker buyer saturates (all 8 pegged at W=2) and fails with *early* ReadErrors → client-limited. W=2's lower served/s reflects the client delivering only 772/s, not a slower seller.
+  - W=4 answered every request it received (0 QueueTimeouts) at 492/s while the client was degraded → signal the seller got faster; its capacity (≥ 492/s) is unmeasured. **Not evidence.**
+  - Invariants 5/5 at W = 1, 2, 4 with no application lock: correctness across processes holds in all three runs (valid regardless of client state, since checks are on server rows).
+  - Host CPU budget becomes binding: W=4 peaks ≈ buyer 867% + seller 355% + db 143% ≈ 13.6 of 16 cores.
+- **Step authorized by the user: 12 buyer workers** (cap 2000 total → ~167 connections each). Added check: host saturation = sum of all containers' CPU per docker-stats sample (flag if ≥ 1400% of 1600%). Order: W=4 first; run the W=1/2 before-pair with 12 buyers only if W=4 is client-clean.
+
+- **M8 12-buyer step — INVALID, host saturated** (`results/m8_833rps_4worker_12buyer.*`): W=4, 12 buyer workers. Arrivals 812.3/s (outside ±2%), sched p99 2,862ms, 43 hot s, 55 early ReadError; buyer CPU mean 1,200% / max 1,473%; **host (sum of containers) ≥1400% in 15 of 20 samples**, mean 1,352%; seller 216/409%, db 54/101%; served 364.5/s, 1,707 QueueTimeouts; 5/5 correctness. More buyer processes consumed more CPU without making the client clean and took CPU from the system under test. Stopped here per the user's constraint (don't starve seller/Postgres).
+  - **Conclusion: on this single 16-CPU host, the Python/httpx buyer cannot generate 833/s cleanly against a multi-worker seller** — the load generator, not the seller, is the binding constraint for this experiment. The before/after throughput comparison at 833/s is **undecided**. Why the buyer's CPU per request rises sharply when the server answers faster is not diagnosed.
+  - What IS established: all 5 invariants held across 1, 2 and 4 seller processes with no application lock (4 runs); W=4 answered every request it received at ≥ 492/s under a degraded client (signal only).
+
 ## Open questions / to revisit
+- **Seller multi-worker capacity is unmeasured.** Options: (1) pre-registered keeps-up test at a rate the client can drive cleanly (like the 300/s A/B), e.g. W=1 vs W=4 at ~500/s; (2) a more efficient load generator (aiohttp, or a compiled open-loop tool) — now justified by measured client cost; (3) buyer on a separate machine.
+- **Criterion refinement pending the user's decision:** ReadTimeout at the full timeout with a clean client = server outcome vs early transport failures = client/network.
 - **Where do the ~8s per 409 go with the fast path on?** Candidate tests: (1) arrival rate the client can sustain (e.g. 300/s) with fast path 0 vs 1 — if fast-path capacity > 226/s, it keeps up where baseline cannot; (2) py-spy on the seller during load; (3) server-side timing of pool-acquire vs handler.
 - **Run-to-run variance (−17% on identical config)** and occasional client degradation (pool 20) — unexplained. Needs repeated runs per config before any fine-grained claim.
 - **What should the WAL question's answer be backed by?** Sold-out path (`FOR UPDATE` + `SELECT` + `COMMIT`) shows the holder in `WALSync` 41% of the time. To demonstrate (not assert) before explaining.

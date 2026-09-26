@@ -1,0 +1,36 @@
+
+=== m8_833rps_1worker   [seller env verified: safe 0 10 1 1 (container 37ffba982a32; 10 DB connections = 1 workers x 10)]
+  arrivals delivered 836.9/s   sched lag p99 99.3ms   max worker s>=90%: 5   sent-no-answer: 37
+  CLIENT: NOT CLEAN ['worker >=90% <=3s', '0 sent-no-answer']
+  served 22303 of 25000 = 341.8/s   QueueTimeouts 2660   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 808/s)
+  latency ms 200: n=   133  p50   3638.3  p99   9483.8
+  latency ms 409: n= 22170  p50  21653.9  p99  40397.0
+  latency ms all served: p50  21541.1  p99  40360.9
+  seller CPU mean 78% max 105%   db CPU mean 27% max 54%
+  pg: busy samples 91/723, mean lock waiters (busy) 1.03
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m8_833rps_2worker   [seller env verified: safe 0 10 1 2 (container fa2c7215d809; 20 DB connections = 2 workers x 10)]
+  arrivals delivered 772.5/s   sched lag p99 3859.8ms   max worker s>=90%: 48   sent-no-answer: 51
+  CLIENT: NOT CLEAN ['arrivals +-2%', 'sched p99 <100ms', 'worker >=90% <=3s', '0 sent-no-answer']
+  served 19105 of 25000 = 285.3/s   QueueTimeouts 5844   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 808/s)
+  latency ms 200: n=   124  p50   1597.6  p99   7499.4
+  latency ms 409: n= 18981  p50  22840.3  p99  45702.7
+  latency ms all served: p50  22734.6  p99  45633.2
+  seller CPU mean 95% max 210%   db CPU mean 28% max 73%
+  pg: busy samples 75/784, mean lock waiters (busy) 3.84
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m8_833rps_4worker   [seller env verified: safe 0 10 1 4 (container 87d8969b691d; 40 DB connections = 4 workers x 10)]
+  arrivals delivered 836.6/s   sched lag p99 4120.0ms   max worker s>=90%: 41   sent-no-answer: 21
+  CLIENT: NOT CLEAN ['sched p99 <100ms', 'worker >=90% <=3s', '0 sent-no-answer']
+  served 24979 of 25000 = 492.0/s   QueueTimeouts 0   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 808/s)
+  latency ms 200: n=   124  p50   2214.1  p99   3408.2
+  latency ms 409: n= 24855  p50  13605.1  p99  24974.0
+  latency ms all served: p50  13581.4  p99  24969.9
+  seller CPU mean 164% max 355%   db CPU mean 44% max 143%
+  pg: busy samples 94/600, mean lock waiters (busy) 8.11
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+  1 worker(s): sent-no-answer= 37 {'ReadTimeout': 37}; ReadTimeout at full 30s timeout=37; early failures=0
+  2 worker(s): sent-no-answer= 51 {'ReadError': 51}; ReadTimeout at full 30s timeout=0; early failures=51
+  4 worker(s): sent-no-answer= 21 {'ReadError': 21}; ReadTimeout at full 30s timeout=0; early failures=21

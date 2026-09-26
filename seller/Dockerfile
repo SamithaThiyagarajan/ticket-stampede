@@ -3,5 +3,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-# Single worker on purpose: multiple workers = multiple processes = the multi-instance problem.
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Worker processes come from $WEB_CONCURRENCY (uvicorn's default for --workers; compose
+# defaults it to 1). Each worker is a separate process with its own DB pool, so all
+# correctness must hold across processes: it lives in Postgres (row lock, one-snapshot
+# fast path, constraints), never in process memory.
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
