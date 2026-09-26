@@ -179,6 +179,34 @@
   - **Correction (mine):** the pool sweep cannot distinguish H1 (lock is the ceiling) from H3 (seller process is the ceiling and inflates lock-hold time via `idle in transaction`). Both predict "more pool doesn't help". My summaries "row lock confirmed as bottleneck" overstated the correlational evidence. Current status: **lock contention = demonstrated and removable; lock as the throughput ceiling = NOT shown; seller process = leading suspect, untested.**
   - Also unexplained: why the same client config pegs when the server answers differently.
 
+- **300/s fast-path A/B — PRE-REGISTERED before either run** (decision by the user): 18,000 arrivals @ 300/s (60s), 8 workers, cap 2000, 0ms, pool 10, in-network, seed 1; identical code, only `SOLDOUT_FASTPATH` 0 vs 1 (set + verified by `bench.sh`, re-checked externally).
+  - **Client-clean (same criteria as the sweep):** arrivals within ±2% of 300/s; sched lag p99 < 100ms; no worker ≥90% CPU > 3s; 0 sent-no-answer; seller container unchanged. A run failing these is INVALID.
+  - **"Keeps up":** 0 QueueTimeouts AND served ≥ 97% of arrivals over the arrival window + drain, i.e. served/s ≥ 291 while arrivals last. **"Falls behind":** any QueueTimeouts OR served/s < 291.
+  - **Interpretation:** fastpath=0 falls behind AND fastpath=1 keeps up → supports the lock being a significant ceiling. Both fall behind similarly → the lock is not the primary ceiling → profile the seller before any further optimization. Any other pattern → report as-is, no forced interpretation.
+
+- **300/s fast-path A/B RESULTS** (`results/m7ab_300rps_*`, `scripts/run_eval.py`, summary `results/m7ab_300rps_summary.txt`):
+
+  | | fastpath=0 | fastpath=1 |
+  |---|---|---|
+  | arrivals delivered | 300.3/s | 300.4/s |
+  | sched lag p99 / max worker s≥90% | 7.1ms / 0 | 3.4ms / 0 |
+  | sent-no-answer | 0 | **1** (ReadError at t=23.09s, 15ms, no queue wait) |
+  | **client (pre-registered)** | **CLEAN** | **NOT CLEAN** (1 sent-no-answer) |
+  | served | 18000/18000 = **196.1/s** | 17999/18000 = **300.3/s** |
+  | QueueTimeouts | 0 | 0 |
+  | keeps up (pre-registered) | **FALLS BEHIND** | KEEPS UP |
+  | 409 latency p50 / p99 | 17,753 / 31,464 ms | **11.1 / 1,171 ms** |
+  | 200 latency p50 / p99 | 1,393 / 3,319 ms | 1,038 / 1,880 ms |
+  | seller CPU mean / max | 80% / 97% | 71% / 100% |
+  | db CPU mean / max | 44% / 64% | 22% / 42% |
+  | pg busy samples / mean lock waiters | 845 of 959 / 8.10 | 59 of 612 / 1.54 |
+  | correctness | 5/5 PASS | 5/5 PASS |
+
+  - **Strict pre-registered outcome: not decided** — fastpath=0 is a valid "falls behind"; fastpath=1 "keeps up" but is invalid by the client rule (one isolated ReadError). Criteria not relaxed after the fact.
+  - Effect size if the fastpath=1 run is taken at face value: served 196 → 300/s (= arrival rate), 409 p50 17.8s → 11ms. One isolated error cannot plausibly produce that, but that judgment is not the pre-registered test.
+  - Reconciliation with the invalid 833/s run (if replicated): the lock is a significant ceiling around ~200–230/s; removing it moves the ceiling above 300/s; at 833/s a further ceiling appears (seller CPU reached 100% max even at 300/s → leading suspect), masked by client contamination.
+  - fastpath=0 at 300/s served 196/s vs 226/s in the 833/s baseline — consistent with the known run-to-run variance.
+
 ## Open questions / to revisit
 - **Where do the ~8s per 409 go with the fast path on?** Candidate tests: (1) arrival rate the client can sustain (e.g. 300/s) with fast path 0 vs 1 — if fast-path capacity > 226/s, it keeps up where baseline cannot; (2) py-spy on the seller during load; (3) server-side timing of pool-acquire vs handler.
 - **Run-to-run variance (−17% on identical config)** and occasional client degradation (pool 20) — unexplained. Needs repeated runs per config before any fine-grained claim.

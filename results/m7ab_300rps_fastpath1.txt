@@ -1,0 +1,31 @@
+
+requests=18000  open loop @ 300.0/s  tickets=100  request_ids sent >1 time=3052
+responses: {200: 118, 409: 17881, 'ReadError': 1}
+transport failures: never sent=0  sent, no answer=1
+throughput: 299.9 req/s over 60.03s (storm only)   max in-flight: 395 (sum of per-worker maxima [49, 49, 50, 50, 49, 51, 50, 47]) (connection cap 2000)
+arrivals delivered: 300.4/s over 59.92s (target 300.0/s over 60.00s)
+buyer CPU per 1s sample, per worker process (max queued in any worker: 0):
+  worker 0: p50=  17%  max=  42%  seconds >= 90%: 0 of 59
+  worker 1: p50=  17%  max=  43%  seconds >= 90%: 0 of 59
+  worker 2: p50=  17%  max=  44%  seconds >= 90%: 0 of 59
+  worker 3: p50=  17%  max=  44%  seconds >= 90%: 0 of 59
+  worker 4: p50=  18%  max=  42%  seconds >= 90%: 0 of 59
+  worker 5: p50=  18%  max=  43%  seconds >= 90%: 0 of 59
+  worker 6: p50=  17%  max=  40%  seconds >= 90%: 0 of 59
+  worker 7: p50=  17%  max=  40%  seconds >= 90%: 0 of 59
+latency ms           n      p50      p99      max
+  all           18000     11.2   1197.3   2545.3
+  200             118   1037.6   1879.6   2016.8
+  409           17881     11.1   1171.3   2545.3
+  ReadError         1     15.2     15.2     15.2
+  sched lag     18000      0.9      3.4    146.6
+  queue wait    18000      0.1      0.2      4.8
+  send lag      18000      1.0      3.5    146.7
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)

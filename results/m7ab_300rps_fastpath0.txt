@@ -1,0 +1,30 @@
+
+requests=18000  open loop @ 300.0/s  tickets=100  request_ids sent >1 time=3052
+responses: {200: 119, 409: 17881}
+throughput: 196.0 req/s over 91.85s (storm only)   max in-flight: 2000 (sum of per-worker maxima [250, 250, 250, 250, 250, 250, 250, 250]) (connection cap 2000)
+arrivals delivered: 300.3/s over 59.93s (target 300.0/s over 60.00s)
+  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure
+buyer CPU per 1s sample, per worker process (max queued in any worker: 567):
+  worker 0: p50=  16%  max=  59%  seconds >= 90%: 0 of 91
+  worker 1: p50=  16%  max=  54%  seconds >= 90%: 0 of 91
+  worker 2: p50=  17%  max=  63%  seconds >= 90%: 0 of 91
+  worker 3: p50=  17%  max=  59%  seconds >= 90%: 0 of 91
+  worker 4: p50=  17%  max=  59%  seconds >= 90%: 0 of 91
+  worker 5: p50=  17%  max=  73%  seconds >= 90%: 0 of 91
+  worker 6: p50=  17%  max=  68%  seconds >= 90%: 0 of 91
+  worker 7: p50=  17%  max=  62%  seconds >= 90%: 0 of 91
+latency ms           n      p50      p99      max
+  all           18000  17624.7  31457.8  39398.0
+  200             119   1393.4   3318.8   6427.6
+  409           17881  17753.3  31463.9  39398.0
+  sched lag     18000      1.1      7.1    312.0
+  queue wait    18000   7557.4  21596.7  22265.2
+  send lag      18000   7558.1  21598.4  22266.7
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: PASS
