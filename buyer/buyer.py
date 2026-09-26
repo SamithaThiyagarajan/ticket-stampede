@@ -20,6 +20,7 @@ import asyncio
 import gzip
 import json
 import math
+import multiprocessing
 import random
 import time
 from collections import Counter, defaultdict
@@ -46,30 +47,41 @@ def build_jobs(n_requests, dup_fraction, dup_copies, seed):
     return jobs[:n_requests]
 
 
-async def run(args):
-    jobs = build_jobs(args.requests, args.dup_fraction, args.dup_copies, args.seed)
-    limits = httpx.Limits(max_connections=args.concurrency, max_keepalive_connections=args.concurrency)
+def storm_worker(args, k, n_workers, start_at):
+    """Process entry point: worker k sends arrivals i with i % n_workers == k."""
+    return asyncio.run(storm(args, k, n_workers, start_at))
+
+
+async def storm(args, k, n_workers, start_at):
+    # Every worker builds the same job list from the same seed and keeps its slice,
+    # still scheduled at start + i/rate, so the combined schedule is unchanged.
+    jobs = [(i, u, q) for i, (u, q) in enumerate(build_jobs(args.requests, args.dup_fraction,
+                                                            args.dup_copies, args.seed))
+            if i % n_workers == k]
+    cap = math.ceil(args.concurrency / n_workers)          # this worker's share of the connections
+    limits = httpx.Limits(max_connections=cap, max_keepalive_connections=cap)
     records, timeline = [], []
     in_flight = max_in_flight = queued = 0
+    # start_at is wall-clock (shared across processes); convert once to this process's perf_counter.
+    start = time.perf_counter() + (start_at - time.time())
 
     async def monitor():
-        # Buyer's own CPU (process_time covers all its threads) per second: proves
+        # This worker's own CPU (process_time covers all its threads) per second: proves
         # or disproves "the client is the bottleneck" with a timeline, not an average.
         t_prev, cpu_prev = time.perf_counter(), time.process_time()
         while True:
             await asyncio.sleep(1)
             t, cpu = time.perf_counter(), time.process_time()
-            timeline.append({"t": round(t - start, 1), "cpu_pct": round(100 * (cpu - cpu_prev) / (t - t_prev), 1),
+            timeline.append({"worker": k, "t": round(t - start, 1),
+                             "cpu_pct": round(100 * (cpu - cpu_prev) / (t - t_prev), 1),
                              "in_flight": in_flight, "queued": queued, "done": len(records)})
             t_prev, cpu_prev = t, cpu
 
     async with httpx.AsyncClient(base_url=args.url, limits=limits, timeout=args.timeout) as client:
-        r = await client.post("/reset", json={"tickets": args.tickets})
-        r.raise_for_status()
 
         async def send(i, user_id, request_id, t0, sched_lag=0.0, queue_wait=0.0):
             nonlocal in_flight, max_in_flight
-            rec = {"i": i, "user_id": user_id, "request_id": request_id,
+            rec = {"worker": k, "i": i, "user_id": user_id, "request_id": request_id,
                    "sched_lag_ms": sched_lag * 1000, "queue_wait_ms": queue_wait * 1000,
                    "send_lag_ms": (sched_lag + queue_wait) * 1000}
             in_flight += 1
@@ -86,7 +98,7 @@ async def run(args):
             rec["latency_ms"] = (time.perf_counter() - t0) * 1000
             records.append(rec)
 
-        sem = asyncio.Semaphore(args.concurrency)
+        sem = asyncio.Semaphore(cap)
 
         async def closed(i, user_id, request_id):
             async with sem:
@@ -101,7 +113,8 @@ async def run(args):
             try:
                 await asyncio.wait_for(sem.acquire(), timeout=args.timeout)
             except asyncio.TimeoutError:
-                records.append({"i": i, "user_id": user_id, "request_id": request_id, "status": "QueueTimeout",
+                records.append({"worker": k, "i": i, "user_id": user_id, "request_id": request_id,
+                                "status": "QueueTimeout",
                                 "sched_lag_ms": (woke - scheduled) * 1000,
                                 "queue_wait_ms": (time.perf_counter() - woke) * 1000,
                                 "send_lag_ms": (time.perf_counter() - scheduled) * 1000,
@@ -114,19 +127,40 @@ async def run(args):
             finally:
                 sem.release()
 
-        start = time.perf_counter()
+        await asyncio.sleep(max(0.0, start - time.perf_counter()))   # common start line
         mon = asyncio.create_task(monitor())
         if args.rate:
-            await asyncio.gather(*(opened(i, u, q) for i, (u, q) in enumerate(jobs)))
+            await asyncio.gather(*(opened(i, u, q) for i, u, q in jobs))
         else:
-            await asyncio.gather(*(closed(i, u, q) for i, (u, q) in enumerate(jobs)))
-        storm_s = time.perf_counter() - start   # excludes /reset and /status
+            await asyncio.gather(*(closed(i, u, q) for i, u, q in jobs))
+        end_at = start_at + (time.perf_counter() - start)
         mon.cancel()
 
-        status = (await client.get("/status")).json()
+    return {"records": records, "timeline": timeline, "max_in_flight": max_in_flight, "end_at": end_at}
 
-    return {"args": vars(args), "storm_seconds": storm_s, "max_in_flight": max_in_flight,
-            "timeline": timeline, "records": records, "status": status}
+
+def run(args):
+    """Main process: reset once, run the workers from a common start time, merge,
+    then read /status once for verification."""
+    with httpx.Client(base_url=args.url, timeout=args.timeout) as c:
+        c.post("/reset", json={"tickets": args.tickets}).raise_for_status()
+    start_at = time.time() + 3.0          # headroom for worker processes to spawn and import
+    n = args.processes
+    if n == 1:
+        parts = [storm_worker(args, 0, 1, start_at)]
+    else:
+        # spawn, not fork: each worker starts clean, with no inherited event-loop state.
+        with multiprocessing.get_context("spawn").Pool(n) as pool:
+            parts = pool.starmap(storm_worker, [(args, k, n, start_at) for k in range(n)])
+    storm_s = max(p["end_at"] for p in parts) - start_at   # excludes /reset and /status
+    with httpx.Client(base_url=args.url, timeout=args.timeout) as c:
+        status = c.get("/status").json()
+
+    return {"args": vars(args), "storm_seconds": storm_s,
+            "max_in_flight": sum(p["max_in_flight"] for p in parts),   # upper bound when n > 1
+            "max_in_flight_per_worker": [p["max_in_flight"] for p in parts],
+            "timeline": [s for p in parts for s in p["timeline"]],
+            "records": [r for p in parts for r in p["records"]], "status": status}
 
 
 def pct(xs, p):
@@ -208,16 +242,35 @@ def report(data):
     if transport:
         never = sum(1 for s in transport if s in NEVER_SENT)
         print(f"transport failures: never sent={never}  sent, no answer={len(transport) - never}")
+    per_worker = data.get("max_in_flight_per_worker")
+    inflight = (f"{data['max_in_flight']} (sum of per-worker maxima {per_worker})" if per_worker and len(per_worker) > 1
+                else str(data["max_in_flight"]))
     print(f"throughput: {len(records) / data['storm_seconds']:.1f} req/s over {data['storm_seconds']:.2f}s "
-          f"(storm only)   max in-flight: {data['max_in_flight']} (connection cap {args['concurrency']})")
-    if args.get("rate") and data["max_in_flight"] >= args["concurrency"]:
-        print("  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure")
+          f"(storm only)   max in-flight: {inflight} (connection cap {args['concurrency']})")
+    if args.get("rate"):
+        # Actual arrival time = scheduled + sched_lag: the rate the client really delivered.
+        arr = sorted(r["i"] / args["rate"] + r["sched_lag_ms"] / 1000 for r in records if "sched_lag_ms" in r)
+        if len(arr) > 1:
+            print(f"arrivals delivered: {(len(arr) - 1) / (arr[-1] - arr[0]):.1f}/s over {arr[-1] - arr[0]:.2f}s "
+                  f"(target {args['rate']}/s over {(len(arr) - 1) / args['rate']:.2f}s)")
+        # Throughput above counts client-side timeouts as completions; this counts only
+        # requests the server answered, over first send -> last answer.
+        served = [r for r in records if isinstance(r["status"], int)]
+        if len(served) > 1:
+            sent = min(r["i"] / args["rate"] + r["send_lag_ms"] / 1000 for r in served)
+            done = max(r["i"] / args["rate"] + r["latency_ms"] / 1000 for r in served)
+            print(f"served by server: {len(served)} responses, {len(served) / (done - sent):.1f}/s "
+                  f"over {done - sent:.2f}s (first send -> last answer)")
+        if data["max_in_flight"] >= args["concurrency"]:
+            print("  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure")
     tl = data.get("timeline") or []
     if tl:
-        cpu = [s["cpu_pct"] for s in tl]
-        print(f"buyer CPU per 1s sample: p50={pct(cpu, .5):.0f}%  max={max(cpu):.0f}%  "
-              f"(seconds >= 90%: {sum(c >= 90 for c in cpu)} of {len(cpu)})   "
-              f"max queued: {max(s['queued'] for s in tl)}")
+        by_worker = defaultdict(list)
+        for s in tl:
+            by_worker[s.get("worker", 0)].append(s["cpu_pct"])
+        print(f"buyer CPU per 1s sample, per worker process (max queued in any worker: {max(s['queued'] for s in tl)}):")
+        for w, cpu in sorted(by_worker.items()):
+            print(f"  worker {w}: p50={pct(cpu, .5):4.0f}%  max={max(cpu):4.0f}%  seconds >= 90%: {sum(c >= 90 for c in cpu)} of {len(cpu)}")
 
     print("latency ms           n      p50      p99      max")
     groups = [("all", records)] + [(str(c), [r for r in records if r["status"] == c]) for c in sorted(codes, key=str)]
@@ -254,6 +307,8 @@ def main():
     p.add_argument("--concurrency", type=int, default=200,
                    help="closed loop: worker count; both modes: HTTP connection cap")
     p.add_argument("--rate", type=float, help="open loop: arrivals per second")
+    p.add_argument("--processes", type=int, default=1,
+                   help="worker processes; arrivals split by i %% processes, connections split evenly")
     p.add_argument("--dup-fraction", type=float, default=0.2)
     p.add_argument("--dup-copies", type=int, default=2)
     p.add_argument("--timeout", type=float, default=30.0)
@@ -267,7 +322,7 @@ def main():
         with opener(args.recheck, "r") as f:
             data = json.load(f)
     else:
-        data = asyncio.run(run(args))
+        data = run(args)
         if args.out:
             # Raw evidence: every verdict and percentile can be re-derived from this file.
             with opener(args.out, "w") as f:

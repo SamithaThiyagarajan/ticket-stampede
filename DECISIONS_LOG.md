@@ -113,6 +113,21 @@
 - **Diagnostic, cap 200** (`results/m7_diag_5k_0ms_cap200.*`): 150.9 req/s, sched lag p50 198ms, 0 errors, PASS — but buyer still 104% CPU in 31/31 s while seller 48%, db 23%. **Single-process Python/httpx client ceiling on this machine ≈ 150 req/s, about 1/5 of the required 833/s.** Docker VM has 16 CPUs; benchmark uses ~2.5.
 - Bug fixed in `bench.sh`: awk `max` compared CPU strings lexically (db showed max < mean).
 
+- **M7 client fix (c) — multi-process buyer** (`--processes K`): main process resets, sets a common wall-clock start (+3s), spawns K workers (`spawn`, not `fork`); worker k sends arrivals `i % K == k` at the unchanged global schedule `start + i/rate`, with its own httpx client and `ceil(cap/K)` connections; main merges records, reads `/status` once, runs the unchanged `verify()`. Report adds achieved arrival rate (scheduled + sched_lag) and per-worker CPU.
+- **M7 validation, 5k @ 833/s, 8 workers, cap 2000, 0ms** (`results/m7_validate_5k_0ms_8proc.*`) — **PASSED all criteria:** arrivals delivered 835.4/s over 5.98s; sched lag p50 1.1ms, p99 66ms; 5000/5000 `/buy` in seller log; all 5 checks PASS, 0 errors. Per-worker CPU: 83–90% only in t=1–2s (opening 250 connections each), then 15–34% while arrivals continued at full rate, 13–15% while draining — client throughput is bounded by server responses (backpressure), not by CPU. The single-process ceiling (~150 req/s, 104% CPU) is gone.
+  - Early server signals (validation run, not conclusions): 8–9 of 10 sessions waiting on Lock in 95% of busy samples, one root blocker 97.8%; seller CPU peaked 102% (one core); lock holder mostly `idle in transaction` (111) or `WALSync` (88). Throughput under backpressure 208.5 req/s.
+
+- **M7 BASELINE — 50k arrivals / 60s / 0ms / pool 10 / 2000 conns / 8 buyer workers** (`results/m7_50k_0ms.*`):
+  - **Client not the bottleneck (valid run):** arrivals delivered 836.5/s over 59.77s; sched lag p50 1.2ms, p99 19.8ms; per-worker CPU p50 17%, max 82–86% (connection ramp only), 0 seconds ≥90% in any worker. Seller container unchanged during run.
+  - **Correctness: all 5 checks PASS** — 100 sold, 0 duplicates, 0 idempotency violations, no drift, every response consistent with `/status`, 0 late-confirmed sales.
+  - **Verdict INCONCLUSIVE** (as predicted by the user): 27,825 `QueueTimeout` (never sent — waited 30s for one of 2000 slots). 0 sent-no-answer. `/buy` in seller log = 22,175 = 132×200 + 22,043×409 exactly.
+  - **Server capacity: 226 req/s**, flat for the whole run (199, 231, 234, 231, 214 per 20s window). The sale itself was over at t≈3.1s (100th sale); **~97s and 99.4% of server work was answering "sold out" — each through the same locked row.**
+  - Latency: 200 p50 2.7s; 409 p50 37.5s (≈30s client queue + ~8s in server: Little's law 2000 in flight / 226 per s ≈ 8.9s).
+  - **pg sampler, 939 busy samples: waiting on Lock mean 8.13; 8 waiters in 76.9% of samples, 9 in 19.9% (8–9 in 96.8%); exactly one root blocker in 98.4%.** Ungranted: `tuple` 7.18, `transactionid` 0.90. **→ H1 prediction ("8–9 of 10 waiting on one holder") matches the observation.** Correlational; causal test = pool sweep.
+  - **What the lock holder is doing** (944 holder observations): `idle in transaction` 44% (DB waiting for the seller to send the next statement), `WALSync` 41% (commit fsync), `waiting_lock` 8% (sampling-transition artifact), CPU 4%. → lock hold time (~1/226 s ≈ 4.4ms) ≈ app round-trips + one WAL fsync. H3 (app) and H4 (fsync) are the components of H1's hold time, not competing explanations.
+  - CPU (docker stats mean/max): seller 72%/89%, db 42%/58%, buyer container 137%/306% across 8 processes.
+  - Report fix: the `throughput` line counts QueueTimeouts as completions (508 req/s — misleading); added `served by server` line (226.0/s). Verdict unchanged on recheck.
+
 ## Open questions / to revisit
 - ~~Transport errors~~ → resolved by D25 (Windows-side client path).
 - **Client send-lag jitter (0–27ms):** hypothesis = Windows ~15.6ms timer resolution. At 833/s arrivals would leave in bursts of ~13 rather than evenly. Average rate holds; burstiness must be reported with the 50k run.
