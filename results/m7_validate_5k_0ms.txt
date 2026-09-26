@@ -1,0 +1,24 @@
+
+requests=5000  open loop @ 833.33/s  tickets=100  request_ids sent >1 time=833
+responses: {200: 121, 409: 3242, 'ReadError': 8, 'QueueTimeout': 1629}
+transport failures: never sent=1629  sent, no answer=8
+throughput: 80.8 req/s over 61.87s (storm only)   max in-flight: 2000 (connection cap 2000)
+  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure
+buyer CPU per 1s sample: p50=104%  max=117%  (seconds >= 90%: 32 of 32)   max queued: 2863
+latency ms           n      p50      p99      max
+  all            5000  34019.5  59944.3  61663.0
+  200             121   6906.5   8189.7   8966.6
+  409            3242  43663.1  60123.8  61663.0
+  QueueTimeout   1629  33722.4  34586.7  34605.7
+  ReadError         8  24900.7  39273.8  39273.8
+  sched lag      5000   2345.2   4318.4   4338.6
+  queue wait     5000  10507.3  31764.3  31764.4
+  send lag       5000  14463.0  34546.3  34605.7
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)

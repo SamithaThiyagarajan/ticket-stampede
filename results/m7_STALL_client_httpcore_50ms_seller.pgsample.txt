@@ -1,0 +1,9 @@
+samples=1406  busy samples=1 (any seller session not idle)
+mean sessions per busy sample, by category:
+  idle                                       9.00
+  active:IO:DataFileImmediateSync            1.00
+sessions waiting on Lock (count -> % of busy samples):
+    0 -> 100.0%
+busy samples with exactly one root blocker: 0.0%
+root blocker's own state (how the lock holder spends its time): {}
+mean ungranted locks by type: {}

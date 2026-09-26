@@ -4,14 +4,20 @@ Closed loop (default): --concurrency workers, each sends its next request when t
 previous finishes. Measures throughput at a fixed concurrency; latency timer starts
 after the request gets its turn, so client-side queueing is excluded.
 
-Open loop (--rate R): request i is sent at start + i/R regardless of completions
+Open loop (--rate R): request i arrives at start + i/R regardless of completions
 (an arrival rate, like "50k people in 60s"). Latency is measured from the SCHEDULED
-time, so server queueing is not hidden (avoids coordinated omission). Send lag =
-actual send time - scheduled time; large lag means the client, not the server, is
-the bottleneck.
+time, so server queueing is not hidden (avoids coordinated omission). At most
+--concurrency requests are handed to httpx; later arrivals wait in our own queue
+(httpcore's pool rescans every queued request per event, which stalled the client at
+50k — see DECISIONS_LOG). Per request:
+  sched_lag  = how late the client woke for the arrival (client trouble)
+  queue_wait = time waiting for an in-flight slot (server backpressure)
+  send_lag   = sched_lag + queue_wait
+A request that waits longer than --timeout for a slot gives up as QueueTimeout.
 """
 import argparse
 import asyncio
+import gzip
 import json
 import math
 import random
@@ -19,6 +25,12 @@ import time
 from collections import Counter, defaultdict
 
 import httpx
+
+# Transport failures split by whether the server could have received the request.
+# Never sent: failed before the request left the client, so the server cannot have acted on it.
+NEVER_SENT = {"QueueTimeout", "PoolTimeout", "ConnectError", "ConnectTimeout"}
+# Anything else non-HTTP (ReadTimeout, ReadError, RemoteProtocolError, ...) = sent, no
+# answer: the server may have committed a sale the buyer never heard about.
 
 
 def build_jobs(n_requests, dup_fraction, dup_copies, seed):
@@ -37,16 +49,29 @@ def build_jobs(n_requests, dup_fraction, dup_copies, seed):
 async def run(args):
     jobs = build_jobs(args.requests, args.dup_fraction, args.dup_copies, args.seed)
     limits = httpx.Limits(max_connections=args.concurrency, max_keepalive_connections=args.concurrency)
-    records = []
-    in_flight = max_in_flight = 0
+    records, timeline = [], []
+    in_flight = max_in_flight = queued = 0
+
+    async def monitor():
+        # Buyer's own CPU (process_time covers all its threads) per second: proves
+        # or disproves "the client is the bottleneck" with a timeline, not an average.
+        t_prev, cpu_prev = time.perf_counter(), time.process_time()
+        while True:
+            await asyncio.sleep(1)
+            t, cpu = time.perf_counter(), time.process_time()
+            timeline.append({"t": round(t - start, 1), "cpu_pct": round(100 * (cpu - cpu_prev) / (t - t_prev), 1),
+                             "in_flight": in_flight, "queued": queued, "done": len(records)})
+            t_prev, cpu_prev = t, cpu
 
     async with httpx.AsyncClient(base_url=args.url, limits=limits, timeout=args.timeout) as client:
         r = await client.post("/reset", json={"tickets": args.tickets})
         r.raise_for_status()
 
-        async def send(i, user_id, request_id, t0, send_lag):
+        async def send(i, user_id, request_id, t0, sched_lag=0.0, queue_wait=0.0):
             nonlocal in_flight, max_in_flight
-            rec = {"i": i, "user_id": user_id, "request_id": request_id, "send_lag_ms": send_lag * 1000}
+            rec = {"i": i, "user_id": user_id, "request_id": request_id,
+                   "sched_lag_ms": sched_lag * 1000, "queue_wait_ms": queue_wait * 1000,
+                   "send_lag_ms": (sched_lag + queue_wait) * 1000}
             in_flight += 1
             max_in_flight = max(max_in_flight, in_flight)
             try:
@@ -65,24 +90,43 @@ async def run(args):
 
         async def closed(i, user_id, request_id):
             async with sem:
-                await send(i, user_id, request_id, time.perf_counter(), 0.0)
+                await send(i, user_id, request_id, time.perf_counter())
 
-        async def opened(i, user_id, request_id, start):
+        async def opened(i, user_id, request_id):
+            nonlocal queued
             scheduled = start + i / args.rate
             await asyncio.sleep(max(0.0, scheduled - time.perf_counter()))
-            await send(i, user_id, request_id, scheduled, time.perf_counter() - scheduled)
+            woke = time.perf_counter()
+            queued += 1
+            try:
+                await asyncio.wait_for(sem.acquire(), timeout=args.timeout)
+            except asyncio.TimeoutError:
+                records.append({"i": i, "user_id": user_id, "request_id": request_id, "status": "QueueTimeout",
+                                "sched_lag_ms": (woke - scheduled) * 1000,
+                                "queue_wait_ms": (time.perf_counter() - woke) * 1000,
+                                "send_lag_ms": (time.perf_counter() - scheduled) * 1000,
+                                "latency_ms": (time.perf_counter() - scheduled) * 1000})
+                return
+            finally:
+                queued -= 1
+            try:
+                await send(i, user_id, request_id, scheduled, woke - scheduled, time.perf_counter() - woke)
+            finally:
+                sem.release()
 
         start = time.perf_counter()
+        mon = asyncio.create_task(monitor())
         if args.rate:
-            await asyncio.gather(*(opened(i, u, q, start) for i, (u, q) in enumerate(jobs)))
+            await asyncio.gather(*(opened(i, u, q) for i, (u, q) in enumerate(jobs)))
         else:
             await asyncio.gather(*(closed(i, u, q) for i, (u, q) in enumerate(jobs)))
         storm_s = time.perf_counter() - start   # excludes /reset and /status
+        mon.cancel()
 
         status = (await client.get("/status")).json()
 
     return {"args": vars(args), "storm_seconds": storm_s, "max_in_flight": max_in_flight,
-            "records": records, "status": status}
+            "timeline": timeline, "records": records, "status": status}
 
 
 def pct(xs, p):
@@ -120,7 +164,14 @@ def verify(data):
     got_409 = {r["request_id"] for r in records if r["status"] == 409}
     told_soldout_but_holds = [q for q in got_409 if rows_of_user.get(user_of[q])]
     users_told_200 = {user_of[q] for q in told}
-    ambiguous_rows = [u for u in rows_of_user if u not in users_told_200]
+    outcomes = defaultdict(set)                   # user_id -> statuses of all its copies
+    for r in records:
+        outcomes[r["user_id"]].add(r["status"])
+    # Rows whose buyer never got a 200: either the server committed after the buyer
+    # gave up (late-confirmed, info), or every copy was never sent (impossible -> FAIL).
+    unconfirmed = [u for u in rows_of_user if u not in users_told_200 and 409 not in outcomes[u]]
+    never_sent_rows = [u for u in unconfirmed if outcomes[u] <= NEVER_SENT]
+    late_confirmed = [u for u in unconfirmed if not outcomes[u] <= NEVER_SENT]
 
     results = {
         "1 no oversell":        (len(tickets) <= total,
@@ -133,10 +184,11 @@ def verify(data):
                                  f"{len(inconsistent)} request_ids told different numbers (responses)"),
         "4 no drift":           (sold == len(tickets),
                                  f"/status sold={sold}, actual rows={len(tickets)}"),
-        "5 responses = state":  (not lost_or_wrong and not told_soldout_but_holds,
+        "5 responses = state":  (not lost_or_wrong and not told_soldout_but_holds and not never_sent_rows,
                                  f"{len(lost_or_wrong)} confirmed sales missing/wrong in /status; "
                                  f"{len(told_soldout_but_holds)} told sold-out but hold a ticket; "
-                                 f"(info) {len(ambiguous_rows)} rows whose buyer never got a 200"),
+                                 f"{len(never_sent_rows)} rows for never-sent requests; "
+                                 f"(info) {len(late_confirmed)} late-confirmed sales (sent, no answer, but committed)"),
     }
     unexpected = sum(1 for r in records if r["status"] not in (200, 409))
     return results, unexpected
@@ -152,10 +204,20 @@ def report(data):
     print(f"\nrequests={len(records)}  {mode}  tickets={data['status']['total_tickets']}  "
           f"request_ids sent >1 time={n_dup_ids}")
     print(f"responses: {dict(codes)}")
+    transport = [r["status"] for r in records if not isinstance(r["status"], int)]
+    if transport:
+        never = sum(1 for s in transport if s in NEVER_SENT)
+        print(f"transport failures: never sent={never}  sent, no answer={len(transport) - never}")
     print(f"throughput: {len(records) / data['storm_seconds']:.1f} req/s over {data['storm_seconds']:.2f}s "
           f"(storm only)   max in-flight: {data['max_in_flight']} (connection cap {args['concurrency']})")
     if args.get("rate") and data["max_in_flight"] >= args["concurrency"]:
-        print("  WARNING: connection cap reached; some latency is client-side queueing")
+        print("  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure")
+    tl = data.get("timeline") or []
+    if tl:
+        cpu = [s["cpu_pct"] for s in tl]
+        print(f"buyer CPU per 1s sample: p50={pct(cpu, .5):.0f}%  max={max(cpu):.0f}%  "
+              f"(seconds >= 90%: {sum(c >= 90 for c in cpu)} of {len(cpu)})   "
+              f"max queued: {max(s['queued'] for s in tl)}")
 
     print("latency ms           n      p50      p99      max")
     groups = [("all", records)] + [(str(c), [r for r in records if r["status"] == c]) for c in sorted(codes, key=str)]
@@ -163,8 +225,10 @@ def report(data):
         lat = [r["latency_ms"] for r in rs]
         print(f"  {name:12} {len(lat):6} {pct(lat, .5):8.1f} {pct(lat, .99):8.1f} {max(lat):8.1f}")
     if args.get("rate"):
-        lag = [r["send_lag_ms"] for r in records]
-        print(f"  send lag     {len(lag):6} {pct(lag, .5):8.1f} {pct(lag, .99):8.1f} {max(lag):8.1f}")
+        for key, label in (("sched_lag_ms", "sched lag"), ("queue_wait_ms", "queue wait"), ("send_lag_ms", "send lag")):
+            lag = [r[key] for r in records if key in r]
+            if lag:
+                print(f"  {label:12} {len(lag):6} {pct(lag, .5):8.1f} {pct(lag, .99):8.1f} {max(lag):8.1f}")
 
     print()
     for name, (ok, detail) in results.items():
@@ -198,14 +262,15 @@ def main():
     p.add_argument("--recheck", help="re-verify a saved --out file instead of running")
     args = p.parse_args()
 
+    opener = lambda path, mode: (gzip.open if path.endswith(".gz") else open)(path, mode + "t")
     if args.recheck:
-        with open(args.recheck) as f:
+        with opener(args.recheck, "r") as f:
             data = json.load(f)
     else:
         data = asyncio.run(run(args))
         if args.out:
             # Raw evidence: every verdict and percentile can be re-derived from this file.
-            with open(args.out, "w") as f:
+            with opener(args.out, "w") as f:
                 json.dump(data, f)
     raise SystemExit(0 if report(data) else 1)
 

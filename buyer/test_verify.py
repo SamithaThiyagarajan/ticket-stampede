@@ -53,9 +53,20 @@ def main():
             r.pop("ticket_number", None)
     failed, unexpected, res = failing(c)
     assert failed == set() and unexpected >= 1, (failed, unexpected)
-    assert "1 rows whose buyer never got a 200" in res["5 responses = state"][1]
+    assert "(info) 1 late-confirmed" in res["5 responses = state"][1]
     print(f"C response lost in transit  : checks pass, {unexpected} unexpected -> INCONCLUSIVE; "
           f"{res['5 responses = state'][1].split('(info) ')[1]}")
+
+    # D. A row exists for a buyer whose every copy failed before leaving the client.
+    #    The server never saw the request, so this is impossible -> must FAIL.
+    d = copy.deepcopy(base)
+    for r in d["records"]:
+        if r["user_id"] == ambiguous_user:
+            r["status"] = "PoolTimeout"
+            r.pop("ticket_number", None)
+    failed, _, res = failing(d)
+    assert failed == {"5 responses = state"} and "1 rows for never-sent" in res["5 responses = state"][1], failed
+    print(f"D row for never-sent request: only check 5 fails -> {res['5 responses = state'][1]}")
 
     print("\nverifier true-positive tests: ALL OK")
 
