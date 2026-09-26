@@ -1,0 +1,11 @@
+﻿
+requests=1000  concurrency=200  tickets=100  request_ids sent >1 time=162
+HTTP codes: {200: 115, 500: 733, 409: 152}   transport errors: 0
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)
+seller log: tickets_pkey violations=733  tickets_request_id_key violations=0  sale CHECK violations=0  HTTP 500 lines=733

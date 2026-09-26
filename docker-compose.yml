@@ -17,7 +17,9 @@ services:
     environment:
       DATABASE_URL: postgresql://tickets:tickets@db:5432/tickets
       DB_POOL_SIZE: ${DB_POOL_SIZE:-10}
-      NAIVE_DELAY_MS: ${NAIVE_DELAY_MS:-50}
+      SELLER_MODE: ${SELLER_MODE:-safe}
+      SELLER_SCHEMA: ${SELLER_SCHEMA:-}
+      WORK_DELAY_MS: ${WORK_DELAY_MS:-50}
     ports:
       - "8000:8000"
     depends_on:

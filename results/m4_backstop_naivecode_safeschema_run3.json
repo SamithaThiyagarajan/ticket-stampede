@@ -1,0 +1,741 @@
+{
+ "args": {
+  "url": "http://localhost:8000",
+  "tickets": 100,
+  "requests": 1000,
+  "concurrency": 200,
+  "dup_fraction": 0.2,
+  "dup_copies": 2,
+  "timeout": 30.0,
+  "seed": 3,
+  "verbose": false,
+  "out": "results\\m4_backstop_naivecode_safeschema_run3.json"
+ },
+ "http_codes": {
+  "200": 113,
+  "500": 776,
+  "409": 111
+ },
+ "transport_errors": {},
+ "responses_by_request_id": {
+  "req-0": [
+   1
+  ],
+  "req-1": [
+   2
+  ],
+  "req-6": [
+   3
+  ],
+  "req-17": [
+   4
+  ],
+  "req-25": [
+   5
+  ],
+  "req-33": [
+   6
+  ],
+  "req-38": [
+   7
+  ],
+  "req-35": [
+   8
+  ],
+  "req-185": [
+   9
+  ],
+  "req-183": [
+   10
+  ],
+  "req-191": [
+   11
+  ],
+  "req-43": [
+   12
+  ],
+  "req-205": [
+   13
+  ],
+  "req-212": [
+   14
+  ],
+  "req-214": [
+   15
+  ],
+  "req-77": [
+   16,
+   16
+  ],
+  "req-231": [
+   17
+  ],
+  "req-242": [
+   18
+  ],
+  "req-250": [
+   19,
+   19
+  ],
+  "req-238": [
+   20
+  ],
+  "req-87": [
+   21
+  ],
+  "req-245": [
+   22
+  ],
+  "req-282": [
+   23
+  ],
+  "req-286": [
+   24
+  ],
+  "req-252": [
+   25
+  ],
+  "req-82": [
+   26
+  ],
+  "req-298": [
+   27
+  ],
+  "req-307": [
+   28,
+   28
+  ],
+  "req-113": [
+   29,
+   29
+  ],
+  "req-337": [
+   30
+  ],
+  "req-302": [
+   31,
+   31
+  ],
+  "req-319": [
+   32,
+   32
+  ],
+  "req-296": [
+   33
+  ],
+  "req-353": [
+   34
+  ],
+  "req-370": [
+   35
+  ],
+  "req-97": [
+   36
+  ],
+  "req-358": [
+   37
+  ],
+  "req-344": [
+   38
+  ],
+  "req-327": [
+   39
+  ],
+  "req-312": [
+   40
+  ],
+  "req-406": [
+   41
+  ],
+  "req-352": [
+   42
+  ],
+  "req-153": [
+   43
+  ],
+  "req-109": [
+   44
+  ],
+  "req-432": [
+   45
+  ],
+  "req-415": [
+   46,
+   46
+  ],
+  "req-322": [
+   47
+  ],
+  "req-475": [
+   48
+  ],
+  "req-225": [
+   49
+  ],
+  "req-365": [
+   50
+  ],
+  "req-402": [
+   51
+  ],
+  "req-347": [
+   52
+  ],
+  "req-157": [
+   53
+  ],
+  "req-143": [
+   54
+  ],
+  "req-160": [
+   55
+  ],
+  "req-167": [
+   56
+  ],
+  "req-356": [
+   57
+  ],
+  "req-461": [
+   58
+  ],
+  "req-114": [
+   59
+  ],
+  "req-501": [
+   60,
+   60
+  ],
+  "req-400": [
+   61
+  ],
+  "req-147": [
+   62
+  ],
+  "req-527": [
+   63
+  ],
+  "req-493": [
+   64
+  ],
+  "req-471": [
+   65
+  ],
+  "req-526": [
+   66
+  ],
+  "req-584": [
+   67
+  ],
+  "req-592": [
+   68
+  ],
+  "req-586": [
+   69
+  ],
+  "req-602": [
+   70,
+   70
+  ],
+  "req-414": [
+   71
+  ],
+  "req-629": [
+   72
+  ],
+  "req-644": [
+   73,
+   73
+  ],
+  "req-632": [
+   74
+  ],
+  "req-438": [
+   75
+  ],
+  "req-604": [
+   76
+  ],
+  "req-559": [
+   77
+  ],
+  "req-601": [
+   78,
+   78
+  ],
+  "req-166": [
+   79
+  ],
+  "req-650": [
+   80
+  ],
+  "req-619": [
+   81
+  ],
+  "req-670": [
+   82
+  ],
+  "req-627": [
+   83
+  ],
+  "req-590": [
+   84
+  ],
+  "req-654": [
+   85
+  ],
+  "req-658": [
+   86
+  ],
+  "req-626": [
+   87
+  ],
+  "req-607": [
+   88
+  ],
+  "req-643": [
+   89
+  ],
+  "req-660": [
+   90,
+   90
+  ],
+  "req-680": [
+   91
+  ],
+  "req-688": [
+   92
+  ],
+  "req-684": [
+   93
+  ],
+  "req-685": [
+   94
+  ],
+  "req-701": [
+   95
+  ],
+  "req-709": [
+   96
+  ],
+  "req-718": [
+   97
+  ],
+  "req-708": [
+   98
+  ],
+  "req-740": [
+   99
+  ],
+  "req-713": [
+   100,
+   100
+  ]
+ },
+ "status": {
+  "total_tickets": 100,
+  "sold": 100,
+  "tickets": [
+   {
+    "ticket_number": 1,
+    "user_id": "user-0"
+   },
+   {
+    "ticket_number": 2,
+    "user_id": "user-1"
+   },
+   {
+    "ticket_number": 3,
+    "user_id": "user-6"
+   },
+   {
+    "ticket_number": 4,
+    "user_id": "user-17"
+   },
+   {
+    "ticket_number": 5,
+    "user_id": "user-25"
+   },
+   {
+    "ticket_number": 6,
+    "user_id": "user-33"
+   },
+   {
+    "ticket_number": 7,
+    "user_id": "user-38"
+   },
+   {
+    "ticket_number": 8,
+    "user_id": "user-35"
+   },
+   {
+    "ticket_number": 9,
+    "user_id": "user-185"
+   },
+   {
+    "ticket_number": 10,
+    "user_id": "user-183"
+   },
+   {
+    "ticket_number": 11,
+    "user_id": "user-191"
+   },
+   {
+    "ticket_number": 12,
+    "user_id": "user-43"
+   },
+   {
+    "ticket_number": 13,
+    "user_id": "user-205"
+   },
+   {
+    "ticket_number": 14,
+    "user_id": "user-212"
+   },
+   {
+    "ticket_number": 15,
+    "user_id": "user-214"
+   },
+   {
+    "ticket_number": 16,
+    "user_id": "user-77"
+   },
+   {
+    "ticket_number": 17,
+    "user_id": "user-231"
+   },
+   {
+    "ticket_number": 18,
+    "user_id": "user-242"
+   },
+   {
+    "ticket_number": 19,
+    "user_id": "user-250"
+   },
+   {
+    "ticket_number": 20,
+    "user_id": "user-238"
+   },
+   {
+    "ticket_number": 21,
+    "user_id": "user-87"
+   },
+   {
+    "ticket_number": 22,
+    "user_id": "user-245"
+   },
+   {
+    "ticket_number": 23,
+    "user_id": "user-282"
+   },
+   {
+    "ticket_number": 24,
+    "user_id": "user-286"
+   },
+   {
+    "ticket_number": 25,
+    "user_id": "user-252"
+   },
+   {
+    "ticket_number": 26,
+    "user_id": "user-82"
+   },
+   {
+    "ticket_number": 27,
+    "user_id": "user-298"
+   },
+   {
+    "ticket_number": 28,
+    "user_id": "user-307"
+   },
+   {
+    "ticket_number": 29,
+    "user_id": "user-113"
+   },
+   {
+    "ticket_number": 30,
+    "user_id": "user-337"
+   },
+   {
+    "ticket_number": 31,
+    "user_id": "user-302"
+   },
+   {
+    "ticket_number": 32,
+    "user_id": "user-319"
+   },
+   {
+    "ticket_number": 33,
+    "user_id": "user-296"
+   },
+   {
+    "ticket_number": 34,
+    "user_id": "user-353"
+   },
+   {
+    "ticket_number": 35,
+    "user_id": "user-370"
+   },
+   {
+    "ticket_number": 36,
+    "user_id": "user-97"
+   },
+   {
+    "ticket_number": 37,
+    "user_id": "user-358"
+   },
+   {
+    "ticket_number": 38,
+    "user_id": "user-344"
+   },
+   {
+    "ticket_number": 39,
+    "user_id": "user-327"
+   },
+   {
+    "ticket_number": 40,
+    "user_id": "user-312"
+   },
+   {
+    "ticket_number": 41,
+    "user_id": "user-406"
+   },
+   {
+    "ticket_number": 42,
+    "user_id": "user-352"
+   },
+   {
+    "ticket_number": 43,
+    "user_id": "user-153"
+   },
+   {
+    "ticket_number": 44,
+    "user_id": "user-109"
+   },
+   {
+    "ticket_number": 45,
+    "user_id": "user-432"
+   },
+   {
+    "ticket_number": 46,
+    "user_id": "user-415"
+   },
+   {
+    "ticket_number": 47,
+    "user_id": "user-322"
+   },
+   {
+    "ticket_number": 48,
+    "user_id": "user-475"
+   },
+   {
+    "ticket_number": 49,
+    "user_id": "user-225"
+   },
+   {
+    "ticket_number": 50,
+    "user_id": "user-365"
+   },
+   {
+    "ticket_number": 51,
+    "user_id": "user-402"
+   },
+   {
+    "ticket_number": 52,
+    "user_id": "user-347"
+   },
+   {
+    "ticket_number": 53,
+    "user_id": "user-157"
+   },
+   {
+    "ticket_number": 54,
+    "user_id": "user-143"
+   },
+   {
+    "ticket_number": 55,
+    "user_id": "user-160"
+   },
+   {
+    "ticket_number": 56,
+    "user_id": "user-167"
+   },
+   {
+    "ticket_number": 57,
+    "user_id": "user-356"
+   },
+   {
+    "ticket_number": 58,
+    "user_id": "user-461"
+   },
+   {
+    "ticket_number": 59,
+    "user_id": "user-114"
+   },
+   {
+    "ticket_number": 60,
+    "user_id": "user-501"
+   },
+   {
+    "ticket_number": 61,
+    "user_id": "user-400"
+   },
+   {
+    "ticket_number": 62,
+    "user_id": "user-147"
+   },
+   {
+    "ticket_number": 63,
+    "user_id": "user-527"
+   },
+   {
+    "ticket_number": 64,
+    "user_id": "user-493"
+   },
+   {
+    "ticket_number": 65,
+    "user_id": "user-471"
+   },
+   {
+    "ticket_number": 66,
+    "user_id": "user-526"
+   },
+   {
+    "ticket_number": 67,
+    "user_id": "user-584"
+   },
+   {
+    "ticket_number": 68,
+    "user_id": "user-592"
+   },
+   {
+    "ticket_number": 69,
+    "user_id": "user-586"
+   },
+   {
+    "ticket_number": 70,
+    "user_id": "user-602"
+   },
+   {
+    "ticket_number": 71,
+    "user_id": "user-414"
+   },
+   {
+    "ticket_number": 72,
+    "user_id": "user-629"
+   },
+   {
+    "ticket_number": 73,
+    "user_id": "user-644"
+   },
+   {
+    "ticket_number": 74,
+    "user_id": "user-632"
+   },
+   {
+    "ticket_number": 75,
+    "user_id": "user-438"
+   },
+   {
+    "ticket_number": 76,
+    "user_id": "user-604"
+   },
+   {
+    "ticket_number": 77,
+    "user_id": "user-559"
+   },
+   {
+    "ticket_number": 78,
+    "user_id": "user-601"
+   },
+   {
+    "ticket_number": 79,
+    "user_id": "user-166"
+   },
+   {
+    "ticket_number": 80,
+    "user_id": "user-650"
+   },
+   {
+    "ticket_number": 81,
+    "user_id": "user-619"
+   },
+   {
+    "ticket_number": 82,
+    "user_id": "user-670"
+   },
+   {
+    "ticket_number": 83,
+    "user_id": "user-627"
+   },
+   {
+    "ticket_number": 84,
+    "user_id": "user-590"
+   },
+   {
+    "ticket_number": 85,
+    "user_id": "user-654"
+   },
+   {
+    "ticket_number": 86,
+    "user_id": "user-658"
+   },
+   {
+    "ticket_number": 87,
+    "user_id": "user-626"
+   },
+   {
+    "ticket_number": 88,
+    "user_id": "user-607"
+   },
+   {
+    "ticket_number": 89,
+    "user_id": "user-643"
+   },
+   {
+    "ticket_number": 90,
+    "user_id": "user-660"
+   },
+   {
+    "ticket_number": 91,
+    "user_id": "user-680"
+   },
+   {
+    "ticket_number": 92,
+    "user_id": "user-688"
+   },
+   {
+    "ticket_number": 93,
+    "user_id": "user-684"
+   },
+   {
+    "ticket_number": 94,
+    "user_id": "user-685"
+   },
+   {
+    "ticket_number": 95,
+    "user_id": "user-701"
+   },
+   {
+    "ticket_number": 96,
+    "user_id": "user-709"
+   },
+   {
+    "ticket_number": 97,
+    "user_id": "user-718"
+   },
+   {
+    "ticket_number": 98,
+    "user_id": "user-708"
+   },
+   {
+    "ticket_number": 99,
+    "user_id": "user-740"
+   },
+   {
+    "ticket_number": 100,
+    "user_id": "user-713"
+   }
+  ]
+ }
+}

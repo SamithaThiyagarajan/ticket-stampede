@@ -14,6 +14,14 @@
 | D9 | Buyer: semaphore-capped concurrency, httpx connection limits set to match | accepted | httpx defaults to 100 max connections; would silently cap concurrency and measure the client, not the server | Client-side limits at high concurrency (M7) |
 | D10 | Duplicate copies sent adjacent (in flight together) | accepted | The retry-while-original-pending case is the hard one; a sequential replay passes even the naive seller | Sequential replay not separately reported |
 | D11 | Idempotency checked twice: server rows (one user_id ↔ one request_id, so a user with >1 row = violation) and client responses (copies told different numbers) | accepted | Independent sources; one catches stored duplicates, the other catches contradictory answers | — |
+| D13 | Safe `/buy`: one READ COMMITTED txn — `SELECT … FOR UPDATE` sale row → idempotency check → capacity → insert → `sold_count = sold_count + 1` → commit | accepted | Lock serializes check+act; after acquiring it Postgres re-reads the latest committed row; idempotency check sits *after* the lock so it sees all prior commits. Evidence: M4 runs below | Throughput cost of one hot row (M7) |
+| D14 | Constraints: `sale.sold_count BETWEEN 0 AND total`, `tickets.ticket_number` PK, `request_id` UNIQUE, single sale row `CHECK (id=1)` | accepted | Backstops for invariants 1–3 — defense in depth, NOT the mechanism (the lock is). Invariant 4 has no constraint backstop; it relies on insert + counter in one txn. Backstop experiment: naive code + these constraints → 100 rows exactly, but 73–78% HTTP 500 | `request_id` UNIQUE never fired independently (PK caught it first) |
+| D20 | `SELLER_SCHEMA` override (defaults to mode) | accepted | Only for the backstop experiment: racy code on constrained tables | — |
+| D15 | No `sale_id` | accepted (pushback) | Single sale, `/reset` wipes all; multi-sale is a problem we don't have | Easy live change if asked |
+| D16 | `SELLER_MODE=naive\|safe`, default `safe` | accepted | Before/after reproducible from one clean checkout; correct system is the default | — |
+| D17 | Same request_id + different user_id → 422 | accepted | Stripe-style: reused key with different payload is a client error; returning the ticket would leak it to another user. Verified by curl | — |
+| D18 | `NAIVE_DELAY_MS` renamed `WORK_DELAY_MS`; applied in both modes at the same point (in safe mode: while holding the lock) | accepted | Fair comparison — safe mode must not pass just because the window was removed | — |
+| D19 | `/status` reads in one REPEATABLE READ read-only txn | accepted | Both reads from one snapshot → no false drift mid-sale | Not tested mid-sale (buyer reads after storm) |
 | D12 | Verdict: any invariant fails → FAIL; all pass but non-200/409 or transport errors → INCONCLUSIVE; PASS only if clean | accepted (revised after M3) | Errors can hide a violation but cannot create one (violations measured from server rows). Original rule marked a 466-for-100 run "inconclusive", which was wrong | — |
 
 ## Observations
@@ -38,6 +46,36 @@
   - **The delay only amplifies the race:** 0ms still oversells about 60% (160–164 rows for 100 tickets). Answer to "did you rig it?"
   - **Drift is always an under-count, and the counter is what stops the oversell:** `sold` ended at exactly 100 in all runs; rows kept being inserted until the lost-update counter finally reached the cap. Oversell ≈ average number of writers per counter increment.
   - **The two idempotency checks disagree, and that is informative:** e.g. 37 server-side vs 5 client-side. Two concurrent copies both read `sold=k`, both insert `k+1`, and the client hears the *same* number twice — looks idempotent from the client, but two rows exist. The server-row check (D11a) catches what the response check cannot.
+
+- **M4 naive regression after refactor:** 493 rows for 100 (in M3 range 466–570) → refactor preserved naive behavior. `results/m4_naive_regression_50ms.*`
+- **M4 safe runs** (same workload + seeds as M3; `results/m4_safe_*`):
+
+  | delay | run | rows | dup numbers | idempotency (server/client) | sold | verdict | wall time |
+  |---|---|---|---|---|---|---|---|
+  | 50ms | 1 | 100 | 0 | 0 / 0 | 100 | PASS | 24.3s |
+  | 50ms | 2 | 100 | 0 | 0 / 0 | 100 | PASS | 27.2s |
+  | 50ms | 3 | 100 | 0 | 0 / 0 | 100 | INCONCLUSIVE (1 ReadError) | 28.2s |
+  | 0ms | 1 | 100 | 0 | 0 / 0 | 100 | PASS | 15.5s |
+  | 0ms | 2 | 100 | 0 | 0 / 0 | 100 | PASS | 14.1s |
+  | 0ms | 3 | 100 | 0 | 0 / 0 | 100 | PASS | 11.4s |
+
+  - Invariants held in 6/6 runs. The 200 count above 100 (116–124) = replays of winning request_ids getting their original ticket back (response check confirms same number).
+  - Second `ReadError` (now 2 across 13 concurrent runs). Revised D12 correctly refused to call it PASS.
+  - **Unexplained slowness:** 0ms safe still takes 11–15s for 1000 requests (~70–90 req/s). Serialized 100 × 50ms only explains ~5s of the 50ms runs. Not investigated — M7. Hypotheses, unverified: sold-out requests still queue on the lock; Docker Desktop networking; client overhead.
+
+- **M4 constraint-backstop experiment** — naive code (no txn, no lock) against the safe schema (`SELLER_MODE=naive SELLER_SCHEMA=safe`, 50ms, same workload/seeds; `results/m4_backstop_*`). Prediction recorded before running: invariants 1–3 hold, many 500s, INCONCLUSIVE.
+
+  | run | rows | dup numbers | idempotency | sold | 200 / 409 / **500** | `tickets_pkey` / `request_id_key` / sale CHECK violations | verdict |
+  |---|---|---|---|---|---|---|---|
+  | 1 | 100 | 0 | 0 / 0 | 100 | 115 / 152 / **733** | 733 / 0 / 0 | INCONCLUSIVE |
+  | 2 | 100 | 0 | 0 / 0 | 100 | 113 / 118 / **769** | 769 / 0 / 0 | INCONCLUSIVE |
+  | 3 | 100 | 0 | 0 / 0 | 100 | 113 / 111 / **776** | 776 / 0 / 0 | INCONCLUSIVE |
+
+  - **Prediction confirmed.** Constraints alone kept the *data* correct (same race that produced 466–570 rows now yields exactly 100), but 73–78% of buyers got a 500. The lock (M4 safe runs) keeps data correct **and** gives every buyer a clean 200/409. That is the evidence for "lock = primary mechanism, constraints = defense in depth".
+  - Every 500 matched a `tickets_pkey` violation 1:1 in the seller log.
+  - **Surprise: `request_id` UNIQUE never fired.** Concurrent copies read the same `sold`, so they collide on ticket_number too; Postgres aborts on the first unique index it checks (the PK). UNIQUE(request_id) would fire alone only if copies read *different* counts — possible, not observed. Its independent value is therefore argued, not demonstrated.
+  - Invariant 4 held, as predicted — but by a property of this code path (a failed insert never reaches its counter update), not by any constraint.
+  - **Implied rejected alternative — optimistic concurrency (constraints + catch-and-retry, no lock):** ~7.3–7.8 conflicts per successful sale at this contention. Each retry re-reads and re-contends, so under a stampede it trades lock waiting for wasted round-trips. Pessimistic row lock chosen for the high-contention case; not benchmarked head-to-head.
 
 ## Open questions / to revisit
 - `ReadError` in 50ms run 1: seller logged no errors and no non-200/409, so the failure was at the connection level (suspect: Docker Desktop port proxy on Windows). Unproven. Watch whether it recurs under higher load (M7).
