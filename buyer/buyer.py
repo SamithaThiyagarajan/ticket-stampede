@@ -1,6 +1,7 @@
 """Load client v1: stampede the seller, then check the four invariants."""
 import argparse
 import asyncio
+import json
 import random
 from collections import Counter, defaultdict
 
@@ -78,10 +79,14 @@ def check(args, jobs, responses, codes, errors, status):
     for name, (ok, detail) in results.items():
         print(f"  [{'PASS' if ok else 'FAIL'}] {name:24} {detail}")
 
-    if unexpected:
-        verdict = "INCONCLUSIVE (unexpected errors)"
+    # Errors can hide a violation but cannot create one (violations are measured from
+    # server rows), so any failed invariant is FAIL; errors only block a PASS.
+    if not all(ok for ok, _ in results.values()):
+        verdict = "FAIL"
+    elif unexpected:
+        verdict = "INCONCLUSIVE (invariants held, but unexpected errors)"
     else:
-        verdict = "PASS" if all(ok for ok, _ in results.values()) else "FAIL"
+        verdict = "PASS"
     print(f"\nOVERALL: {verdict}")
     if args.verbose and dup_numbers:
         print("duplicate ticket numbers (number: rows):", dict(sorted(dup_numbers.items())[:20]))
@@ -99,8 +104,15 @@ def main():
     p.add_argument("--timeout", type=float, default=30.0)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("-v", "--verbose", action="store_true")
+    p.add_argument("--out", help="write raw results JSON to this path")
     args = p.parse_args()
-    ok = check(args, *asyncio.run(run(args)))
+    jobs, responses, codes, errors, status = asyncio.run(run(args))
+    ok = check(args, jobs, responses, codes, errors, status)
+    if args.out:
+        # Raw evidence: enough to re-derive every verdict without trusting this script's summary.
+        with open(args.out, "w") as f:
+            json.dump({"args": vars(args), "http_codes": codes, "transport_errors": errors,
+                       "responses_by_request_id": responses, "status": status}, f, indent=1)
     raise SystemExit(0 if ok else 1)
 
 

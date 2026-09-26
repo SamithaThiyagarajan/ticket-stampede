@@ -1,0 +1,11 @@
+﻿
+requests=1000  concurrency=200  tickets=100  request_ids sent >1 time=162
+HTTP codes: {200: 520, 409: 479}   transport errors: {'ReadError': 1}
+
+  [FAIL] 1 no oversell            466 tickets issued for 100 available
+  [FAIL] 2 no duplicate ticket    80 ticket numbers issued >1 time (446 rows); 0 out of range
+  [FAIL] 3 idempotency            37 request_ids hold >1 ticket (server rows); 5 request_ids told different numbers (responses)
+  [FAIL] 4 no drift               /status sold=100, actual rows=466
+
+OVERALL: INCONCLUSIVE (unexpected errors)
+duplicate ticket numbers (number: rows): {2: 10, 3: 10, 4: 9, 5: 9, 6: 10, 7: 10, 8: 10, 9: 10, 10: 10, 11: 10, 12: 9, 13: 10, 14: 10, 15: 10, 16: 10, 17: 10, 18: 10, 19: 10, 20: 10, 21: 10}
