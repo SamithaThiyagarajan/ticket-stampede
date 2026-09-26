@@ -1,0 +1,17 @@
+﻿
+requests=400  open loop @ 20.0/s  tickets=100  request_ids sent >1 time=66
+responses: {200: 116, 409: 284}
+throughput: 20.0 req/s over 20.02s (storm only)   max in-flight: 8 (connection cap 200)
+latency ms           n      p50      p99      max
+  all             400     70.4    373.2    392.8
+  200             116    147.7    382.4    392.8
+  409             284     67.6    248.3    339.3
+  send lag        400      9.8     26.5     26.8
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; (info) 0 rows whose buyer never got a 200
+
+OVERALL: PASS

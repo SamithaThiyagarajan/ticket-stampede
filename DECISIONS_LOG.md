@@ -22,6 +22,10 @@
 | D17 | Same request_id + different user_id → 422 | accepted | Stripe-style: reused key with different payload is a client error; returning the ticket would leak it to another user. Verified by curl | — |
 | D18 | `NAIVE_DELAY_MS` renamed `WORK_DELAY_MS`; applied in both modes at the same point (in safe mode: while holding the lock) | accepted | Fair comparison — safe mode must not pass just because the window was removed | — |
 | D19 | `/status` reads in one REPEATABLE READ read-only txn | accepted | Both reads from one snapshot → no false drift mid-sale | Not tested mid-sale (buyer reads after storm) |
+| D21 | Load client supports closed loop (default) and open loop (`--rate`) | accepted | Closed loop = throughput at fixed concurrency, but hides queueing (coordinated omission: slow server slows the client). Open loop = arrival rate, matches "50k in 60s"; latency measured from *scheduled* time | Client's ability to hold 833/s on one Python process — unmeasured |
+| D22 | Check 5: every 200 (request_id → N) must appear in `/status` as N owned by that request's user; a 409'd request's user must hold no row; rows whose buyer never got a 200 reported as info (ambiguous) | accepted | Neither responses nor `/status` alone can detect a confirmed sale that is lost/contradicted. Mapping relies on 1 user_id ↔ 1 request_id (harness property, not API) | No mode yet produces a real lost sale; proven only by tamper test |
+| D23 | Verifier is a pure function over the saved raw file (`--recheck`), with tamper tests (`buyer/test_verify.py`) | accepted | Raw evidence is self-verifying; checker's true positives demonstrated, not assumed | — |
+| D24 | Report `max_in_flight`, send lag, latency per status code | accepted | Measures (not assumes) achieved concurrency; separates client lag from server latency; 200 vs 409 latency is a bottleneck clue | — |
 | D12 | Verdict: any invariant fails → FAIL; all pass but non-200/409 or transport errors → INCONCLUSIVE; PASS only if clean | accepted (revised after M3) | Errors can hide a violation but cannot create one (violations measured from server rows). Original rule marked a 466-for-100 run "inconclusive", which was wrong | — |
 
 ## Observations
@@ -77,8 +81,16 @@
   - Invariant 4 held, as predicted — but by a property of this code path (a failed insert never reaches its counter update), not by any constraint.
   - **Implied rejected alternative — optimistic concurrency (constraints + catch-and-retry, no lock):** ~7.3–7.8 conflicts per successful sale at this contention. Each retry re-reads and re-contends, so under a stampede it trades lock waiting for wasted round-trips. Pessimistic row lock chosen for the high-contention case; not benchmarked head-to-head.
 
+- **M6 load client v2 validation** (`results/m6_*`, `buyer/test_verify.py`):
+  - *My prediction corrected before running:* I first claimed check 5 would catch the naive seller. It cannot: naive inserts before responding and never rolls back, so every response has a matching row. Confirmed: naive run → checks 1–4 FAIL (430 rows / 100), check 5 PASS.
+  - Safe, closed loop, 50ms, seeds 1–3: checks 1–5 PASS, max in-flight = 200 (concurrency actually reached). 32.6–38.7 req/s. Latency p50 4.6–5.7s, p99 14.0–16.4s. **409 p99 (14–16s) > 200 p99 (6–7s)** → sold-out requests appear to queue on the lock too (signal for M7, not proof).
+  - **Transport errors now in every closed-loop run** (2–4/run: ReadError, one RemoteProtocolError) → all 3 INCONCLUSIVE. None produced an ambiguous row (0 rows without a 200).
+  - Tamper tests on a real saved run: control passes; deleted confirmed sale → only check 5 fails; ticket reassigned to a 409'd user → only check 5 fails (both sub-checks); response turned into ReadError → invariants pass, 1 ambiguous row, INCONCLUSIVE. `--recheck` reproduces the saved report byte-identical.
+  - Open loop 400 @ 20/s: storm 20.02s at 20.0 req/s (schedule held), max in-flight 8, **0 transport errors, first clean PASS since v2**. Send lag p50 9.8ms, max 26.8ms, spread across the whole run (first attempt showed one ~100ms spike; did not reproduce, unexplained).
+
 ## Open questions / to revisit
-- `ReadError` in 50ms run 1: seller logged no errors and no non-200/409, so the failure was at the connection level (suspect: Docker Desktop port proxy on Windows). Unproven. Watch whether it recurs under higher load (M7).
+- **Transport errors (priority before 50k):** 0 at low in-flight (open loop, ≤14 in flight); 2–4 per run at 200 in-flight with multi-second latencies. Suspect the Docker Desktop port proxy (Windows host → WSL2). Discriminating experiment: run the buyer inside the compose network, bypassing the proxy. If errors vanish → proxy; if not → server/uvicorn.
+- **Client send-lag jitter (0–27ms):** hypothesis = Windows ~15.6ms timer resolution. At 833/s arrivals would leave in bursts of ~13 rather than evenly. Average rate holds; burstiness must be reported with the 50k run.
 - DB pool size (`DB_POOL_SIZE=10`) caps how many requests are inside the race window at once. The concurrency the DB sees is the pool size, not the client count. Matters for M3 and M7.
 - `/status` does two separate reads (sale row, then tickets): not a consistent snapshot. Fine for naive; decide for the corrected seller.
 - Same `request_id` sent with a *different* `user_id`: what should happen? Not yet decided.

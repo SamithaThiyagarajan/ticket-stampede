@@ -1,8 +1,21 @@
-"""Load client v1: stampede the seller, then check the four invariants."""
+"""Load client v2: stampede the seller, then verify the invariants from raw data.
+
+Closed loop (default): --concurrency workers, each sends its next request when the
+previous finishes. Measures throughput at a fixed concurrency; latency timer starts
+after the request gets its turn, so client-side queueing is excluded.
+
+Open loop (--rate R): request i is sent at start + i/R regardless of completions
+(an arrival rate, like "50k people in 60s"). Latency is measured from the SCHEDULED
+time, so server queueing is not hidden (avoids coordinated omission). Send lag =
+actual send time - scheduled time; large lag means the client, not the server, is
+the bottleneck.
+"""
 import argparse
 import asyncio
 import json
+import math
 import random
+import time
 from collections import Counter, defaultdict
 
 import httpx
@@ -24,38 +37,90 @@ def build_jobs(n_requests, dup_fraction, dup_copies, seed):
 async def run(args):
     jobs = build_jobs(args.requests, args.dup_fraction, args.dup_copies, args.seed)
     limits = httpx.Limits(max_connections=args.concurrency, max_keepalive_connections=args.concurrency)
-    responses = defaultdict(list)          # request_id -> [ticket_number, ...] from 200s
-    codes, errors = Counter(), Counter()
-    sem = asyncio.Semaphore(args.concurrency)
+    records = []
+    in_flight = max_in_flight = 0
 
     async with httpx.AsyncClient(base_url=args.url, limits=limits, timeout=args.timeout) as client:
         r = await client.post("/reset", json={"tickets": args.tickets})
         r.raise_for_status()
 
-        async def buy(user_id, request_id):
-            async with sem:
-                try:
-                    r = await client.post("/buy", json={"user_id": user_id, "request_id": request_id})
-                except httpx.HTTPError as e:
-                    errors[type(e).__name__] += 1
-                    return
-                codes[r.status_code] += 1
+        async def send(i, user_id, request_id, t0, send_lag):
+            nonlocal in_flight, max_in_flight
+            rec = {"i": i, "user_id": user_id, "request_id": request_id, "send_lag_ms": send_lag * 1000}
+            in_flight += 1
+            max_in_flight = max(max_in_flight, in_flight)
+            try:
+                r = await client.post("/buy", json={"user_id": user_id, "request_id": request_id})
+                rec["status"] = r.status_code
                 if r.status_code == 200:
-                    responses[request_id].append(r.json()["ticket_number"])
+                    rec["ticket_number"] = r.json()["ticket_number"]
+            except httpx.HTTPError as e:
+                rec["status"] = type(e).__name__
+            finally:
+                in_flight -= 1
+            rec["latency_ms"] = (time.perf_counter() - t0) * 1000
+            records.append(rec)
 
-        await asyncio.gather(*(buy(u, q) for u, q in jobs))
+        sem = asyncio.Semaphore(args.concurrency)
+
+        async def closed(i, user_id, request_id):
+            async with sem:
+                await send(i, user_id, request_id, time.perf_counter(), 0.0)
+
+        async def opened(i, user_id, request_id, start):
+            scheduled = start + i / args.rate
+            await asyncio.sleep(max(0.0, scheduled - time.perf_counter()))
+            await send(i, user_id, request_id, scheduled, time.perf_counter() - scheduled)
+
+        start = time.perf_counter()
+        if args.rate:
+            await asyncio.gather(*(opened(i, u, q, start) for i, (u, q) in enumerate(jobs)))
+        else:
+            await asyncio.gather(*(closed(i, u, q) for i, (u, q) in enumerate(jobs)))
+        storm_s = time.perf_counter() - start   # excludes /reset and /status
+
         status = (await client.get("/status")).json()
 
-    return jobs, responses, codes, errors, status
+    return {"args": vars(args), "storm_seconds": storm_s, "max_in_flight": max_in_flight,
+            "records": records, "status": status}
 
 
-def check(args, jobs, responses, codes, errors, status):
+def pct(xs, p):
+    """Nearest-rank percentile."""
+    xs = sorted(xs)
+    return xs[max(0, math.ceil(p * len(xs)) - 1)]
+
+
+def verify(data):
+    """Recompute every invariant from raw records + /status. Returns (results, unexpected)."""
+    records, status = data["records"], data["status"]
     total, sold, tickets = status["total_tickets"], status["sold"], status["tickets"]
+
+    # Checks 1-4: unchanged from v1.
     numbers = [t["ticket_number"] for t in tickets]
     dup_numbers = {n: c for n, c in Counter(numbers).items() if c > 1}
     out_of_range = [n for n in numbers if not 1 <= n <= total]
     users_multi = {u: c for u, c in Counter(t["user_id"] for t in tickets).items() if c > 1}
-    inconsistent = {q: ns for q, ns in responses.items() if len(set(ns)) > 1}
+    told = defaultdict(set)                       # request_id -> ticket numbers told (200s)
+    for r in records:
+        if r["status"] == 200:
+            told[r["request_id"]].add(r["ticket_number"])
+    inconsistent = {q for q, ns in told.items() if len(ns) > 1}
+
+    # Check 5: client responses vs final durable state.
+    # /status has no request_id; the mapping relies on the load generator using
+    # exactly one user_id per request_id.
+    user_of = {r["request_id"]: r["user_id"] for r in records}
+    holders = defaultdict(set)                    # ticket_number -> user_ids holding it
+    rows_of_user = defaultdict(list)
+    for t in tickets:
+        holders[t["ticket_number"]].add(t["user_id"])
+        rows_of_user[t["user_id"]].append(t["ticket_number"])
+    lost_or_wrong = [(q, n) for q, ns in told.items() for n in ns if user_of[q] not in holders.get(n, ())]
+    got_409 = {r["request_id"] for r in records if r["status"] == 409}
+    told_soldout_but_holds = [q for q in got_409 if rows_of_user.get(user_of[q])]
+    users_told_200 = {user_of[q] for q in told}
+    ambiguous_rows = [u for u in rows_of_user if u not in users_told_200]
 
     results = {
         "1 no oversell":        (len(tickets) <= total,
@@ -68,13 +133,39 @@ def check(args, jobs, responses, codes, errors, status):
                                  f"{len(inconsistent)} request_ids told different numbers (responses)"),
         "4 no drift":           (sold == len(tickets),
                                  f"/status sold={sold}, actual rows={len(tickets)}"),
+        "5 responses = state":  (not lost_or_wrong and not told_soldout_but_holds,
+                                 f"{len(lost_or_wrong)} confirmed sales missing/wrong in /status; "
+                                 f"{len(told_soldout_but_holds)} told sold-out but hold a ticket; "
+                                 f"(info) {len(ambiguous_rows)} rows whose buyer never got a 200"),
     }
+    unexpected = sum(1 for r in records if r["status"] not in (200, 409))
+    return results, unexpected
 
-    n_dup_ids = sum(1 for c in Counter(q for _, q in jobs).values() if c > 1)
-    print(f"\nrequests={len(jobs)}  concurrency={args.concurrency}  tickets={total}  "
+
+def report(data):
+    args, records = data["args"], data["records"]
+    results, unexpected = verify(data)
+    codes = Counter(r["status"] for r in records)
+    n_dup_ids = sum(1 for c in Counter(r["request_id"] for r in records).values() if c > 1)
+    mode = f"open loop @ {args['rate']}/s" if args.get("rate") else f"closed loop, concurrency={args['concurrency']}"
+
+    print(f"\nrequests={len(records)}  {mode}  tickets={data['status']['total_tickets']}  "
           f"request_ids sent >1 time={n_dup_ids}")
-    print(f"HTTP codes: {dict(codes)}   transport errors: {dict(errors) or 0}")
-    unexpected = sum(c for code, c in codes.items() if code not in (200, 409)) + sum(errors.values())
+    print(f"responses: {dict(codes)}")
+    print(f"throughput: {len(records) / data['storm_seconds']:.1f} req/s over {data['storm_seconds']:.2f}s "
+          f"(storm only)   max in-flight: {data['max_in_flight']} (connection cap {args['concurrency']})")
+    if args.get("rate") and data["max_in_flight"] >= args["concurrency"]:
+        print("  WARNING: connection cap reached; some latency is client-side queueing")
+
+    print("latency ms           n      p50      p99      max")
+    groups = [("all", records)] + [(str(c), [r for r in records if r["status"] == c]) for c in sorted(codes, key=str)]
+    for name, rs in groups:
+        lat = [r["latency_ms"] for r in rs]
+        print(f"  {name:12} {len(lat):6} {pct(lat, .5):8.1f} {pct(lat, .99):8.1f} {max(lat):8.1f}")
+    if args.get("rate"):
+        lag = [r["send_lag_ms"] for r in records]
+        print(f"  send lag     {len(lag):6} {pct(lag, .5):8.1f} {pct(lag, .99):8.1f} {max(lag):8.1f}")
+
     print()
     for name, (ok, detail) in results.items():
         print(f"  [{'PASS' if ok else 'FAIL'}] {name:24} {detail}")
@@ -88,8 +179,6 @@ def check(args, jobs, responses, codes, errors, status):
     else:
         verdict = "PASS"
     print(f"\nOVERALL: {verdict}")
-    if args.verbose and dup_numbers:
-        print("duplicate ticket numbers (number: rows):", dict(sorted(dup_numbers.items())[:20]))
     return verdict == "PASS"
 
 
@@ -98,22 +187,27 @@ def main():
     p.add_argument("--url", default="http://localhost:8000")
     p.add_argument("--tickets", type=int, default=100)
     p.add_argument("--requests", type=int, default=1000)
-    p.add_argument("--concurrency", type=int, default=200)
+    p.add_argument("--concurrency", type=int, default=200,
+                   help="closed loop: worker count; both modes: HTTP connection cap")
+    p.add_argument("--rate", type=float, help="open loop: arrivals per second")
     p.add_argument("--dup-fraction", type=float, default=0.2)
     p.add_argument("--dup-copies", type=int, default=2)
     p.add_argument("--timeout", type=float, default=30.0)
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("-v", "--verbose", action="store_true")
     p.add_argument("--out", help="write raw results JSON to this path")
+    p.add_argument("--recheck", help="re-verify a saved --out file instead of running")
     args = p.parse_args()
-    jobs, responses, codes, errors, status = asyncio.run(run(args))
-    ok = check(args, jobs, responses, codes, errors, status)
-    if args.out:
-        # Raw evidence: enough to re-derive every verdict without trusting this script's summary.
-        with open(args.out, "w") as f:
-            json.dump({"args": vars(args), "http_codes": codes, "transport_errors": errors,
-                       "responses_by_request_id": responses, "status": status}, f, indent=1)
-    raise SystemExit(0 if ok else 1)
+
+    if args.recheck:
+        with open(args.recheck) as f:
+            data = json.load(f)
+    else:
+        data = asyncio.run(run(args))
+        if args.out:
+            # Raw evidence: every verdict and percentile can be re-derived from this file.
+            with open(args.out, "w") as f:
+                json.dump(data, f)
+    raise SystemExit(0 if report(data) else 1)
 
 
 if __name__ == "__main__":
