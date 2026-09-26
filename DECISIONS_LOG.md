@@ -26,6 +26,7 @@
 | D22 | Check 5: every 200 (request_id → N) must appear in `/status` as N owned by that request's user; a 409'd request's user must hold no row; rows whose buyer never got a 200 reported as info (ambiguous) | accepted | Neither responses nor `/status` alone can detect a confirmed sale that is lost/contradicted. Mapping relies on 1 user_id ↔ 1 request_id (harness property, not API) | No mode yet produces a real lost sale; proven only by tamper test |
 | D23 | Verifier is a pure function over the saved raw file (`--recheck`), with tamper tests (`buyer/test_verify.py`) | accepted | Raw evidence is self-verifying; checker's true positives demonstrated, not assumed | — |
 | D24 | Report `max_in_flight`, send lag, latency per status code | accepted | Measures (not assumes) achieved concurrency; separates client lag from server latency; 200 vs 409 latency is a bottleneck clue | — |
+| D25 | Benchmarks run the buyer inside the compose network (`docker compose run --rm buyer --url http://seller:8000 …`, `tools` profile) | accepted | Host buyer: 8 transport errors / 6000 requests (5 of 6 runs INCONCLUSIVE); in-network: 0 / 6000 (6 of 6 PASS), interleaved runs, same seller/workload/seeds. P(0 \| expected 8) ≈ e^-8 | Confounds: Linux vs Windows event loop; buyer now shares the VM's CPUs with seller+DB, so throughput/latency across the two setups are not directly comparable |
 | D12 | Verdict: any invariant fails → FAIL; all pass but non-200/409 or transport errors → INCONCLUSIVE; PASS only if clean | accepted (revised after M3) | Errors can hide a violation but cannot create one (violations measured from server rows). Original rule marked a 466-for-100 run "inconclusive", which was wrong | — |
 
 ## Observations
@@ -88,8 +89,20 @@
   - Tamper tests on a real saved run: control passes; deleted confirmed sale → only check 5 fails; ticket reassigned to a 409'd user → only check 5 fails (both sub-checks); response turned into ReadError → invariants pass, 1 ambiguous row, INCONCLUSIVE. `--recheck` reproduces the saved report byte-identical.
   - Open loop 400 @ 20/s: storm 20.02s at 20.0 req/s (schedule held), max in-flight 8, **0 transport errors, first clean PASS since v2**. Send lag p50 9.8ms, max 26.8ms, spread across the whole run (first attempt showed one ~100ms spike; did not reproduce, unexplained).
 
+- **Network-path experiment** (`results/m6net_*`; safe seller, 50ms, pool 10, 1000 req, concurrency 200, seeds 1–6, host and in-network runs interleaved):
+
+  | buyer | runs | errors | runs with error | verdicts | throughput |
+  |---|---|---|---|---|---|
+  | Windows host | 6 | 8 ReadError | 5/6 | 5 INCONCLUSIVE, 1 PASS | 40.8–45.4 req/s |
+  | in compose network | 6 | 0 | 0/6 | 6 PASS | 60.3–68.2 req/s |
+
+  - All 12 runs: all 5 invariant checks PASS — errors never affected correctness.
+  - **Errors disappear** → attributable to the Windows-side client path (Docker Desktop proxy and/or Windows network stack), not the seller. Experiment does not separate proxy from stack.
+  - In-network was ~50% faster despite the CPU-contention confound biasing the other way → the host path likely also costs throughput (suggestive, not proof).
+  - Side note: raw file from the first open-loop run (~100ms send-lag spike) was overwritten by the rerun; its numbers survive only in this log and the transcript.
+
 ## Open questions / to revisit
-- **Transport errors (priority before 50k):** 0 at low in-flight (open loop, ≤14 in flight); 2–4 per run at 200 in-flight with multi-second latencies. Suspect the Docker Desktop port proxy (Windows host → WSL2). Discriminating experiment: run the buyer inside the compose network, bypassing the proxy. If errors vanish → proxy; if not → server/uvicorn.
+- ~~Transport errors~~ → resolved by D25 (Windows-side client path).
 - **Client send-lag jitter (0–27ms):** hypothesis = Windows ~15.6ms timer resolution. At 833/s arrivals would leave in bursts of ~13 rather than evenly. Average rate holds; burstiness must be reported with the 50k run.
 - DB pool size (`DB_POOL_SIZE=10`) caps how many requests are inside the race window at once. The concurrency the DB sees is the pool size, not the client count. Matters for M3 and M7.
 - `/status` does two separate reads (sale row, then tickets): not a consistent snapshot. Fine for naive; decide for the corrected seller.

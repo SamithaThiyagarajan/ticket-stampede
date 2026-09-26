@@ -1,0 +1,16 @@
+﻿
+requests=1000  closed loop, concurrency=200  tickets=100  request_ids sent >1 time=162
+responses: {200: 117, 409: 883}
+throughput: 62.6 req/s over 15.97s (storm only)   max in-flight: 200 (connection cap 200)
+latency ms           n      p50      p99      max
+  all            1000   2552.0   8127.4   9139.2
+  200             117   2965.9   5830.9   6263.5
+  409             883   2522.5   8243.3   9139.2
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; (info) 0 rows whose buyer never got a 200
+
+OVERALL: PASS

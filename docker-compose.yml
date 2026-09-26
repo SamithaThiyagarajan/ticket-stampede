@@ -25,3 +25,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Load client inside the compose network (bypasses the host -> Docker port proxy).
+  # Only runs on demand: docker compose run --rm buyer --url http://seller:8000 ...
+  buyer:
+    build: ./buyer
+    profiles: ["tools"]
+    volumes:
+      - ./results:/results
+    depends_on:
+      - seller

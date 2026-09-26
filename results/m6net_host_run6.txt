@@ -1,0 +1,17 @@
+﻿
+requests=1000  closed loop, concurrency=200  tickets=100  request_ids sent >1 time=182
+responses: {200: 117, 409: 882, 'ReadError': 1}
+throughput: 40.8 req/s over 24.50s (storm only)   max in-flight: 200 (connection cap 200)
+latency ms           n      p50      p99      max
+  all            1000   4442.3  14553.4  18136.5
+  200             117   3248.2   6164.0   6727.9
+  409             882   4594.9  14700.4  18136.5
+  ReadError         1   5481.3   5481.3   5481.3
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; (info) 0 rows whose buyer never got a 200
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)
