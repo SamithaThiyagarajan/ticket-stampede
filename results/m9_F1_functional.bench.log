@@ -1,0 +1,69 @@
+seller1 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+seller2 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+seller3 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+one Postgres: 30 client connections = 3 x 10; by client IP: 172.22.0.3=10 172.22.0.4=10 172.22.0.5=10 ; seller IPs: seller1=172.22.0.5 seller2=172.22.0.4 seller3=172.22.0.3
+containers: 46e7911444ac c09460c252e3 f0d685835280 aa674cdda541 c20d681fa533 
+
+requests=3000  open loop @ 300.0/s  tickets=100  request_ids sent >1 time=488
+responses: {200: 122, 409: 2878}
+throughput: 299.8 req/s over 10.01s (storm only)   max in-flight: 201 (sum of per-worker maxima [24, 25, 25, 25, 25, 26, 27, 24]) (connection cap 2000)
+arrivals delivered: 300.3/s over 9.99s (target 300.0/s over 10.00s)
+served by server: 3000 responses, 300.1/s over 10.00s (first send -> last answer)
+buyer CPU per 1s sample, per worker process (max queued in any worker: 0):
+  worker 0: p50=  20%  max=  30%  seconds >= 90%: 0 of 9
+  worker 1: p50=  20%  max=  31%  seconds >= 90%: 0 of 9
+  worker 2: p50=  21%  max=  30%  seconds >= 90%: 0 of 9
+  worker 3: p50=  21%  max=  30%  seconds >= 90%: 0 of 9
+  worker 4: p50=  21%  max=  31%  seconds >= 90%: 0 of 9
+  worker 5: p50=  21%  max=  32%  seconds >= 90%: 0 of 9
+  worker 6: p50=  21%  max=  31%  seconds >= 90%: 0 of 9
+  worker 7: p50=  20%  max=  30%  seconds >= 90%: 0 of 9
+latency ms           n      p50      p99      max
+  all            3000      9.8    698.1   1143.5
+  200             122    424.5    883.6    899.7
+  409            2878      9.7    587.5   1143.5
+  sched lag      3000      1.0      7.9     91.8
+  queue wait     3000      0.1      0.2      2.4
+  send lag       3000      1.1      9.1     91.8
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: PASS
+all containers unchanged during run
+
+===== /buy handled per instance (each seller's own access log) =====
+  seller1 (172.22.0.5): 1000
+  seller2 (172.22.0.4): 1000
+  seller3 (172.22.0.3): 1000
+
+===== docker stats: mean / max CPU per container =====
+  ticket_stampede-buyer-run-38a8acd8e703   mean  223.1%  max  473.8%
+  ticket_stampede-db-1                     mean   31.5%  max  108.6%
+  ticket_stampede-seller2-1                mean   20.8%  max   49.7%
+  m9_F1_functional_sampler                 mean    1.9%  max    2.1%
+  ticket_stampede-seller3-1                mean   20.3%  max   46.8%
+  ticket_stampede-lb-1                     mean   11.3%  max   22.8%
+  ticket_stampede-seller1-1                mean   20.8%  max   50.2%
+===== pg sampler =====
+samples=192  busy samples=24 (any seller session not idle)
+mean sessions per busy sample, by category:
+  idle                                      18.50
+  waiting_lock                              10.33
+  active:cpu:-                               0.79
+  idle in transaction                        0.21
+  active:IO:WALSync                          0.08
+  active:Client:ClientRead                   0.08
+sessions waiting on Lock (count -> % of busy samples):
+    0 ->  58.3%
+    7 ->   4.2%
+   17 ->   4.2%
+   27 ->  12.5%
+   28 ->   8.3%
+   29 ->  12.5%
+busy samples with exactly one root blocker: 33.3%
+root blocker's own state (how the lock holder spends its time): {'waiting_lock': 8, 'idle in transaction': 5, 'active:cpu:-': 2, 'active:IO:WALSync': 1}
+mean ungranted locks by type: {'tuple': 9.08, 'transactionid': 0.71}

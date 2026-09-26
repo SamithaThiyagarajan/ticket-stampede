@@ -1,0 +1,18 @@
+
+=== m9_F1_functional   [seller1 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets]
+  arrivals delivered 300.3/s   sched lag p99 7.9ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 3000 of 3000 = 300.1/s   QueueTimeouts 0   -> KEEPS UP (needs 0 QueueTimeouts and >= 291/s)
+  latency ms 200: n=   122  p50    424.5  p99    883.6
+  latency ms 409: n=  2878  p50      9.7  p99    587.5
+  latency ms all served: p50      9.8  p99    698.1
+  lb-1       CPU mean   11% max   23%
+  seller1-1  CPU mean   21% max   50%
+  seller2-1  CPU mean   21% max   50%
+  seller3-1  CPU mean   20% max   47%
+  db         CPU mean   32% max  109%
+  buyer container CPU mean 223% max 474%
+  routing (X-Upstream): 172.22.0.3:8000=1000  172.22.0.4:8000=1000  172.22.0.5:8000=1000
+  request_ids whose copies hit >1 instance: 483; of those holding a ticket: 18, all copies answered 200 with the same ticket: 18
+  pg: busy samples 24/192, mean lock waiters (busy) 10.33
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

@@ -28,6 +28,37 @@ services:
       db:
         condition: service_healthy
 
+  # Distributed stretch: three independent seller instances (one process each) behind
+  # nginx, all using the SAME Postgres. Start with: docker compose --profile cluster up -d
+  seller1: &cluster-seller
+    build: ./seller
+    profiles: ["cluster"]
+    environment:
+      DATABASE_URL: postgresql://tickets:tickets@db:5432/tickets
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-10}
+      SELLER_MODE: ${SELLER_MODE:-safe}
+      SELLER_SCHEMA: ${SELLER_SCHEMA:-}
+      SOLDOUT_FASTPATH: ${SOLDOUT_FASTPATH:-1}
+      WORK_DELAY_MS: ${WORK_DELAY_MS:-50}
+      WEB_CONCURRENCY: 1
+    depends_on:
+      db:
+        condition: service_healthy
+  seller2: *cluster-seller
+  seller3: *cluster-seller
+
+  lb:
+    image: nginx:1.27-alpine
+    profiles: ["cluster"]
+    volumes:
+      - ./lb/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - seller1
+      - seller2
+      - seller3
+
   # Load client inside the compose network (bypasses the host -> Docker port proxy).
   # Only runs on demand: docker compose run --rm buyer --url http://seller:8000 ...
   buyer:

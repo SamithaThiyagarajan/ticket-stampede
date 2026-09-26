@@ -1,0 +1,19 @@
+
+=== m9_50k_833rps_3sellers   [seller1 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets]
+  arrivals delivered 832.7/s   sched lag p99 4018.9ms   max worker s>=90%: 77   sent-no-answer: 0
+  CLIENT: NOT CLEAN ['sched p99 <100ms', 'worker >=90% <=3s']
+  served 49946 of 50000 = 554.7/s   QueueTimeouts 54   -> FALLS BEHIND (needs 0 QueueTimeouts and >= 808/s)
+  latency ms 200: n=   133  p50   1575.6  p99   8527.9
+  latency ms 409: n= 49811  p50  17374.1  p99  34478.1
+  latency ms all served: p50  17322.0  p99  34476.0
+  m9_50k_833rps_3sellers_sampler CPU mean    2% max    3%
+  lb-1       CPU mean   26% max   53%
+  seller1-1  CPU mean   57% max  102%
+  seller2-1  CPU mean   58% max  101%
+  seller3-1  CPU mean   50% max   93%
+  db         CPU mean   46% max   80%
+  buyer container CPU mean 729% max 848%
+  routing (X-Upstream): 172.22.0.3:8000=15221  172.22.0.4:8000=17362  172.22.0.5:8000=17363
+  request_ids whose copies hit >1 instance: 5657; of those holding a ticket: 27, all copies answered 200 with the same ticket: 27
+  pg: busy samples 181/1029, mean lock waiters (busy) 2.25
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

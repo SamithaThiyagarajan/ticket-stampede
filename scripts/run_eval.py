@@ -3,7 +3,7 @@ Usage: python scripts/run_eval.py NAME [NAME ...]   (reads results/NAME.*)"""
 import gzip
 import json
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "buyer"))
@@ -35,14 +35,16 @@ for name in sys.argv[1:]:
     for line in list(open(R / f"{name}.dockerstats.csv"))[1:]:
         _, cname, c, _ = line.strip().split(",", 3)
         cpu[cname].append(float(c.rstrip("%")))
-    seller = next(v for k, v in cpu.items() if "seller" in k)
+    sellers = {k: v for k, v in sorted(cpu.items()) if "seller" in k or "lb-1" in k}   # all instances + nginx
     db = next(v for k, v in cpu.items() if "db-1" in k)
 
     clean = {"arrivals +-2%": abs(delivered - rate) / rate <= .02,
              "sched p99 <100ms": pct([r["sched_lag_ms"] for r in recs], .99) < 100,
              "worker >=90% <=3s": max(hot.values()) <= 3,
              "0 sent-no-answer": sna == 0,
-             "seller unchanged": "seller container unchanged" in (R / f"{name}.env").read_text()}
+             # bench.sh writes "seller container unchanged", bench_cluster.sh "all containers unchanged"
+             "seller unchanged": "container unchanged" in (R / f"{name}.env").read_text()
+                                 or "containers unchanged" in (R / f"{name}.env").read_text()}
     served_rate = len(served) / (t1 - t0)
     keeps_up = qto == 0 and served_rate >= 0.97 * rate
 
@@ -56,6 +58,25 @@ for name in sys.argv[1:]:
         rs = [r for r in recs if r["status"] == code]
         print(f"  latency ms {code}: n={len(rs):6}  {lat(rs)}")
     print(f"  latency ms all served: {lat(served)}")
-    print(f"  seller CPU mean {sum(seller)/len(seller):.0f}% max {max(seller):.0f}%   db CPU mean {sum(db)/len(db):.0f}% max {max(db):.0f}%")
+    for k, v in sellers.items():
+        print(f"  {k.replace('ticket_stampede-', ''):10} CPU mean {sum(v)/len(v):4.0f}% max {max(v):4.0f}%")
+    print(f"  db         CPU mean {sum(db)/len(db):4.0f}% max {max(db):4.0f}%")
+    buyer_cpu = [c for k, v in cpu.items() if "buyer-run" in k for c in v]
+    if buyer_cpu:
+        print(f"  buyer container CPU mean {sum(buyer_cpu)/len(buyer_cpu):.0f}% max {max(buyer_cpu):.0f}%")
+    routed = [r for r in recs if "upstream" in r]
+    if routed:
+        # Per-request routing from nginx's X-Upstream header: distribution, and whether
+        # copies of one request_id were served by different instances yet got one answer.
+        print("  routing (X-Upstream): " + "  ".join(f"{u}={n}" for u, n in sorted(Counter(r["upstream"] for r in routed).items())))
+        by_rid = defaultdict(list)
+        for r in routed:
+            by_rid[r["request_id"]].append(r)
+        multi = [rs for rs in by_rid.values() if len({r["upstream"] for r in rs}) > 1]
+        multi_200 = [rs for rs in multi if any(r["status"] == 200 for r in rs)]
+        same = sum(1 for rs in multi_200 if len({r.get("ticket_number") for r in rs if r["status"] == 200}) == 1
+                   and all(r["status"] == 200 for r in rs))
+        print(f"  request_ids whose copies hit >1 instance: {len(multi)}; of those holding a ticket: {len(multi_200)}, "
+              f"all copies answered 200 with the same ticket: {same}")
     print(f"  pg: busy samples {len(busy)}/{len(samples)}, mean lock waiters (busy) {waiters:.2f}")
     print("  correctness: " + "  ".join(f"{k.split()[0]}:{'PASS' if ok else 'FAIL'}" for k, (ok, _) in results.items()))

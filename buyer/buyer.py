@@ -89,6 +89,8 @@ async def storm(args, k, n_workers, start_at):
             try:
                 r = await client.post("/buy", json={"user_id": user_id, "request_id": request_id})
                 rec["status"] = r.status_code
+                if "x-upstream" in r.headers:          # set by the nginx load balancer
+                    rec["upstream"] = r.headers["x-upstream"]
                 if r.status_code == 200:
                     rec["ticket_number"] = r.json()["ticket_number"]
             except httpx.HTTPError as e:
