@@ -13,6 +13,9 @@ DB_POOL_SIZE = int(os.environ.get("DB_POOL_SIZE", "10"))
 # at the same point so naive-vs-safe is a fair comparison.
 WORK_DELAY_MS = int(os.environ.get("WORK_DELAY_MS", "50"))
 SELLER_MODE = os.environ.get("SELLER_MODE", "safe")
+# Lock-free answer for replays and post-sellout requests (see buy_safe). "0" restores
+# the M7 baseline path, where every request queues on the sale-row lock.
+SOLDOUT_FASTPATH = os.environ.get("SOLDOUT_FASTPATH", "1") == "1"
 if SELLER_MODE not in ("naive", "safe"):
     raise ValueError(f"SELLER_MODE must be naive or safe, got {SELLER_MODE!r}")
 # Schema defaults to the mode. Override only for the constraint-backstop experiment
@@ -54,10 +57,36 @@ async def buy(body: BuyRequest):
     return await (buy_safe(body) if SELLER_MODE == "safe" else buy_naive(body))
 
 
+def existing_ticket_response(existing, body: BuyRequest):
+    """Response for a request_id that already holds a ticket (same on both paths)."""
+    if existing["user_id"] != body.user_id:
+        return JSONResponse(status_code=422, content={
+            "error": "request_id was already used by a different user_id"})
+    return {"ticket_number": existing["ticket_number"]}
+
+
 async def buy_safe(body: BuyRequest):
-    # One transaction (READ COMMITTED). Statement ORDER matters: the idempotency
-    # check must come after the lock, so it sees every previously committed sale.
     async with pool.acquire() as conn:
+        if SOLDOUT_FASTPATH:
+            # Fast path, no lock. ONE statement = ONE snapshot. sold_count and every
+            # ticket row commit in the same transaction, so a snapshot showing
+            # sold_count >= total also contains all ticket rows: "sold out and no row
+            # for this request_id" means it never will have one -> 409 is final.
+            # Splitting this into two statements reopens the race (the ticket could
+            # commit between them). Relies on sold_count never decreasing in a sale.
+            fast = await conn.fetchrow(
+                """SELECT s.sold_count >= s.total_tickets AS sold_out, t.ticket_number, t.user_id
+                   FROM sale s LEFT JOIN tickets t ON t.request_id = $1
+                   WHERE s.id = 1""", body.request_id)
+            if fast["ticket_number"] is not None:
+                return existing_ticket_response(fast, body)
+            if fast["sold_out"]:
+                return JSONResponse(status_code=409, content={"sold_out": True})
+            # Not sold out in this snapshot: fall through to the locked path, which
+            # re-checks everything under the lock.
+
+        # One transaction (READ COMMITTED). Statement ORDER matters: the idempotency
+        # check must come after the lock, so it sees every previously committed sale.
         async with conn.transaction():
             # 1. Lock the sale row. Every other /buy blocks here until we commit.
             #    On acquiring the lock, Postgres re-reads the latest committed row.
@@ -70,10 +99,7 @@ async def buy_safe(body: BuyRequest):
                 "SELECT ticket_number, user_id FROM tickets WHERE request_id = $1", body.request_id
             )
             if existing is not None:
-                if existing["user_id"] != body.user_id:
-                    return JSONResponse(status_code=422, content={
-                        "error": "request_id was already used by a different user_id"})
-                return {"ticket_number": existing["ticket_number"]}
+                return existing_ticket_response(existing, body)
 
             # 3. Capacity.
             if sale["sold_count"] >= sale["total_tickets"]:

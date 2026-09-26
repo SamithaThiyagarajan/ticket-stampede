@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 # One instrumented benchmark run with a verified seller configuration.
-#   scripts/bench.sh NAME WORK_DELAY_MS DB_POOL_SIZE [buyer args...]
+#   [FASTPATH=0|1] scripts/bench.sh NAME WORK_DELAY_MS DB_POOL_SIZE [buyer args...]
+# FASTPATH (default 1) = SOLDOUT_FASTPATH; 0 reproduces the M7 baseline code path.
 # Writes results/NAME.{txt,json.gz,pgsample.jsonl,pgsample.txt,dockerstats.csv,env}
 set -euo pipefail
 export MSYS_NO_PATHCONV=1          # Git Bash on Windows would rewrite /results/... paths
 cd "$(dirname "$0")/.."
 NAME=$1 DELAY=$2 POOL=$3; shift 3
+FASTPATH=${FASTPATH:-1}
 R=results/$NAME
 
 # Seller config is set explicitly on every run; never inherited from the shell.
-SELLER_MODE=safe WORK_DELAY_MS=$DELAY DB_POOL_SIZE=$POOL SELLER_SCHEMA= \
+SELLER_MODE=safe WORK_DELAY_MS=$DELAY DB_POOL_SIZE=$POOL SELLER_SCHEMA= SOLDOUT_FASTPATH=$FASTPATH \
   docker compose up -d --force-recreate seller >/dev/null 2>&1
 sleep 3
-ENV=$(docker compose exec -T seller printenv SELLER_MODE WORK_DELAY_MS DB_POOL_SIZE | tr '\n' ' ')
+ENV=$(docker compose exec -T seller printenv SELLER_MODE WORK_DELAY_MS DB_POOL_SIZE SOLDOUT_FASTPATH | tr '\n' ' ')
 SELLER_ID=$(docker compose ps -q seller)
-[ "$ENV" = "safe $DELAY $POOL " ] || { echo "ABORT: seller env is '$ENV', wanted 'safe $DELAY $POOL'"; exit 1; }
+WANT="safe $DELAY $POOL $FASTPATH "
+[ "$ENV" = "$WANT" ] || { echo "ABORT: seller env is '$ENV', wanted '$WANT'"; exit 1; }
 echo "seller env verified: $ENV(container ${SELLER_ID:0:12})" | tee "$R.env"
 
 docker compose run --rm -T --no-deps --name "${NAME}_sampler" --entrypoint python buyer \
