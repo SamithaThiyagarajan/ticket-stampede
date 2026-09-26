@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: tickets
+      POSTGRES_PASSWORD: tickets
+      POSTGRES_DB: tickets
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tickets"]
+      interval: 2s
+      retries: 15
+
+  seller:
+    build: ./seller
+    environment:
+      DATABASE_URL: postgresql://tickets:tickets@db:5432/tickets
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-10}
+      NAIVE_DELAY_MS: ${NAIVE_DELAY_MS:-50}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
