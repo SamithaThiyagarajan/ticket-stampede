@@ -1,0 +1,17 @@
+m10_50k_833rps_3sellers_aiohttp: requests with sched lag >100ms: 609 (1.22%)  >300ms: 324
+m10_50k_833rps_3sellers_aiohttp_4buyer: requests with sched lag >100ms: 282 (0.56%)  >300ms: 102
+
+4-worker run, latency by arrival window (ms):   window  p50   p99
+   t= 0s   1422.8   4036.2
+   t= 5s      6.9    621.5
+   t=10s      6.7     54.2
+   t=15s      6.8     27.1
+   t=20s      6.9     24.6
+   t=25s      6.1     12.8
+   t=30s      6.6     46.9
+   t=35s      5.9     14.1
+   t=40s      6.1     56.4
+   t=45s      6.1     22.6
+   t=50s      6.3     24.0
+   t=55s      6.5     15.4
+   arrivals after t=5s: p50 6.4  p99 149.8

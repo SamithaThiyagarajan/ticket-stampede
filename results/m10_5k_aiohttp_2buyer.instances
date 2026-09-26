@@ -1,0 +1,4 @@
+===== /buy handled per instance (each seller's own access log) =====
+  seller1 (172.22.0.4): 1666
+  seller2 (172.22.0.5): 1667
+  seller3 (172.22.0.3): 1667

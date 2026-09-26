@@ -17,6 +17,7 @@ A request that waits longer than --timeout for a slot gives up as QueueTimeout.
 """
 import argparse
 import asyncio
+import contextlib
 import gzip
 import json
 import math
@@ -25,6 +26,7 @@ import random
 import time
 from collections import Counter, defaultdict
 
+import aiohttp
 import httpx
 
 # Transport failures split by whether the server could have received the request.
@@ -47,6 +49,48 @@ def build_jobs(n_requests, dup_fraction, dup_copies, seed):
     return jobs[:n_requests]
 
 
+TRANSPORT_ERRORS = (httpx.HTTPError, aiohttp.ClientError, asyncio.TimeoutError)
+
+
+def error_name(e):
+    """Map transport failures onto the existing categories (NEVER_SENT vs sent-no-answer).
+    Unmapped errors keep their class name and count as sent-no-answer: nothing is hidden."""
+    if isinstance(e, aiohttp.ConnectionTimeoutError):
+        return "ConnectTimeout"                  # never sent
+    if isinstance(e, aiohttp.ClientConnectorError):
+        return "ConnectError"                    # never sent
+    if isinstance(e, (aiohttp.SocketTimeoutError, asyncio.TimeoutError)):
+        return "ReadTimeout"                     # sent, no answer within --timeout
+    return type(e).__name__                      # e.g. ServerDisconnectedError, ClientOSError, httpx names
+
+
+@contextlib.asynccontextmanager
+async def http_client(args, cap):
+    """Yield post_buy(payload) -> (status, x-upstream header or None, ticket_number or None).
+    Only the HTTP layer differs between clients; scheduling, queueing, recording and
+    verification are shared. Connection limit = cap, the same as our in-flight semaphore,
+    so no request waits inside the library's own pool."""
+    if args.client == "aiohttp":
+        timeout = aiohttp.ClientTimeout(total=None, sock_connect=args.timeout, sock_read=args.timeout)
+        async with aiohttp.ClientSession(base_url=args.url, connector=aiohttp.TCPConnector(limit=cap),
+                                         timeout=timeout) as session:
+            async def post_buy(payload):
+                async with session.post("/buy", json=payload) as r:
+                    body = await r.read()        # always read the body: frees the connection
+                    # Parse JSON only on 200: e.g. an nginx 502 body is HTML.
+                    ticket = json.loads(body)["ticket_number"] if r.status == 200 else None
+                    return r.status, r.headers.get("X-Upstream"), ticket
+            yield post_buy
+    else:
+        limits = httpx.Limits(max_connections=cap, max_keepalive_connections=cap)
+        async with httpx.AsyncClient(base_url=args.url, limits=limits, timeout=args.timeout) as client:
+            async def post_buy(payload):
+                r = await client.post("/buy", json=payload)
+                ticket = r.json()["ticket_number"] if r.status_code == 200 else None
+                return r.status_code, r.headers.get("x-upstream"), ticket
+            yield post_buy
+
+
 def storm_worker(args, k, n_workers, start_at):
     """Process entry point: worker k sends arrivals i with i % n_workers == k."""
     return asyncio.run(storm(args, k, n_workers, start_at))
@@ -59,7 +103,6 @@ async def storm(args, k, n_workers, start_at):
                                                             args.dup_copies, args.seed))
             if i % n_workers == k]
     cap = math.ceil(args.concurrency / n_workers)          # this worker's share of the connections
-    limits = httpx.Limits(max_connections=cap, max_keepalive_connections=cap)
     records, timeline = [], []
     in_flight = max_in_flight = queued = 0
     # start_at is wall-clock (shared across processes); convert once to this process's perf_counter.
@@ -77,7 +120,7 @@ async def storm(args, k, n_workers, start_at):
                              "in_flight": in_flight, "queued": queued, "done": len(records)})
             t_prev, cpu_prev = t, cpu
 
-    async with httpx.AsyncClient(base_url=args.url, limits=limits, timeout=args.timeout) as client:
+    async with http_client(args, cap) as post_buy:
 
         async def send(i, user_id, request_id, t0, sched_lag=0.0, queue_wait=0.0):
             nonlocal in_flight, max_in_flight
@@ -87,14 +130,14 @@ async def storm(args, k, n_workers, start_at):
             in_flight += 1
             max_in_flight = max(max_in_flight, in_flight)
             try:
-                r = await client.post("/buy", json={"user_id": user_id, "request_id": request_id})
-                rec["status"] = r.status_code
-                if "x-upstream" in r.headers:          # set by the nginx load balancer
-                    rec["upstream"] = r.headers["x-upstream"]
-                if r.status_code == 200:
-                    rec["ticket_number"] = r.json()["ticket_number"]
-            except httpx.HTTPError as e:
-                rec["status"] = type(e).__name__
+                status, upstream, ticket = await post_buy({"user_id": user_id, "request_id": request_id})
+                rec["status"] = status
+                if upstream:                           # set by the nginx load balancer
+                    rec["upstream"] = upstream
+                if status == 200:
+                    rec["ticket_number"] = ticket
+            except TRANSPORT_ERRORS as e:
+                rec["status"] = error_name(e)
             finally:
                 in_flight -= 1
             rec["latency_ms"] = (time.perf_counter() - t0) * 1000
@@ -237,7 +280,8 @@ def report(data):
     n_dup_ids = sum(1 for c in Counter(r["request_id"] for r in records).values() if c > 1)
     mode = f"open loop @ {args['rate']}/s" if args.get("rate") else f"closed loop, concurrency={args['concurrency']}"
 
-    print(f"\nrequests={len(records)}  {mode}  tickets={data['status']['total_tickets']}  "
+    print(f"\nclient={args.get('client', 'httpx')}  processes={args.get('processes', 1)}  "
+          f"requests={len(records)}  {mode}  tickets={data['status']['total_tickets']}  "
           f"request_ids sent >1 time={n_dup_ids}")
     print(f"responses: {dict(codes)}")
     transport = [r["status"] for r in records if not isinstance(r["status"], int)]
@@ -309,6 +353,8 @@ def main():
     p.add_argument("--concurrency", type=int, default=200,
                    help="closed loop: worker count; both modes: HTTP connection cap")
     p.add_argument("--rate", type=float, help="open loop: arrivals per second")
+    p.add_argument("--client", choices=("httpx", "aiohttp"), default="httpx",
+                   help="HTTP library for /buy (httpx = all runs before M10)")
     p.add_argument("--processes", type=int, default=1,
                    help="worker processes; arrivals split by i %% processes, connections split evenly")
     p.add_argument("--dup-fraction", type=float, default=0.2)

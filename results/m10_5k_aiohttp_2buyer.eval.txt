@@ -1,0 +1,18 @@
+
+=== m10_5k_aiohttp_2buyer   [client=aiohttp, buyer processes=2]   [seller1 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets]
+  arrivals delivered 839.5/s   sched lag p99 37.2ms   max worker s>=90%: 0   sent-no-answer: 0
+  CLIENT: CLEAN
+  served 5000 of 5000 = 839.0/s   QueueTimeouts 0   -> KEEPS UP (needs 0 QueueTimeouts and >= 808/s)
+  latency ms 200: n=   121  p50    811.5  p99   1829.4
+  latency ms 409: n=  4879  p50     43.7  p99   2167.1
+  latency ms all served: p50     48.2  p99   2155.1
+  lb-1       CPU mean   18% max   48%
+  seller1-1  CPU mean   37% max   99%
+  seller2-1  CPU mean   37% max   99%
+  seller3-1  CPU mean   37% max   99%
+  db         CPU mean   35% max  101%
+  buyer container CPU mean 133% max 156%
+  routing (X-Upstream): 172.22.0.3:8000=1667  172.22.0.4:8000=1666  172.22.0.5:8000=1667
+  request_ids whose copies hit >1 instance: 779; of those holding a ticket: 17, all copies answered 200 with the same ticket: 17
+  pg: busy samples 27/162, mean lock waiters (busy) 15.26
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

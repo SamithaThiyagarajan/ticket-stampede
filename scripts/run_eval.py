@@ -48,7 +48,7 @@ for name in sys.argv[1:]:
     served_rate = len(served) / (t1 - t0)
     keeps_up = qto == 0 and served_rate >= 0.97 * rate
 
-    print(f"\n=== {name}   [{env}]")
+    print(f"\n=== {name}   [client={d['args'].get('client', 'httpx')}, buyer processes={d['args'].get('processes', 1)}]   [{env}]")
     print(f"  arrivals delivered {delivered:.1f}/s   sched lag p99 {pct([r['sched_lag_ms'] for r in recs], .99):.1f}ms   "
           f"max worker s>=90%: {max(hot.values())}   sent-no-answer: {sna}")
     print(f"  CLIENT: {'CLEAN' if all(clean.values()) else 'NOT CLEAN ' + str([k for k, v in clean.items() if not v])}")
