@@ -1,0 +1,19 @@
+capture: 58039 packets, 1665 upstream TCP connections, t=-7.50s .. (relative to buyer start)
+new upstream connections (SYN) per seller: {'172.22.0.3': 576, '172.22.0.5': 544, '172.22.0.4': 545}
+connections closed by nginx (FIN from nginx): 391
+connections closed by a seller (FIN from seller): 391
+  idle time before the seller's FIN: min 0.001s  p50 3.786s  max 10.897s; within 4.9–5.3s: 56 of 391
+nginx sent request data AFTER the seller's FIN had arrived: 74 time(s)
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46092.63 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46100.07 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46107.21 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46113.97 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46121.27 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46132.55 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46139.51 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46143.60 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46149.59 ms after the seller's FIN arrived
+  172.22.0.6:53580 -> 172.22.0.4  request sent 46157.56 ms after the seller's FIN arrived
+
+RST sent by a seller: 0 connection(s)
+502s in buyer records: 0

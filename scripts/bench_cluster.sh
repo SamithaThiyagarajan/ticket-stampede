@@ -50,6 +50,13 @@ DBVOL=$(docker inspect -f '{{range .Mounts}}{{.Name}}{{end}}' "$(docker compose 
 echo "containers: $IDS" | tee -a "$R.env"
 echo "db volume: $DBVOL" | tee -a "$R.env"
 echo "fault: ${FAULT:-none}" | tee -a "$R.env"
+# Optional packet capture of nginx's upstream side (measurement only; system under test untouched).
+if [ "${CAPTURE:-0}" = 1 ]; then
+  docker run -d --rm --name "${NAME}_pcap" --net "container:$(docker compose ps -q lb)" \
+    --cap-add NET_RAW --cap-add NET_ADMIN -v "$(pwd -W)/results:/out" ticket-tcpdump \
+    -i eth0 -s 128 -U -w "/out/$NAME.pcap" "tcp port 8000" > /dev/null
+  sleep 1; echo "capture: tcpdump on lb eth0, tcp port 8000 -> $R.pcap" | tee -a "$R.env"
+fi
 
 docker compose run --rm -T --no-deps --name "${NAME}_sampler" --entrypoint python buyer \
   pgsample.py --duration 1800 --out "/$R.pgsample.jsonl" >/dev/null 2>&1 &
@@ -75,6 +82,7 @@ docker compose run --rm -T --no-deps buyer --url http://lb:80 "$@" --start-at "$
 [ -n "$FAULT" ] && wait $INJECTOR
 touch "$R.done"; wait $STATS; rm -f "$R.done"
 docker stop "${NAME}_sampler" >/dev/null 2>&1 || true
+[ "${CAPTURE:-0}" = 1 ] && { docker stop "${NAME}_pcap" > /dev/null 2>&1 || true; }
 NOW=$(for S in $SELLERS lb db; do docker compose ps -q $S | cut -c1-12; done | tr '\n' ' ')
 [ "$NOW" = "$IDS" ] && echo "all containers unchanged during run" | tee -a "$R.env" \
   || { echo "INVALID: containers changed during run ($IDS -> $NOW)" | tee -a "$R.env"; exit 1; }

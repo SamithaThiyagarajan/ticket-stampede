@@ -1,0 +1,24 @@
+
+client=aiohttp  processes=2  requests=1000  open loop @ 100.0/s  tickets=100  request_ids sent >1 time=162
+responses: {200: 116, 409: 884}
+throughput: 100.0 req/s over 10.00s (storm only)   max in-flight: 8 (sum of per-worker maxima [4, 4]) (connection cap 2000)
+arrivals delivered: 100.1/s over 9.98s (target 100.0/s over 9.99s)
+served by server: 1000 responses, 100.2/s over 9.98s (first send -> last answer)
+buyer CPU per 1s sample, per worker process (max queued in any worker: 0):
+  worker 0: p50=   9%  max=  12%  seconds >= 90%: 0 of 9
+  worker 1: p50=   9%  max=  11%  seconds >= 90%: 0 of 9
+latency ms           n      p50      p99      max
+  all            1000      7.8     43.3     87.0
+  200             116     16.8     65.4     87.0
+  409             884      7.6     13.3     16.9
+  sched lag      1000      1.1      2.5     16.6
+  queue wait     1000      0.1      0.2      0.7
+  send lag       1000      1.1      2.6     16.6
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: PASS

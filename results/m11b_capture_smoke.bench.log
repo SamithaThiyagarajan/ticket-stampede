@@ -1,0 +1,64 @@
+seller1 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+seller2 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+seller3 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+one Postgres: 30 client connections = 3 x 10; by client IP: 172.22.0.3=10 172.22.0.4=10 172.22.0.5=10 ; seller IPs: seller1=172.22.0.4 seller2=172.22.0.5 seller3=172.22.0.3
+containers: e12eb2d35848 73f91b938d19 09bc21950e71 4d9ef8d261e3 c20d681fa533 
+db volume: 7f468edc511111b1a37e718a6e24086ebb10a2bc0ad334d98060846f11f9f4ae
+fault: none
+capture: tcpdump on lb eth0, tcp port 8000 -> results/m11b_capture_smoke.pcap
+start_at: 1790479864.011
+
+client=aiohttp  processes=2  requests=1000  open loop @ 100.0/s  tickets=100  request_ids sent >1 time=162
+responses: {200: 116, 409: 884}
+throughput: 100.0 req/s over 10.00s (storm only)   max in-flight: 8 (sum of per-worker maxima [4, 4]) (connection cap 2000)
+arrivals delivered: 100.1/s over 9.98s (target 100.0/s over 9.99s)
+served by server: 1000 responses, 100.2/s over 9.98s (first send -> last answer)
+buyer CPU per 1s sample, per worker process (max queued in any worker: 0):
+  worker 0: p50=   9%  max=  12%  seconds >= 90%: 0 of 9
+  worker 1: p50=   9%  max=  11%  seconds >= 90%: 0 of 9
+latency ms           n      p50      p99      max
+  all            1000      7.8     43.3     87.0
+  200             116     16.8     65.4     87.0
+  409             884      7.6     13.3     16.9
+  sched lag      1000      1.1      2.5     16.6
+  queue wait     1000      0.1      0.2      0.7
+  send lag       1000      1.1      2.6     16.6
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: PASS
+all containers unchanged during run
+db volume unchanged
+
+===== /buy handled per instance (each seller's own access log) =====
+  seller1 (172.22.0.4): 333  by status: 200=38 409=295 
+  seller2 (172.22.0.5): 334  by status: 200=39 409=295 
+  seller3 (172.22.0.3): 333  by status: 200=39 409=294 
+  nginx [error]-level lines: 0; db log lines this run: 0
+
+===== docker stats: mean / max CPU per container =====
+  ticket_stampede-db-1                     mean    9.1%  max   21.2%
+  ticket_stampede-buyer-run-b41981f00a5a   mean    9.2%  max   18.9%
+  ticket_stampede-seller2-1                mean    4.2%  max   12.6%
+  m11b_capture_smoke_sampler               mean    1.9%  max    2.2%
+  ticket_stampede-seller3-1                mean    4.5%  max   13.0%
+  ticket_stampede-lb-1                     mean    2.6%  max    7.7%
+  ticket_stampede-seller1-1                mean    4.5%  max   12.8%
+  m11b_capture_smoke_pcap                  mean    0.6%  max    1.9%
+===== pg sampler =====
+samples=250  busy samples=8 (any seller session not idle)
+mean sessions per busy sample, by category:
+  idle                                      28.50
+  active:cpu:-                               0.75
+  waiting_lock                               0.50
+  idle in transaction                        0.25
+sessions waiting on Lock (count -> % of busy samples):
+    0 ->  87.5%
+    4 ->  12.5%
+busy samples with exactly one root blocker: 12.5%
+root blocker's own state (how the lock holder spends its time): {'idle in transaction': 1}
+mean ungranted locks by type: {'tuple': 0.38, 'transactionid': 0.12}

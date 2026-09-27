@@ -1,0 +1,5 @@
+# Measurement-only sidecar: runs tcpdump inside another container's network namespace
+# (docker run --net container:<id> --cap-add NET_RAW --cap-add NET_ADMIN ...).
+FROM python:3.12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends tcpdump && rm -rf /var/lib/apt/lists/*
+ENTRYPOINT ["tcpdump"]
