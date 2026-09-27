@@ -1,0 +1,24 @@
+UNREACHABLE samples: 31 of 644, t=13.658..28.848s, errors: {'InterfaceError': 1, 'ConnectionRefusedError': 8, 'TimeoutError': 12, 'CannotConnectNowError': 10}
+samples=613  busy samples=98 (any seller session not idle)
+mean sessions per busy sample, by category:
+  idle                                      23.82
+  waiting_lock                               3.49
+  active:cpu:-                               0.88
+  active:Client:ClientRead                   0.54
+  idle in transaction                        0.37
+  active:IO:WALSync                          0.02
+sessions waiting on Lock (count -> % of busy samples):
+    0 ->  82.7%
+    1 ->   1.0%
+    5 ->   2.0%
+    9 ->   1.0%
+   10 ->   1.0%
+   15 ->   1.0%
+   23 ->   2.0%
+   26 ->   2.0%
+   27 ->   1.0%
+   28 ->   2.0%
+   29 ->   4.1%
+busy samples with exactly one root blocker: 13.3%
+root blocker's own state (how the lock holder spends its time): {'waiting_lock': 12, 'idle in transaction': 10, 'active:IO:WALSync': 2, 'active:cpu:-': 2, 'active:Client:ClientRead': 1}
+mean ungranted locks by type: {'tuple': 3.05, 'transactionid': 0.45}

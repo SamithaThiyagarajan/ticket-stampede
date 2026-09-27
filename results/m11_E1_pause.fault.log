@@ -1,0 +1,8 @@
+1790482180.022053400 fault=pause offset=1.0s duration=10s start_at=1790482186.846 db=c20d681fa533 volume=7f468edc5111 dryrun=0
+1790482188.242851600 inject: docker pause issued
+1790482190.844917800 inject: docker pause returned
+1790482201.187099600 restore: docker unpause issued
+1790482203.601346600 restore: docker unpause returned
+1790482206.092726000 postgres accepting connections
+1790482210.314811400 db container unchanged (c20d681fa533)
+1790482212.639041000 db volume unchanged

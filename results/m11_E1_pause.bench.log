@@ -1,0 +1,79 @@
+seller1 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+seller2 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+seller3 env verified: safe 0 10 1 1  DATABASE_URL=postgresql://tickets:tickets@db:5432/tickets
+one Postgres: 30 client connections = 3 x 10; by client IP: 172.22.0.3=10 172.22.0.4=10 172.22.0.5=10 ; seller IPs: seller1=172.22.0.3 seller2=172.22.0.4 seller3=172.22.0.5
+containers: 8a0c8473b2d2 d5281a25b40c 7398a43c0932 f8888ac6f2e3 c20d681fa533 
+db volume: 7f468edc511111b1a37e718a6e24086ebb10a2bc0ad334d98060846f11f9f4ae
+fault: pause:1.0:10
+start_at: 1790482186.846
+
+client=aiohttp  processes=4  requests=50000  open loop @ 833.33/s  tickets=100  request_ids sent >1 time=8442
+responses: {200: 130, 409: 49868, 'ReadTimeout': 2}
+transport failures: never sent=0  sent, no answer=2
+throughput: 771.6 req/s over 64.80s (storm only)   max in-flight: 2000 (sum of per-worker maxima [500, 500, 500, 500]) (connection cap 2000)
+arrivals delivered: 836.9/s over 59.74s (target 833.33/s over 60.00s)
+served by server: 49998 responses, 774.6/s over 64.55s (first send -> last answer)
+  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure
+buyer CPU per 1s sample, per worker process (max queued in any worker: 2465):
+  worker 0: p50=  35%  max=  56%  seconds >= 90%: 0 of 64
+  worker 1: p50=  35%  max=  53%  seconds >= 90%: 0 of 64
+  worker 2: p50=  36%  max=  54%  seconds >= 90%: 0 of 64
+  worker 3: p50=  36%  max=  52%  seconds >= 90%: 0 of 64
+latency ms           n      p50      p99      max
+  all           50000   9198.6  21622.5  40574.8
+  200             130   1130.9  22849.9  22921.3
+  409           49868   9221.3  21603.4  34900.1
+  ReadTimeout       2  30002.9  40574.8  40574.8
+  sched lag     50000      0.9      8.8    296.7
+  queue wait    50000   6770.6  11792.9  11868.9
+  send lag      50000   6771.1  11793.6  11870.0
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)
+all containers unchanged during run
+db volume unchanged
+
+===== /buy handled per instance (each seller's own access log) =====
+  seller1 (172.22.0.3): 16665  by status: 200=53 409=16612 
+  seller2 (172.22.0.4): 16667  by status: 200=27 409=16640 
+  seller3 (172.22.0.5): 16666  by status: 200=50 409=16616 
+  nginx [error]-level lines: 0; db log lines this run: 1
+
+===== docker stats: mean / max CPU per container =====
+  ticket_stampede-db-1                     mean   40.8%  max   85.7%
+  ticket_stampede-seller2-1                mean   54.8%  max  103.1%
+  m11_E1_pause_sampler                     mean    3.0%  max   33.0%
+  ticket_stampede-seller3-1                mean   54.8%  max  102.8%
+  ticket_stampede-lb-1                     mean   24.1%  max   47.7%
+  ticket_stampede-buyer-run-2fe65455d00a   mean  119.2%  max  203.2%
+  ticket_stampede-seller1-1                mean   49.2%  max  102.9%
+===== pg sampler =====
+UNREACHABLE samples: 11 of 722, t=14.296..25.337s, errors: {'TimeoutError': 11}
+samples=711  busy samples=147 (any seller session not idle)
+mean sessions per busy sample, by category:
+  idle                                      26.02
+  waiting_lock                               2.43
+  active:cpu:-                               0.77
+  active:Client:ClientRead                   0.50
+  idle in transaction                        0.23
+  active:LWLock:LockManager                  0.03
+  active:IO:WALSync                          0.02
+sessions waiting on Lock (count -> % of busy samples):
+    0 ->  88.4%
+    1 ->   0.7%
+    2 ->   0.7%
+    9 ->   1.4%
+   14 ->   0.7%
+   22 ->   1.4%
+   23 ->   0.7%
+   27 ->   0.7%
+   28 ->   2.7%
+   29 ->   2.7%
+busy samples with exactly one root blocker: 10.2%
+root blocker's own state (how the lock holder spends its time): {'idle in transaction': 11, 'waiting_lock': 5, 'active:Client:ClientRead': 3, 'active:IO:WALSync': 2}
+mean ungranted locks by type: {'transactionid': 0.21, 'tuple': 2.27}

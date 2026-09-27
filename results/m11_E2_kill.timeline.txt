@@ -1,0 +1,188 @@
+=== fault timeline (t relative to buyer start) ===
+  t=  -6.594s  fault=kill offset=1.0s duration=10s start_at=1790482504.913 db=c20d681fa533 volume=7f468edc5111 dryrun=0
+  t=   1.412s  inject: docker kill -s SIGKILL issued
+  t=   4.028s  inject: docker kill returned
+  t=  14.335s  restore: docker start issued
+  t=  17.171s  restore: docker start returned
+  t=  19.397s  postgres accepting connections
+  t=  22.550s  db container unchanged (c20d681fa533)
+  t=  24.395s  db volume unchanged
+  t=   3.102s  docker event: kill
+  t=   3.758s  docker event: die
+  t=  16.850s  docker event: start
+
+=== outcomes per second, by answer time ===
+  t(s)              200            409            500            502
+     0               21              0              0              0
+     1               97            192              0              0
+     2                1           1018              0              0
+     3                0            123            110            648
+     4                0              0              0            833
+     5                0              0              0            833
+     6                0              0              0            834
+     7                0              0              1            834
+     8                0              0              0            832
+     9                0              0              0            834
+    10                0              0              0            834
+    11                0              0              1            831
+    12                0              0              0            835
+    13                0              0              0            833
+    14                0              0              1            825
+    15                0              0              0            834
+    16                0              0              0            833
+    17                0              0             47            833
+    18                0            192             29            833
+    19                0             92              0            834
+    20                0              0              0            832
+    21                0              0              0            836
+    22                0              0              0            832
+    23                0            140              0            662
+
+=== outcome totals ===
+  {409: 32554, 200: 122, 500: 189, 502: 17135}
+  non-200/409 outcomes: 17324, first at t=3.134s, last at t=23.793s
+  5xx by upstream: {('172.22.0.3:8000', 500): 32, ('172.22.0.5:8000', 502): 3, ('172.22.0.4:8000', 502): 3, ('sellers', 502): 17124, ('172.22.0.4:8000', 500): 118, ('172.22.0.5:8000', 500): 39, ('172.22.0.3:8000', 502): 5}
+  first 200/409 answer per upstream after Postgres accepted connections (t=19.397s): 172.22.0.3:8000: t=23.794s, 172.22.0.4:8000: t=23.750s, 172.22.0.5:8000: t=23.817s
+
+=== latency by arrival window (ms, answered requests) ===
+  arrivals t= 0-5s: n= 4167  p50    1399.8  p99   25163.0  max   26747.3
+  arrivals t= 5-10s: n= 4167  p50       2.3  p99       4.7  max      17.6
+  arrivals t=10-15s: n= 4166  p50       2.3  p99       4.5  max   11792.0
+  arrivals t=15-20s: n= 4167  p50       2.4  p99       5.5  max      16.3
+  arrivals t=20-25s: n= 4167  p50       2.5  p99    2318.1  max    3184.5
+  arrivals t=25-30s: n= 4166  p50       8.2  p99    1614.7  max    2183.4
+  arrivals t=30-35s: n= 4167  p50       6.4  p99     111.6  max     204.3
+  arrivals t=35-40s: n= 4167  p50       7.2  p99     140.8  max     266.8
+  arrivals t=40-45s: n= 4166  p50       6.7  p99      63.2  max      88.2
+  arrivals t=45-50s: n= 4167  p50       7.8  p99      42.2  max      71.3
+  arrivals t=50-55s: n= 4167  p50       6.9  p99      51.8  max      88.1
+  arrivals t=55-60s: n= 4166  p50       7.9  p99     117.1  max     218.7
+  queue wait (client-side backpressure): p50 0.1  p99 0.2  max 8.5 ms; QueueTimeouts: 0
+  100th 200-answer at t=1.679s
+
+=== pg sampler: 31 unreachable samples, t=13.7..28.8s (sampler clock), errors {'InterfaceError': 1, 'ConnectionRefusedError': 8, 'TimeoutError': 12, 'CannotConnectNowError': 10}
+
+=== seller logs: exception types ===
+  {'asyncpg.exceptions.ConnectionDoesNotExistError': 30, 'ConnectionResetError': 17, 'AttributeError': 7, 'ConnectionRefusedError': 80, 'asyncpg.exceptions.CannotConnectNowError': 75}
+
+=== nginx error log: 17135 line(s) ===
+  2026/09/27 04:15:08 [error] 30#30: *2654 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:15:08 [error] 30#30: *2495 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:15:08 [error] 30#30: *2663 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:15:08 [error] 30#30: *2364 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:15:08 [error] 30#30: *2633 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:15:08 [error] 30#30: *2629 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:15:08 [error] 30#30: *1958 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:15:08 [error] 30#30: *2134 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:15:08 [error] 30#30: *2692 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:15:08 [error] 30#30: *1613 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+
+=== Postgres log (this run) ===
+  
+  PostgreSQL Database directory appears to contain a database; Skipping initialization
+  
+  2026-09-27 04:15:22.151 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+  2026-09-27 04:15:22.153 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+  2026-09-27 04:15:22.153 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+  2026-09-27 04:15:22.165 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+  2026-09-27 04:15:22.182 UTC [29] LOG:  database system was interrupted; last known up at 2026-09-27 04:13:18 UTC
+  2026-09-27 04:15:22.240 UTC [30] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.249 UTC [31] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.256 UTC [32] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.270 UTC [33] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.283 UTC [34] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.296 UTC [35] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.309 UTC [36] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.323 UTC [37] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.337 UTC [38] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.351 UTC [39] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.359 UTC [40] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.368 UTC [41] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.381 UTC [42] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.394 UTC [43] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.406 UTC [44] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.420 UTC [45] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.436 UTC [46] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.451 UTC [47] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.467 UTC [48] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.470 UTC [49] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.483 UTC [50] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.500 UTC [51] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.515 UTC [52] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.529 UTC [53] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.546 UTC [54] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.562 UTC [55] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.575 UTC [56] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.581 UTC [57] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.591 UTC [58] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.607 UTC [59] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.622 UTC [60] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.638 UTC [61] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.653 UTC [62] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.674 UTC [63] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.690 UTC [64] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.692 UTC [65] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.706 UTC [66] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.718 UTC [67] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.733 UTC [68] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.747 UTC [69] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.760 UTC [70] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.772 UTC [71] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.785 UTC [72] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.799 UTC [73] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.801 UTC [74] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.812 UTC [75] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.825 UTC [76] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.840 UTC [77] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.856 UTC [78] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.870 UTC [79] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.883 UTC [80] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.895 UTC [81] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.912 UTC [82] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.913 UTC [83] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.926 UTC [84] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.940 UTC [85] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.954 UTC [86] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.966 UTC [87] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.979 UTC [88] FATAL:  the database system is starting up
+  2026-09-27 04:15:22.993 UTC [89] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.011 UTC [90] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.023 UTC [91] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.028 UTC [92] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.042 UTC [93] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.057 UTC [94] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.071 UTC [95] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.085 UTC [96] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.100 UTC [97] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.115 UTC [98] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.128 UTC [99] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.133 UTC [100] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.143 UTC [101] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.157 UTC [102] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.173 UTC [103] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.175 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
+  2026-09-27 04:15:23.186 UTC [104] FATAL:  the database system is starting up
+  2026-09-27 04:15:23.190 UTC [29] LOG:  redo starts at 0/4668AF0
+  2026-09-27 04:15:23.196 UTC [29] LOG:  invalid record length at 0/46A11E8: expected at least 24, got 0
+  2026-09-27 04:15:23.196 UTC [29] LOG:  redo done at 0/46A11C0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+  2026-09-27 04:15:23.199 UTC [105] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.199 UTC [105] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.213 UTC [106] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.213 UTC [106] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.227 UTC [107] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.227 UTC [107] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.244 UTC [109] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.244 UTC [109] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.245 UTC [108] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.245 UTC [108] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.259 UTC [110] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.259 UTC [110] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.276 UTC [111] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.276 UTC [111] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.290 UTC [112] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.290 UTC [112] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.304 UTC [113] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.304 UTC [113] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.318 UTC [114] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:15:23.318 UTC [114] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:15:23.320 UTC [1] LOG:  database system is ready to accept connections

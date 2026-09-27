@@ -1,0 +1,8 @@
+1790482498.318990500 fault=kill offset=1.0s duration=10s start_at=1790482504.913 db=c20d681fa533 volume=7f468edc5111 dryrun=0
+1790482506.324552500 inject: docker kill -s SIGKILL issued
+1790482508.940720300 inject: docker kill returned
+1790482519.247874600 restore: docker start issued
+1790482522.083913500 restore: docker start returned
+1790482524.309555900 postgres accepting connections
+1790482527.462525400 db container unchanged (c20d681fa533)
+1790482529.307666000 db volume unchanged

@@ -1,0 +1,29 @@
+
+client=aiohttp  processes=4  requests=50000  open loop @ 833.33/s  tickets=100  request_ids sent >1 time=8442
+responses: {200: 130, 409: 49868, 'ReadTimeout': 2}
+transport failures: never sent=0  sent, no answer=2
+throughput: 771.6 req/s over 64.80s (storm only)   max in-flight: 2000 (sum of per-worker maxima [500, 500, 500, 500]) (connection cap 2000)
+arrivals delivered: 836.9/s over 59.74s (target 833.33/s over 60.00s)
+served by server: 49998 responses, 774.6/s over 64.55s (first send -> last answer)
+  NOTE: in-flight cap reached; arrivals queued client-side (see queue_wait) — server backpressure
+buyer CPU per 1s sample, per worker process (max queued in any worker: 2465):
+  worker 0: p50=  35%  max=  56%  seconds >= 90%: 0 of 64
+  worker 1: p50=  35%  max=  53%  seconds >= 90%: 0 of 64
+  worker 2: p50=  36%  max=  54%  seconds >= 90%: 0 of 64
+  worker 3: p50=  36%  max=  52%  seconds >= 90%: 0 of 64
+latency ms           n      p50      p99      max
+  all           50000   9198.6  21622.5  40574.8
+  200             130   1130.9  22849.9  22921.3
+  409           49868   9221.3  21603.4  34900.1
+  ReadTimeout       2  30002.9  40574.8  40574.8
+  sched lag     50000      0.9      8.8    296.7
+  queue wait    50000   6770.6  11792.9  11868.9
+  send lag      50000   6771.1  11793.6  11870.0
+
+  [PASS] 1 no oversell            100 tickets issued for 100 available
+  [PASS] 2 no duplicate ticket    0 ticket numbers issued >1 time (0 rows); 0 out of range
+  [PASS] 3 idempotency            0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)
+  [PASS] 4 no drift               /status sold=100, actual rows=100
+  [PASS] 5 responses = state      0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)
+
+OVERALL: INCONCLUSIVE (invariants held, but unexpected errors)

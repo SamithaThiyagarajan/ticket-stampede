@@ -1,0 +1,57 @@
+=== fault timeline (t relative to buyer start) ===
+  t=  -6.824s  fault=pause offset=1.0s duration=10s start_at=1790482186.846 db=c20d681fa533 volume=7f468edc5111 dryrun=0
+  t=   1.397s  inject: docker pause issued
+  t=   3.999s  inject: docker pause returned
+  t=  14.341s  restore: docker unpause issued
+  t=  16.755s  restore: docker unpause returned
+  t=  19.247s  postgres accepting connections
+  t=  23.469s  db container unchanged (c20d681fa533)
+  t=  25.793s  db volume unchanged
+  t=   3.676s  docker event: pause
+  t=  16.424s  docker event: unpause
+
+=== outcomes per second, by answer time ===
+  t(s)              200            409 sent-no-answer
+     0               27              0              0
+     1               96            217              0
+     2                0           1024              0
+     3                1            565              0
+    16                0            467              0
+    17                4            900              0
+    18                0            975              0
+    19                0            995              0
+    20                0            923              0
+    31                0           1237              1
+    58                0           1127              1
+
+=== outcome totals ===
+  {200: 130, 409: 49868, 'ReadTimeout': 2}
+  non-200/409 outcomes: 2, first at t=31.978s, last at t=58.979s
+  5xx by upstream: {}
+  first 200/409 answer per upstream after Postgres accepted connections (t=19.247s): 172.22.0.3:8000: t=19.249s, 172.22.0.4:8000: t=19.247s, 172.22.0.5:8000: t=19.251s
+
+=== latency by arrival window (ms, answered requests) ===
+  arrivals t= 0-5s: n= 4166  p50   13909.4  p99   24001.9  max   29236.0
+  arrivals t= 5-10s: n= 4167  p50   13205.6  p99   22826.4  max   31763.0
+  arrivals t=10-15s: n= 4166  p50   12826.7  p99   21868.5  max   30819.9
+  arrivals t=15-20s: n= 4166  p50   11969.5  p99   20907.1  max   31877.6
+  arrivals t=20-25s: n= 4167  p50   10905.6  p99   21623.5  max   32088.8
+  arrivals t=25-30s: n= 4166  p50    9517.3  p99   22491.4  max   34900.1
+  arrivals t=30-35s: n= 4167  p50    7922.1  p99   23112.0  max   33776.8
+  arrivals t=35-40s: n= 4167  p50    6595.5  p99   22665.4  max   28518.9
+  arrivals t=40-45s: n= 4166  p50    5424.3  p99   19913.9  max   24377.1
+  arrivals t=45-50s: n= 4167  p50    4881.1  p99   16353.4  max   19230.4
+  arrivals t=50-55s: n= 4167  p50    4583.7  p99   12676.6  max   14556.4
+  arrivals t=55-60s: n= 4166  p50    3666.4  p99    8630.3  max    9341.2
+  queue wait (client-side backpressure): p50 6770.6  p99 11792.9  max 11868.9 ms; QueueTimeouts: 0
+  100th 200-answer at t=1.698s
+
+=== pg sampler: 11 unreachable samples, t=14.3..25.3s (sampler clock), errors {'TimeoutError': 11}
+
+=== seller logs: exception types ===
+  none
+
+=== nginx error log: 0 line(s) ===
+
+=== Postgres log (this run) ===
+  2026-09-27 04:11:03.924 UTC [87773] LOG:  could not receive data from client: Connection reset by peer

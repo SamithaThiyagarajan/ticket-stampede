@@ -1,0 +1,110 @@
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2026-09-27 04:15:22.151 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-09-27 04:15:22.153 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-09-27 04:15:22.153 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-09-27 04:15:22.165 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-09-27 04:15:22.182 UTC [29] LOG:  database system was interrupted; last known up at 2026-09-27 04:13:18 UTC
+2026-09-27 04:15:22.240 UTC [30] FATAL:  the database system is starting up
+2026-09-27 04:15:22.249 UTC [31] FATAL:  the database system is starting up
+2026-09-27 04:15:22.256 UTC [32] FATAL:  the database system is starting up
+2026-09-27 04:15:22.270 UTC [33] FATAL:  the database system is starting up
+2026-09-27 04:15:22.283 UTC [34] FATAL:  the database system is starting up
+2026-09-27 04:15:22.296 UTC [35] FATAL:  the database system is starting up
+2026-09-27 04:15:22.309 UTC [36] FATAL:  the database system is starting up
+2026-09-27 04:15:22.323 UTC [37] FATAL:  the database system is starting up
+2026-09-27 04:15:22.337 UTC [38] FATAL:  the database system is starting up
+2026-09-27 04:15:22.351 UTC [39] FATAL:  the database system is starting up
+2026-09-27 04:15:22.359 UTC [40] FATAL:  the database system is starting up
+2026-09-27 04:15:22.368 UTC [41] FATAL:  the database system is starting up
+2026-09-27 04:15:22.381 UTC [42] FATAL:  the database system is starting up
+2026-09-27 04:15:22.394 UTC [43] FATAL:  the database system is starting up
+2026-09-27 04:15:22.406 UTC [44] FATAL:  the database system is starting up
+2026-09-27 04:15:22.420 UTC [45] FATAL:  the database system is starting up
+2026-09-27 04:15:22.436 UTC [46] FATAL:  the database system is starting up
+2026-09-27 04:15:22.451 UTC [47] FATAL:  the database system is starting up
+2026-09-27 04:15:22.467 UTC [48] FATAL:  the database system is starting up
+2026-09-27 04:15:22.470 UTC [49] FATAL:  the database system is starting up
+2026-09-27 04:15:22.483 UTC [50] FATAL:  the database system is starting up
+2026-09-27 04:15:22.500 UTC [51] FATAL:  the database system is starting up
+2026-09-27 04:15:22.515 UTC [52] FATAL:  the database system is starting up
+2026-09-27 04:15:22.529 UTC [53] FATAL:  the database system is starting up
+2026-09-27 04:15:22.546 UTC [54] FATAL:  the database system is starting up
+2026-09-27 04:15:22.562 UTC [55] FATAL:  the database system is starting up
+2026-09-27 04:15:22.575 UTC [56] FATAL:  the database system is starting up
+2026-09-27 04:15:22.581 UTC [57] FATAL:  the database system is starting up
+2026-09-27 04:15:22.591 UTC [58] FATAL:  the database system is starting up
+2026-09-27 04:15:22.607 UTC [59] FATAL:  the database system is starting up
+2026-09-27 04:15:22.622 UTC [60] FATAL:  the database system is starting up
+2026-09-27 04:15:22.638 UTC [61] FATAL:  the database system is starting up
+2026-09-27 04:15:22.653 UTC [62] FATAL:  the database system is starting up
+2026-09-27 04:15:22.674 UTC [63] FATAL:  the database system is starting up
+2026-09-27 04:15:22.690 UTC [64] FATAL:  the database system is starting up
+2026-09-27 04:15:22.692 UTC [65] FATAL:  the database system is starting up
+2026-09-27 04:15:22.706 UTC [66] FATAL:  the database system is starting up
+2026-09-27 04:15:22.718 UTC [67] FATAL:  the database system is starting up
+2026-09-27 04:15:22.733 UTC [68] FATAL:  the database system is starting up
+2026-09-27 04:15:22.747 UTC [69] FATAL:  the database system is starting up
+2026-09-27 04:15:22.760 UTC [70] FATAL:  the database system is starting up
+2026-09-27 04:15:22.772 UTC [71] FATAL:  the database system is starting up
+2026-09-27 04:15:22.785 UTC [72] FATAL:  the database system is starting up
+2026-09-27 04:15:22.799 UTC [73] FATAL:  the database system is starting up
+2026-09-27 04:15:22.801 UTC [74] FATAL:  the database system is starting up
+2026-09-27 04:15:22.812 UTC [75] FATAL:  the database system is starting up
+2026-09-27 04:15:22.825 UTC [76] FATAL:  the database system is starting up
+2026-09-27 04:15:22.840 UTC [77] FATAL:  the database system is starting up
+2026-09-27 04:15:22.856 UTC [78] FATAL:  the database system is starting up
+2026-09-27 04:15:22.870 UTC [79] FATAL:  the database system is starting up
+2026-09-27 04:15:22.883 UTC [80] FATAL:  the database system is starting up
+2026-09-27 04:15:22.895 UTC [81] FATAL:  the database system is starting up
+2026-09-27 04:15:22.912 UTC [82] FATAL:  the database system is starting up
+2026-09-27 04:15:22.913 UTC [83] FATAL:  the database system is starting up
+2026-09-27 04:15:22.926 UTC [84] FATAL:  the database system is starting up
+2026-09-27 04:15:22.940 UTC [85] FATAL:  the database system is starting up
+2026-09-27 04:15:22.954 UTC [86] FATAL:  the database system is starting up
+2026-09-27 04:15:22.966 UTC [87] FATAL:  the database system is starting up
+2026-09-27 04:15:22.979 UTC [88] FATAL:  the database system is starting up
+2026-09-27 04:15:22.993 UTC [89] FATAL:  the database system is starting up
+2026-09-27 04:15:23.011 UTC [90] FATAL:  the database system is starting up
+2026-09-27 04:15:23.023 UTC [91] FATAL:  the database system is starting up
+2026-09-27 04:15:23.028 UTC [92] FATAL:  the database system is starting up
+2026-09-27 04:15:23.042 UTC [93] FATAL:  the database system is starting up
+2026-09-27 04:15:23.057 UTC [94] FATAL:  the database system is starting up
+2026-09-27 04:15:23.071 UTC [95] FATAL:  the database system is starting up
+2026-09-27 04:15:23.085 UTC [96] FATAL:  the database system is starting up
+2026-09-27 04:15:23.100 UTC [97] FATAL:  the database system is starting up
+2026-09-27 04:15:23.115 UTC [98] FATAL:  the database system is starting up
+2026-09-27 04:15:23.128 UTC [99] FATAL:  the database system is starting up
+2026-09-27 04:15:23.133 UTC [100] FATAL:  the database system is starting up
+2026-09-27 04:15:23.143 UTC [101] FATAL:  the database system is starting up
+2026-09-27 04:15:23.157 UTC [102] FATAL:  the database system is starting up
+2026-09-27 04:15:23.173 UTC [103] FATAL:  the database system is starting up
+2026-09-27 04:15:23.175 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-09-27 04:15:23.186 UTC [104] FATAL:  the database system is starting up
+2026-09-27 04:15:23.190 UTC [29] LOG:  redo starts at 0/4668AF0
+2026-09-27 04:15:23.196 UTC [29] LOG:  invalid record length at 0/46A11E8: expected at least 24, got 0
+2026-09-27 04:15:23.196 UTC [29] LOG:  redo done at 0/46A11C0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-09-27 04:15:23.199 UTC [105] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.199 UTC [105] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.213 UTC [106] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.213 UTC [106] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.217 UTC [27] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-09-27 04:15:23.227 UTC [107] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.227 UTC [107] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.244 UTC [109] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.244 UTC [109] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.245 UTC [108] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.245 UTC [108] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.259 UTC [110] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.259 UTC [110] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.276 UTC [111] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.276 UTC [111] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.290 UTC [112] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.290 UTC [112] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.304 UTC [113] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.304 UTC [113] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.309 UTC [27] LOG:  checkpoint complete: wrote 50 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.025 s, sync=0.041 s, total=0.097 s; sync files=38, longest=0.008 s, average=0.002 s; distance=225 kB, estimate=225 kB; lsn=0/46A11E8, redo lsn=0/46A11E8
+2026-09-27 04:15:23.318 UTC [114] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:15:23.318 UTC [114] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:15:23.320 UTC [1] LOG:  database system is ready to accept connections

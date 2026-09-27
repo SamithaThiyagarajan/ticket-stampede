@@ -1,0 +1,365 @@
+1790482045805631110 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482045977971093 docker-event exec_die
+1790482047980552018 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482047981102493 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482048168452006 docker-event exec_die
+1790482050170067031 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482050170557438 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482050351228278 docker-event exec_die
+1790482052340128933 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482052340653534 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482052508587076 docker-event exec_die
+1790482054510653600 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482054511560072 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482054730780939 docker-event exec_die
+1790482056733443834 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482056733849067 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482056931289996 docker-event exec_die
+1790482058932759687 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482058933463718 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482059134449922 docker-event exec_die
+1790482061136009920 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482061136812707 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482061336926676 docker-event exec_die
+1790482063338763350 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482063339262371 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482063512696785 docker-event exec_die
+1790482065515093597 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482065515832381 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482065756559511 docker-event exec_die
+1790482067758109108 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482067758509380 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482067942381905 docker-event exec_die
+1790482069944183947 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482069944850965 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482070162158773 docker-event exec_die
+1790482072163814539 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482072164367720 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482072383195373 docker-event exec_die
+1790482074385598859 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482074386127686 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482074579963607 docker-event exec_die
+1790482076581584571 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482076581980924 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482076774515375 docker-event exec_die
+1790482078775960301 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482078776350710 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482078970439633 docker-event exec_die
+1790482080972988348 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482080973559019 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482081205611029 docker-event exec_die
+1790482083202692130 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482083203240153 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482083380539887 docker-event exec_die
+1790482085382283357 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482085382741538 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482085591814088 docker-event exec_die
+1790482087593898940 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482087594240562 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482087803048585 docker-event exec_die
+1790482089804906208 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482089805340223 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482090060663979 docker-event exec_die
+1790482092062196971 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482092062774284 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482092242846587 docker-event exec_die
+1790482094244241310 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482094244775194 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482094430911482 docker-event exec_die
+1790482096432990450 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482096433321142 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482096628221911 docker-event exec_die
+1790482098630715330 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482098631262373 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482098803889228 docker-event exec_die
+1790482100805781595 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482100806555941 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482101033290507 docker-event exec_die
+1790482103035071387 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482103035522074 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482103206240447 docker-event exec_die
+1790482103897747031 docker-event exec_create: pg_isready -U tickets
+1790482103907207204 docker-event exec_start: pg_isready -U tickets
+1790482104097994094 docker-event exec_die
+1790482105208093911 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482105209169176 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482105397437901 docker-event exec_die
+1790482107399661146 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482107400151882 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482107566394613 docker-event exec_die
+1790482109568504229 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482109569261830 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482109754925113 docker-event exec_die
+1790482111756707494 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482111757039114 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482111922759770 docker-event exec_die
+1790482113922025087 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482113922380942 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482114110170444 docker-event exec_die
+1790482116112599178 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482116113157530 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482116304166698 docker-event exec_die
+1790482118306749943 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482118307331789 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482118486379550 docker-event exec_die
+1790482120487476496 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482120487895999 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482120780755000 docker-event exec_die
+1790482122782981736 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482122783771697 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482122978179161 docker-event exec_die
+1790482124980420562 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482124980841925 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482125121231081 docker-event exec_die
+1790482127122879356 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482127123393301 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482127292998422 docker-event exec_die
+1790482129294697001 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482129295345613 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482129474936620 docker-event exec_die
+1790482131477443112 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482131477923859 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482131658707429 docker-event exec_die
+1790482133662206853 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482133662767266 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482133849545590 docker-event exec_die
+1790482135851533855 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482135851874925 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482135991708773 docker-event exec_die
+1790482137994482545 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482137995139613 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482138158297776 docker-event exec_die
+1790482138647448165 docker-event exec_create: psql -U tickets -tAc select count(*) from pg_stat_activity where datname='tickets' and backend_type='client backend' and pid<>pg_backend_pid()
+1790482138658391715 docker-event exec_start: psql -U tickets -tAc select count(*) from pg_stat_activity where datname='tickets' and backend_type='client backend' and pid<>pg_backend_pid()
+1790482138836276885 docker-event exec_die
+1790482140160608662 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482140160956605 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482140336175728 docker-event exec_die
+1790482141817204361 docker-event exec_create: psql -U tickets -tAc select host(client_addr) || '=' || count(*) from pg_stat_activity where datname='tickets' and backend_type='client backend' and pid<>pg_backend_pid() group by client_addr order by 1
+1790482141827194584 docker-event exec_start: psql -U tickets -tAc select host(client_addr) || '=' || count(*) from pg_stat_activity where datname='tickets' and backend_type='client backend' and pid<>pg_backend_pid() group by client_addr order by 1
+1790482141980867498 docker-event exec_die
+1790482142334342117 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482142335082493 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482142541364796 docker-event exec_die
+1790482144543559515 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482144544002672 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482144692750664 docker-event exec_die
+1790482146694877493 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482146695236816 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482146880373597 docker-event exec_die
+1790482148882690857 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482148883366920 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482149094143881 docker-event exec_die
+1790482151095618778 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482151096044162 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482151252504778 docker-event exec_die
+1790482153254051140 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482153254422164 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482153420001498 docker-event exec_die
+1790482155421541888 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482155421982867 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482155609338977 docker-event exec_die
+1790482157612553650 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482157613298019 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482157803796441 docker-event exec_die
+1790482159806087729 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482159806755388 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482160005194852 docker-event exec_die
+1790482162007354278 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482162007770677 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482162185648610 docker-event exec_die
+1790482164188377190 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482164188729244 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482164369819020 docker-event exec_die
+1790482166372060314 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482166372476840 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482166548015709 docker-event exec_die
+1790482168549740781 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482168550130427 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482168760045406 docker-event exec_die
+1790482170761379038 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482170761731264 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482170969171490 docker-event exec_die
+1790482172966900533 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482172967362165 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482173155100146 docker-event exec_die
+1790482175156553346 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482175156850938 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482175361230003 docker-event exec_die
+1790482177362609644 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482177363275079 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482177606984329 docker-event exec_die
+1790482179609254426 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482179609707073 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482179882773698 docker-event exec_die
+1790482181884373110 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482181885048533 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482182075223348 docker-event exec_die
+1790482184076834903 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482184077350487 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482184247147001 docker-event exec_die
+1790482186248770826 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482186249764267 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482186461876945 docker-event exec_die
+1790482188464041294 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482188464633200 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482188717734725 docker-event exec_die
+1790482190522412794 docker-event pause
+1790482203270228103 docker-event unpause
+1790482205305354376 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482205305776436 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482205543233549 docker-event exec_create: pg_isready -U tickets -q
+1790482205553981378 docker-event exec_die
+1790482205555192142 docker-event health_status: healthy
+1790482205560001146 docker-event exec_start: pg_isready -U tickets -q
+1790482205797973573 docker-event exec_die
+1790482207555787867 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482207556213857 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482207807294225 docker-event exec_die
+1790482209809248047 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482209809637572 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482210063501317 docker-event exec_die
+1790482212065504372 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482212066121629 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482212377050960 docker-event exec_die
+1790482214378900573 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482214379486631 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482214615234032 docker-event exec_die
+1790482216616777667 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482216617250087 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482216879386101 docker-event exec_die
+1790482218881599542 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482218882005228 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482219139995981 docker-event exec_die
+1790482221141589235 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482221142077088 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482221358129833 docker-event exec_die
+1790482223360900911 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482223361471268 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482223587049281 docker-event exec_die
+1790482225590323675 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482225590778138 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482225848402552 docker-event exec_die
+1790482227850490043 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482227850915610 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482228069476202 docker-event exec_die
+1790482230071379081 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482230071897531 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482230324163204 docker-event exec_die
+1790482232322525724 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482232322983510 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482232567533520 docker-event exec_die
+1790482234569850768 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482234570279842 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482234783724471 docker-event exec_die
+1790482236785818123 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482236786416234 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482237034646142 docker-event exec_die
+1790482239035896937 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482239036379246 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482239346184950 docker-event exec_die
+1790482241348066711 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482241349784555 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482241555056773 docker-event exec_die
+1790482243556995387 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482243558215869 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482243791751375 docker-event exec_die
+1790482245793114390 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482245793538609 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482246020093126 docker-event exec_die
+1790482248022128693 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482248022620410 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482248251318866 docker-event exec_die
+1790482250252855440 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482250253385994 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482250491426803 docker-event exec_die
+1790482252493336911 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482252493843912 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482252694097571 docker-event exec_die
+1790482254696796831 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482254697340538 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482254868715899 docker-event exec_die
+1790482256870339279 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482256870866221 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482257061654650 docker-event exec_die
+1790482259064348427 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482259065256899 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482259300576257 docker-event exec_die
+1790482261302018992 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482261302464024 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482261498179759 docker-event exec_die
+1790482263495622190 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482263496298031 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482263692846511 docker-event exec_die
+1790482265695775681 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482265696415174 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482265907321081 docker-event exec_die
+1790482267909822965 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482267910594279 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482268090328983 docker-event exec_die
+1790482270093242876 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482270093789092 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482270282924138 docker-event exec_die
+1790482272285613875 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482272286635582 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482272467134206 docker-event exec_die
+1790482274468993263 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482274469510311 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482274639946765 docker-event exec_die
+1790482276641474413 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482276642104495 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482276877463682 docker-event exec_die
+1790482278880608611 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482278881012814 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482279045969273 docker-event exec_die
+1790482281047803200 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482281048314797 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482281245481175 docker-event exec_die
+1790482283247518252 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482283247926099 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482283418310569 docker-event exec_die
+1790482285419744637 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482285420393457 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482285592095025 docker-event exec_die
+1790482287593527306 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482287594152329 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482287765031253 docker-event exec_die
+1790482289767538953 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482289768133634 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482289966950540 docker-event exec_die
+1790482291968425442 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482291968928442 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482292152969027 docker-event exec_die
+1790482294155128083 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482294156863347 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482294328577220 docker-event exec_die
+1790482296330471459 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482296331101456 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482296515411061 docker-event exec_die
+1790482298518009866 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482298518807872 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482298719902701 docker-event exec_die
+1790482300721288063 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482300721670690 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482300979720942 docker-event exec_die
+1790482302982181344 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482302982847550 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482303205270013 docker-event exec_die
+1790482305207835115 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482305208433381 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482305390221350 docker-event exec_die
+1790482307392588544 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482307393582269 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482307579449075 docker-event exec_die
+1790482309580952028 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482309581546151 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482309781691258 docker-event exec_die
+1790482311784025643 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482311784574546 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482311968302568 docker-event exec_die
+1790482313970381870 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482313970719631 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482314146996999 docker-event exec_die
+1790482316149037766 docker-event exec_create: /bin/sh -c pg_isready -U tickets
+1790482316149353369 docker-event exec_start: /bin/sh -c pg_isready -U tickets
+1790482316320610777 docker-event exec_die

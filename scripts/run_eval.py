@@ -28,7 +28,8 @@ for name in sys.argv[1:]:
     lat = lambda rs: f"p50 {pct([r['latency_ms'] for r in rs], .5):8.1f}  p99 {pct([r['latency_ms'] for r in rs], .99):8.1f}"
     results, _ = verify(d)
 
-    samples = [json.loads(l) for l in open(R / f"{name}.pgsample.jsonl")]
+    samples = [s for s in (json.loads(l) for l in open(R / f"{name}.pgsample.jsonl"))
+               if not s.get("unreachable")]           # M11: samples taken while the db was down
     busy = [s for s in samples if any(k != "idle" for k in s["categories"])]
     waiters = sum(s["categories"].get("waiting_lock", 0) for s in busy) / max(1, len(busy))
     cpu = defaultdict(list)
