@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ticket Stampede Replay</title>
+<title>Ticket Stampede Report</title>
 <style>
 .viz-root {
   color-scheme: light;
@@ -11,7 +11,8 @@
   --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
   --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100;
   --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
-  --band: rgba(208,59,59,0.08); --band-ink: #b03030; --idle: #d8d7d0;
+  --good-ink: #006300; --warn-ink: #8a5a00; --bad-ink: #b03030;
+  --band: rgba(208,59,59,0.08); --band-ink: #b03030; --idle: #d8d7d0; --code: #f0efec;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) .viz-root {
@@ -19,7 +20,8 @@
     --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #ffffff; --text-secondary: #c3c2b7;
     --muted: #898781; --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
     --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
-    --band: rgba(208,59,59,0.16); --band-ink: #f08a8a; --idle: #383835;
+    --good-ink: #0ca30c; --warn-ink: #fab219; --bad-ink: #f08a8a;
+    --band: rgba(208,59,59,0.16); --band-ink: #f08a8a; --idle: #383835; --code: #262624;
   }
 }
 :root[data-theme="dark"] .viz-root {
@@ -27,29 +29,77 @@
   --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #ffffff; --text-secondary: #c3c2b7;
   --muted: #898781; --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
   --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
-  --band: rgba(208,59,59,0.16); --band-ink: #f08a8a; --idle: #383835;
+  --good-ink: #0ca30c; --warn-ink: #fab219; --bad-ink: #f08a8a;
+  --band: rgba(208,59,59,0.16); --band-ink: #f08a8a; --idle: #383835; --code: #262624;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--page); }
 .viz-root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text-primary);
-  background: var(--page); min-height: 100vh; padding: 20px 16px 48px; }
-.wrap { max-width: 1180px; margin: 0 auto; }
-h1 { font-size: 20px; margin: 0 0 2px; font-weight: 650; }
+  background: var(--page); min-height: 100vh; padding: 20px 16px 64px; line-height: 1.5; }
+.wrap { max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 26px; margin: 0 0 4px; font-weight: 700; }
+.lede { font-size: 17px; color: var(--text-primary); margin: 8px 0 6px; max-width: 820px; }
 .sub { color: var(--text-secondary); font-size: 13px; margin: 0 0 14px; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 12px 0 22px; font-size: 13px; }
+nav.toc a { color: var(--text-secondary); text-decoration: none; border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 10px; background: var(--surface-1); }
+nav.toc a:hover { color: var(--text-primary); }
+section.story { margin: 0 0 34px; scroll-margin-top: 12px; }
+section.story > h2 { font-size: 20px; margin: 0 0 4px; font-weight: 700; }
+section.story > h2 .num { color: var(--muted); font-weight: 600; margin-right: 8px; }
+.why { font-size: 15px; color: var(--text-secondary); margin: 0 0 12px; max-width: 860px; }
+p { max-width: 860px; margin: 0 0 10px; font-size: 14.5px; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.card h3 { font-size: 15px; margin: 0 0 4px; font-weight: 650; }
+.card .explain { font-size: 13.5px; color: var(--text-secondary); margin: 0 0 10px; }
+.idtag { font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 0 5px; margin-left: 6px; font-weight: 500; vertical-align: 1px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 820px) { .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); } }
+/* grid children may shrink below their content width; wide content (flows, tables) scrolls inside */
+.grid2 > *, .grid3 > *, .row > *, .charts > *, .tiles > * { min-width: 0; }
+.card { min-width: 0; overflow-wrap: anywhere; }
+/* tables keep normal word wrapping and scroll sideways inside .tablewrap instead of collapsing */
+.card table, .card th, .card td { overflow-wrap: normal; word-break: normal; }
+.tablewrap td.l, .tablewrap th.l { min-width: 110px; }
+.tablewrap td, .tablewrap th { white-space: nowrap; }
+.tablewrap td.l { white-space: normal; min-width: 150px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.tile .k { font-size: 12px; color: var(--text-secondary); } .tile .v { font-size: 22px; font-weight: 700; margin-top: 2px; }
+.tile .n { font-size: 12px; color: var(--muted); }
+.flow { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 13px; background: var(--code);
+  border-radius: 10px; padding: 12px 14px; white-space: pre; overflow-x: auto; color: var(--text-primary); margin: 0 0 10px; }
+.hero { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.hero .big { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; }
+ol.inv { margin: 0 0 10px; padding-left: 22px; font-size: 14.5px; max-width: 860px; } ol.inv li { margin-bottom: 4px; }
+.badge { display: inline-block; font-size: 12px; font-weight: 650; border-radius: 6px; padding: 1px 7px; white-space: nowrap; border: 1px solid; }
+.b-good { color: var(--good-ink); border-color: var(--good); } .b-warn { color: var(--warn-ink); border-color: var(--warning); }
+.b-bad { color: var(--bad-ink); border-color: var(--critical); } .b-inv { color: var(--warn-ink); border-color: var(--serious); }
+.ok { color: var(--good-ink); font-weight: 700; } .bad { color: var(--bad-ink); font-weight: 700; }
+table { border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; width: 100%; }
+th, td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { color: var(--text-secondary); font-weight: 600; } td.l, th.l { text-align: left; }
+.tablewrap { overflow-x: auto; }
+details { margin-top: 8px; } details summary { cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; white-space: pre-wrap; color: var(--text-secondary); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+svg text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.tip { position: fixed; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 9px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  color: var(--text-primary); display: none; z-index: 5; font-variant-numeric: tabular-nums; max-width: 320px; }
+.tip b { font-weight: 600; } .tip .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+.callout { border-left: 3px solid var(--series-1); padding: 6px 12px; margin: 0 0 12px; font-size: 14px; max-width: 860px; }
+.callout.warn { border-left-color: var(--warning); }
+ul.plain { margin: 0 0 10px; padding-left: 20px; font-size: 14px; max-width: 860px; } ul.plain li { margin-bottom: 4px; }
+.dec td, .dec th { font-size: 13px; }
+/* detailed replay viewer */
 .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .tabs button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; cursor: pointer;
   border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); }
 .tabs button[aria-selected="true"] { color: var(--text-primary); border-color: var(--text-secondary); font-weight: 600; }
-.caption { font-size: 14px; color: var(--text-secondary); margin: 0 0 12px; max-width: 900px; }
-.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 12px; }
-.tile .k { font-size: 12px; color: var(--text-secondary); }
-.tile .v { font-size: 22px; font-weight: 650; margin-top: 2px; }
-.tile .n { font-size: 12px; color: var(--muted); }
 .row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
-@media (max-width: 820px) { .row { grid-template-columns: 1fr; } }
-.card h2 { font-size: 14px; margin: 0 0 8px; font-weight: 650; }
-.card h2 .hint { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 6px; }
+@media (max-width: 820px) { .row { grid-template-columns: minmax(0, 1fr); } }
 .scrub { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .scrub input[type=range] { flex: 1; accent-color: var(--text-secondary); }
 .scrub button { font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 8px; cursor: pointer;
@@ -58,305 +108,697 @@ h1 { font-size: 20px; margin: 0 0 2px; font-weight: 650; }
 .now dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; font-size: 13px; }
 .now dt { color: var(--text-secondary); } .now dd { margin: 0; font-variant-numeric: tabular-nums; }
 .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
-@media (max-width: 820px) { .charts { grid-template-columns: 1fr; } }
-.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--text-secondary); margin: -2px 0 6px; }
-.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
-svg text { fill: var(--muted); font-size: 11px; font-family: inherit; }
-.tip { position: fixed; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
-  border-radius: 8px; padding: 7px 9px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
-  color: var(--text-primary); display: none; z-index: 5; font-variant-numeric: tabular-nums; }
-.tip b { font-weight: 600; } .tip .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
-.checks li { list-style: none; margin: 0 0 6px; font-size: 13px; }
-.checks ul { padding: 0; margin: 0; }
-.ok { color: var(--good); font-weight: 700; } .bad { color: var(--critical); font-weight: 700; }
-.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; white-space: pre-wrap; color: var(--text-secondary); }
-table { border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
-th, td { padding: 3px 8px; text-align: right; border-bottom: 1px solid var(--grid); }
-th { color: var(--text-secondary); font-weight: 600; } td:first-child, th:first-child { text-align: left; }
-details summary { cursor: pointer; font-size: 13px; color: var(--text-secondary); }
-.tablewrap { overflow-x: auto; max-height: 420px; margin-top: 8px; }
-.lanes-legend span { margin-right: 14px; white-space: nowrap; }
+@media (max-width: 820px) { .charts { grid-template-columns: minmax(0, 1fr); } }
+.checks li { list-style: none; margin: 0 0 6px; font-size: 13px; } .checks ul { padding: 0; margin: 0; }
 </style>
 </head>
 <body>
 <div class="viz-root"><div class="wrap">
-  <h1>Ticket Stampede: experiment replay</h1>
-  <p class="sub">buyer → nginx → seller1/2/3 → one PostgreSQL · 50,000 arrivals at ≈833/s, 100 tickets · rebuilt from saved results by <code>scripts/build_viewer.py</code></p>
-  <div class="tabs" role="tablist" id="tabs"></div>
-  <p class="caption" id="caption"></p>
-  <div class="tiles" id="tiles"></div>
 
+<header>
+  <h1>Ticket Stampede</h1>
+  <p class="lede">A ticket-selling service designed to sell <b>exactly 100 tickets</b>, safely, when tens of thousands of purchase requests arrive within about a minute — and to stay correct when its database fails.</p>
+  <p class="sub">An evidence report: every number on this page is computed from saved experiment results by <code>scripts/build_viewer.py</code>. Works offline; no server, no external libraries.</p>
+  <nav class="toc" aria-label="Contents">
+    <a href="#overview">1 Overview</a><a href="#correct">2 What “correct” means</a><a href="#race">3 The concurrency problem</a>
+    <a href="#idem">4 Idempotency</a><a href="#load">5 Load test</a><a href="#faults">6 Database failure</a>
+    <a href="#cua">7 Committed-but-unacknowledged</a><a href="#sweep">8 Capacity sweep</a><a href="#soldout">9 After sell-out</a>
+    <a href="#decisions">10 Decisions</a><a href="#limits">11 Limitations</a><a href="#future">12 Production extensions</a>
+    <a href="#evidence">13 Detailed evidence</a>
+  </nav>
+</header>
+
+<!-- 1 --------------------------------------------------------------------------------------------->
+<section class="story" id="overview">
+  <h2><span class="num">1</span>Overview</h2>
+  <p class="why">A flash sale: far more people want a ticket than there are tickets, and they all click at almost the same moment. The service must sell each of the 100 tickets exactly once, answer everyone else clearly, and never contradict itself.</p>
+  <div class="grid2">
+    <div class="card"><h3>How it is built</h3>
+      <p class="explain">Requests flow top to bottom. The sellers keep no ticket state of their own; every decision is made in PostgreSQL, the single source of truth. That is what lets three sellers run side by side without coordinating.</p>
+      <svg id="ovArch" width="100%" height="300" role="img" aria-label="Architecture: arrivals, load generator, nginx, three sellers, PostgreSQL"></svg>
+    </div>
+    <div class="card"><h3>Scale of the assignment workload</h3>
+      <p class="explain">The brief describes up to 50,000 people arriving within the same 60 seconds. That is an <b>arrival rate</b> of about 833 per second — not 50,000 simultaneous connections, which is not what we model.</p>
+      <div class="tiles" id="ovTiles"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 --------------------------------------------------------------------------------------------->
+<section class="story" id="correct">
+  <h2><span class="num">2</span>What does “correct” mean?</h2>
+  <p class="why">“It didn't crash” is not enough. Every run is checked against five rules, recomputed independently from the raw request log and the final database state — not taken from the service's own claims.</p>
+  <ol class="inv">
+    <li><b>No overselling</b> — never more than 100 tickets are issued.</li>
+    <li><b>No duplicate ticket numbers</b> — two purchases can never receive the same ticket.</li>
+    <li><b>Idempotency</b> — retrying the same <code>request_id</code> returns the same ticket instead of creating another one.</li>
+    <li><b>Response consistency</b> — every “you got ticket N” answer agrees with the final database state, and nobody told “sold out” holds a ticket.</li>
+    <li><b>Counter consistency</b> — the stored <code>sold_count</code> equals the number of actual ticket rows.</li>
+  </ol>
+  <div class="card"><div class="hero"><div class="big" id="heroChecks"></div><div id="heroText" style="max-width:720px"></div></div></div>
+</section>
+
+<!-- 3 --------------------------------------------------------------------------------------------->
+<section class="story" id="race">
+  <h2><span class="num">3</span>The concurrency problem</h2>
+  <p class="why">The obvious implementation works perfectly when requests arrive one at a time — and breaks badly when they arrive together.</p>
+  <div class="grid2">
+    <div class="card"><h3>Naive version (built first, on purpose)</h3>
+      <div class="flow">READ sold_count            (e.g. 41)
+      ↓
+check capacity            (41 &lt; 100, OK)
+      ↓
+INSERT ticket 42
+      ↓
+UPDATE sold_count = 42
+                ⚠ race condition</div>
+      <p class="explain">Many buyers can read the same available state (“41 sold”) before any of them writes, so several of them all issue ticket 42, and the counter update is lost.</p>
+    </div>
+    <div class="card"><h3>Final version: one transaction with a row lock</h3>
+      <div class="flow">BEGIN
+  lock the sale row          (SELECT … FOR UPDATE)
+  has this request_id bought already?  → return it
+  any tickets left?                    → else 409
+  issue ticket sold_count + 1
+  update sold_count
+COMMIT                       (lock released)</div>
+      <p class="explain"><b>SELECT … FOR UPDATE</b> locks the one row that holds the inventory. <b>Only one transaction at a time can make the decision about the remaining inventory</b>; the others wait their turn and then see the updated count. Database constraints (primary key on the ticket number, unique <code>request_id</code>, a check that <code>sold_count</code> never exceeds the total) are a second line of defence.</p>
+    </div>
+  </div>
+  <div class="card"><h3>Evidence: tickets issued for 100 available<span class="idtag">M3 naive · M4 safe</span></h3>
+    <p class="explain">Same workload for both designs: 1,000 requests, 200 at a time, 100 tickets, 20% of request_ids sent twice. Runs with a 50 ms delay between the check and the write widen the race window; the 0 ms runs show the race exists without it. The dashed line is the 100 tickets that actually exist.</p>
+    <div class="legend" id="lg-race"></div>
+    <svg id="raceChart" width="100%" height="330" role="img" aria-label="Tickets issued per run, naive vs safe"></svg>
+    <details><summary>Table: every naive and safe run, plus “constraints only” (the naive code on the constrained schema)</summary><div class="tablewrap"><table id="raceTable"></table></div></details>
+  </div>
+</section>
+
+<!-- 4 --------------------------------------------------------------------------------------------->
+<section class="story" id="idem">
+  <h2><span class="num">4</span>Idempotency: retries must not buy twice</h2>
+  <p class="why">Networks fail and people double-click, so the same purchase request can arrive more than once. Every request carries a <code>request_id</code> chosen by the buyer; the service promises that one <code>request_id</code> produces at most one ticket.</p>
+  <div class="grid2">
+    <div class="card"><h3>The rule</h3>
+      <div class="flow">request_id = A      →  ticket 57
+retry request_id = A  →  ticket 57 again  (no new ticket)
+request_id = B      →  another ticket</div>
+      <ul class="plain">
+        <li>One purchase request (one <code>request_id</code>) produces <b>at most one ticket</b>, however many times it is sent.</li>
+        <li>A different <code>request_id</code> is a different purchase, even from the same user: this assignment has <b>no one-ticket-per-user rule</b> (the schema has no per-user constraint; not load-tested separately).</li>
+        <li>Re-using a <code>request_id</code> with a <i>different</i> user is rejected (HTTP 422), so a reused id cannot hand one buyer's ticket to another (checked by hand during development; not part of the saved load tests).</li>
+      </ul>
+    </div>
+    <div class="card"><h3>Evidence: every request sent 10 times, across three sellers<span class="idtag">M9 F2</span></h3>
+      <p class="explain">Each request_id was sent as 10 simultaneous copies, spread by the load balancer over all three sellers — the hardest version of “retry while the original is still in flight”.</p>
+      <div id="idemEvidence"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 --------------------------------------------------------------------------------------------->
+<section class="story" id="load">
+  <h2><span class="num">5</span>Load test: 50,000 arrivals in about 60 seconds</h2>
+  <p class="why">The load generator is <b>open-loop</b>: it sends requests on a fixed schedule — about 833 per second — whether or not earlier requests have finished, like real independent buyers. A run only counts if the load generator itself kept to its schedule; otherwise we would be measuring the client, not the service.</p>
+  <div class="callout">How to read the numbers: <b>throughput</b> = responses completed per second · <b>p50</b> = median latency (half the requests were faster) · <b>p99</b> = the latency of the slowest 1% of requests. In the reference run, most of the p99 came from requests arriving in the first seconds, while the 100 tickets were being sold through the lock (see the latency chart in section 13).</div>
+  <div class="card"><h3>Every 833/s run of the assignment workload</h3>
+    <p class="explain">Clean runs are listed first. Runs that failed a validity rule, or were disturbed by the intermittent nginx 502 issue (see Limitations), stay on the list with the reason — they are not averaged into the result.</p>
+    <div class="tablewrap"><table id="benchTable"></table></div>
+    <p class="explain" id="benchSummary" style="margin-top:10px"></p>
+  </div>
+</section>
+
+<!-- 6 --------------------------------------------------------------------------------------------->
+<section class="story" id="faults">
+  <h2><span class="num">6</span>What happens when PostgreSQL fails?</h2>
+  <p class="why">All sellers depend on the one database. These experiments deliberately broke it during the assignment workload and then checked that nothing was oversold, duplicated or lost. They test specific failures — not every possible one.</p>
+  <div class="callout warn">Three different things happen in each experiment and should not be confused: <b>(1) expected database errors</b> — sellers answer HTTP 500 while PostgreSQL is gone; <b>(2) nginx 502 “no live upstreams”</b> — the load balancer takes sellers out of rotation after connection errors and keeps them out for a while; <b>(3) correctness after recovery</b> — the five checks plus a replay of every uncertain request.</div>
+  <div id="faultCards"></div>
+</section>
+
+<!-- 7 --------------------------------------------------------------------------------------------->
+<section class="story" id="cua">
+  <h2><span class="num">7</span>The committed-but-unacknowledged purchase</h2>
+  <p class="why">The subtlest failure: <b>PostgreSQL commits the purchase successfully, but the confirmation never reaches the buyer.</b> The buyer sees an error — yet they own a ticket. A random crash almost never lands in this sub-millisecond window, so we created it deliberately.</p>
+  <div class="grid2">
+    <div class="card"><h3>The scenario</h3>
+      <svg id="cuaFlow" width="100%" height="470" role="img" aria-label="Committed but unacknowledged flow"></svg>
+    </div>
+    <div class="card"><h3>How it was created<span class="idtag">M12</span></h3>
+      <p class="explain">A small test-only proxy sat between one seller and PostgreSQL. It understood the database protocol and, for some transactions, <b>dropped PostgreSQL's “COMMIT complete” reply</b> after the commit had already happened. The application code was not changed.</p>
+      <p class="explain"><b>Proof the drop happens after the commit</b> — three transactions through the proxy, then their fate read directly from PostgreSQL:</p>
+      <div class="mono" id="cuaProbe"></div>
+      <p class="explain" id="cuaRouting" style="margin-top:8px"></p>
+    </div>
+  </div>
+  <div class="card"><h3>Result</h3>
+    <div class="tiles" id="cuaTiles"></div>
+    <p class="explain">For every committed-but-unacknowledged purchase: the buyer's only answer was a failure, PostgreSQL holds the ticket, and replaying the same <code>request_id</code> returned <b>that exact ticket</b> — without creating another. This is the case idempotency exists for: without a request_id, the buyer's only safe move would be to buy again, and they would end up with two tickets.</p>
+    <details open><summary>Every dropped COMMIT reply, one row per transaction</summary><div class="tablewrap"><table id="cuaTable"></table></div></details>
+    <details><summary>Replay check and five checks for this run</summary><div class="mono" id="cuaReplay"></div></details>
+  </div>
+</section>
+
+<!-- 8 --------------------------------------------------------------------------------------------->
+<section class="story" id="sweep">
+  <h2><span class="num">8</span>Arrival-rate sweep: where does it start to saturate?</h2>
+  <p class="why">The 833/s benchmark shows the required load is handled; it does not show how much headroom there is. So the offered rate was raised step by step (60 s each), with validity rules fixed before running.</p>
+  <div class="card"><h3>Answered rate vs offered rate</h3>
+    <p class="explain">Each marker is one run. Points on the dashed line answered everything that arrived; points below it fell behind. The shape shows the verdict, so it does not depend on colour.</p>
+    <div class="legend" id="lg-sweep"></div>
+    <svg id="sweepChart" width="100%" height="340" role="img" aria-label="Answered rate versus offered rate"></svg>
+    <div class="tablewrap" style="margin-top:8px"><table id="sweepTable"></table></div>
+  </div>
+  <div class="card"><h3>What the sweep shows — and what it does not</h3>
+    <ul class="plain" id="sweepFindings"></ul>
+    <details><summary>Why seller CPU: where a seller process spends its time (CPU profile under load)</summary>
+      <p class="explain">A sampling profile of one seller under load showed its time going to HTTP parsing, the web framework and the event loop — not to database work. It is from a separate diagnostic run whose throughput is not a benchmark.</p>
+      <div class="mono" id="profile"></div></details>
+  </div>
+</section>
+
+<!-- 9 --------------------------------------------------------------------------------------------->
+<section class="story" id="soldout">
+  <h2><span class="num">9</span>What happens after sell-out?</h2>
+  <p class="why">Once all 100 tickets are gone, nearly every later request only needs to learn “sold out”. Making each of them queue for the inventory lock would waste the lock on a question whose answer cannot change — tickets are never returned during a sale in this design.</p>
+  <div class="grid2">
+    <div class="card"><h3>The sold-out fast path</h3>
+      <div class="flow">one database read (one snapshot):
+   does this request_id already own a ticket?  → return that ticket
+   otherwise, is the sale sold out?            → 409 sold out
+   otherwise                                   → the locked purchase path</div>
+      <p class="explain">An old <code>request_id</code> must still be checked first, because it may be a retry of a purchase that committed. Both facts are read <b>in one database snapshot</b>: since a ticket and its counter update commit together, a snapshot that says “sold out” also contains every ticket row, so “sold out and not yours” is final. Reading them separately would reopen a race.</p>
+    </div>
+    <div class="card"><h3>Evidence: with vs without the fast path, 300 arrivals/s<span class="idtag">M7 A/B</span></h3>
+      <p class="explain">Same workload and code, only the fast path switched on or off; three runs each, alternating.</p>
+      <div class="tablewrap"><table id="fpTable"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -------------------------------------------------------------------------------------------->
+<section class="story" id="decisions">
+  <h2><span class="num">10</span>Architecture decisions</h2>
+  <p class="why">Each choice below was made for a reason we can defend, and each is separated into what this submission implements and what a production system would add.</p>
+  <div class="card tablewrap"><table class="dec">
+    <thead><tr><th class="l">Decision</th><th class="l">What we implemented</th><th class="l">In production</th></tr></thead>
+    <tbody>
+      <tr><td class="l"><b>PostgreSQL is the source of truth</b></td><td class="l">All ticket state lives in PostgreSQL; sellers are stateless and can be added or restarted freely.</td><td class="l">Same principle, with the database made highly available (see Production extensions).</td></tr>
+      <tr><td class="l"><b>A row lock protects the inventory decision</b></td><td class="l"><code>SELECT … FOR UPDATE</code> on the single sale row serializes the check-then-issue step.</td><td class="l">Same; shorten the time the lock is held (e.g. one database round trip per purchase) if inventory were large.</td></tr>
+      <tr><td class="l"><b>Constraints as defence in depth</b></td><td class="l">Primary key on ticket number, unique <code>request_id</code>, <code>sold_count</code> checked against the total. Shown working: the naive code on the constrained schema issued no extra tickets (but failed many requests).</td><td class="l">Same.</td></tr>
+      <tr><td class="l"><b>No application-level lock</b></td><td class="l">Rejected: an in-process lock (e.g. Python asyncio) protects one process only; it does nothing across three sellers or several worker processes.</td><td class="l">Same.</td></tr>
+      <tr><td class="l"><b>Row lock rather than SERIALIZABLE</b></td><td class="l">The row lock expresses the critical section directly. SERIALIZABLE would be expected to make concurrent buyers of the same row fail with serialization errors and retry under a stampede (reasoning; not benchmarked).</td><td class="l">Same, unless a workload needed serializable guarantees across many rows.</td></tr>
+      <tr><td class="l"><b>No Redis</b></td><td class="l">Not needed: the observed limiting component was seller CPU, not the database, and a second store would create a second source of truth to keep consistent.</td><td class="l">Only if a measured bottleneck required it.</td></tr>
+      <tr><td class="l"><b>No Kubernetes</b></td><td class="l">Docker Compose runs the whole topology reproducibly on one machine.</td><td class="l">An orchestrator for multi-host deployment and restarts.</td></tr>
+      <tr><td class="l"><b>No PostgreSQL replication/failover</b></td><td class="l">Deliberately not implemented. Asynchronous failover could lose an acknowledged sale and sell its ticket number again; a safe failover needs synchronous replication, fencing and more — a large system on its own, and on one physical host it would remove no real failure.</td><td class="l">Synchronous replication with a standby quorum, fenced leader election, routing to the current primary.</td></tr>
+      <tr><td class="l"><b>nginx as load balancer</b></td><td class="l">Plain round-robin over three sellers, one worker process, upstream keep-alive.</td><td class="l">A load balancer with active readiness checks.</td></tr>
+    </tbody></table></div>
+</section>
+
+<!-- 11 -------------------------------------------------------------------------------------------->
+<section class="story" id="limits">
+  <h2><span class="num">11</span>Limitations — what the evidence does and does not establish</h2>
+  <p class="why">These are specific, not disclaimers: each says exactly where the evidence stops.</p>
+  <div class="card"><ul class="plain" id="limitsList"></ul></div>
+</section>
+
+<!-- 12 -------------------------------------------------------------------------------------------->
+<section class="story" id="future">
+  <h2><span class="num">12</span>Production extensions (not implemented)</h2>
+  <p class="why">What a production deployment would add. None of this is part of the submission.</p>
+  <div class="card"><ul class="plain">
+    <li><b>Highly available PostgreSQL:</b> synchronous replication to a quorum of standbys, fenced leader election, and clients routed only to the current primary.</li>
+    <li><b>Active seller readiness checks</b> in the load balancer, and returning “503 try again” for database errors instead of an unhandled 500.</li>
+    <li><b>Controlled retries of connection-level failures</b> — safe only because of <code>request_id</code> idempotency, and limited to one retry to avoid retry storms.</li>
+    <li><b>Multi-host deployment</b>, so a single machine is no longer a single failure domain.</li>
+    <li><b>Production observability:</b> metrics, alerting and tracing beyond these offline experiment reports.</li>
+  </ul></div>
+</section>
+
+<!-- 13 -------------------------------------------------------------------------------------------->
+<section class="story" id="evidence">
+  <h2><span class="num">13</span>Detailed evidence: replay any run second by second</h2>
+  <p class="why">For a technical reviewer. Pick a run, then drag the slider or hover a chart: the architecture diagram shows what every component was doing in that second.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <p class="explain" id="caption" style="font-size:14px;color:var(--text-secondary)"></p>
+  <div class="tiles" id="tiles"></div>
   <div class="scrub">
     <button id="play" type="button">▶ Play</button>
     <input type="range" id="t" min="0" max="60" value="0" step="1" aria-label="Time in seconds">
     <span class="tlabel" id="tlabel"></span>
   </div>
-
   <div class="row">
-    <div class="card"><h2>Architecture at the selected second<span class="hint">state and traffic per component</span></h2>
+    <div class="card"><h3>Architecture at the selected second</h3><p class="explain">Each box shows that component's state in the selected second; lines show requests per second.</p>
       <svg id="arch" width="100%" height="270" role="img" aria-label="Architecture state"></svg></div>
-    <div class="card now"><h2>At this second</h2><dl id="now"></dl></div>
+    <div class="card now"><h3>At this second</h3><dl id="now"></dl></div>
   </div>
-
-  <div class="card" style="margin-bottom:12px">
-    <h2>Component state per second<span class="hint">hover a cell to move the time cursor</span></h2>
-    <div class="legend lanes-legend" id="laneLegend"></div>
+  <div class="card">
+    <h3>Component state per second</h3><p class="explain">One row per component, one cell per second. Hover a cell to move the time cursor.</p>
+    <div class="legend" id="laneLegend"></div>
     <svg id="lanes" width="100%" height="150" role="img" aria-label="Component state lanes"></svg>
   </div>
-
   <div class="charts">
-    <div class="card"><h2>Responses per second<span class="hint">by the second the buyer got its answer</span></h2>
+    <div class="card"><h3>Responses per second</h3><p class="explain">By the second the buyer received its answer.</p>
       <div class="legend" id="lg-resp"></div><svg id="c-resp" width="100%" height="220"></svg></div>
-    <div class="card"><h2>Tickets sold<span class="hint">distinct tickets confirmed to a buyer, cumulative</span></h2>
+    <div class="card"><h3>Tickets sold</h3><p class="explain">Distinct tickets confirmed to a buyer, cumulative.</p>
       <svg id="c-sold" width="100%" height="220"></svg></div>
-    <div class="card"><h2>Latency, ms (log scale)<span class="hint">p50 and p99 of answers in each second</span></h2>
+    <div class="card"><h3>Latency, ms (log scale)</h3><p class="explain">p50 and p99 of the answers received in each second.</p>
       <div class="legend" id="lg-lat"></div><svg id="c-lat" width="100%" height="220"></svg></div>
-    <div class="card"><h2>Answers per seller per second<span class="hint">from nginx's X-Upstream header</span></h2>
+    <div class="card"><h3>Answers per seller per second</h3><p class="explain">From the load balancer's per-response seller header.</p>
       <div class="legend" id="lg-sel"></div><svg id="c-sel" width="100%" height="220"></svg></div>
   </div>
-
   <div class="row">
-    <div class="card checks"><h2>Five correctness checks<span class="hint">recomputed by verify() from the raw results</span></h2><ul id="checks"></ul></div>
-    <div class="card"><h2>Replay after recovery<span class="hint">scripts/replay_check.py</span></h2><div class="mono" id="replay"></div></div>
+    <div class="card checks"><h3>Five correctness checks</h3><p class="explain">Recomputed by verify() from the raw results.</p><ul id="checks"></ul></div>
+    <div class="card"><h3>Replay after recovery</h3><p class="explain">Every confirmed and every uncertain request replayed against the final state (fault runs only).</p><div class="mono" id="replay"></div></div>
   </div>
-
-  <div class="card" style="margin-bottom:12px"><h2>Timeline</h2>
-    <table id="events"><thead><tr><th>t (s)</th><th>event</th></tr></thead><tbody></tbody></table></div>
-
+  <div class="card"><h3>Timeline</h3><table id="events"><thead><tr><th class="l">t (s)</th><th class="l">event</th></tr></thead><tbody></tbody></table></div>
   <div class="card"><details><summary>Data table: every second (the same numbers as the charts)</summary>
     <div class="tablewrap"><table id="dtable"></table></div></details></div>
+  <div class="card"><details><summary>All runs with full validity, CPU and lock-wait detail</summary>
+    <div class="tablewrap"><table id="rawTable"></table></div></details></div>
+</section>
+
 </div></div>
 <div class="tip" id="tip"></div>
 <script>
 const DATA = /*__DATA__*/null;
+const RUNS = DATA.runs, S = DATA.story;
 const css = n => getComputedStyle(document.querySelector('.viz-root')).getPropertyValue(n).trim();
-const RESP = [["409", "409 sold out", "--series-1"], ["200", "200 purchase", "--series-2"],
-              ["500", "500 seller error", "--series-3"], ["502", "502 nginx", "--series-4"]];
-const LAT = [["lat_p50", "p50", "--series-1"], ["lat_p99", "p99", "--series-2"]];
-const SEL = [["seller1", "seller1", "--series-1"], ["seller2", "seller2", "--series-2"], ["seller3", "seller3", "--series-3"]];
-const STATE = {  // status palette: state only, always with icon + label
-  up: ["--good", "✓", "up"], routing: ["--good", "✓", "routing"], serving: ["--good", "✓", "serving"],
-  paused: ["--warning", "‖", "paused"], recovering: ["--warning", "↻", "crash recovery"],
-  errors: ["--serious", "▲", "returning 500s"], resets: ["--serious", "▲", "connection resets"],
-  down: ["--critical", "✕", "down"], "no upstream": ["--critical", "✕", "no live upstreams"],
-  idle: ["--idle", "–", "no answers"] };
-let run = 0, t = 0, pinned = false, timer = null;
 const $ = id => document.getElementById(id);
-const fmt = n => n == null ? "–" : n >= 1000 ? n.toLocaleString() : (Math.round(n * 10) / 10).toString();
 const tip = $("tip");
-
-function tabs() {
-  $("tabs").innerHTML = DATA.map((r, i) =>
-    `<button role="tab" aria-selected="${i === run}" data-i="${i}">${r.label}</button>`).join("");
-  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => { run = +b.dataset.i; stop(); t = defaultT(); render(); });
+const fmt = n => n == null ? "–" : n >= 1000 ? Math.round(n).toLocaleString() : (Math.round(n * 10) / 10).toString();
+const ms = n => n == null ? "–" : n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 1 : 2) + " s" : Math.round(n) + " ms";
+const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const REASON = {
+  "arrivals +-2%": "the load generator missed its arrival rate", "sched p99<100ms": "the load generator fell behind its own schedule",
+  "worker>=90% <=3s": "a load-generator process was CPU-saturated", "0 sent-no-answer": "requests were sent but never answered (server-side timeouts)",
+  "containers unchanged": "a container changed during the run", "host < 1400%": "the host machine's CPU was saturated",
+  "0 QueueTimeouts": "requests gave up waiting in the client queue", "0 x 5xx": "HTTP 5xx errors occurred",
+  "served >= 97%": "fewer than 97% of the offered rate was answered", "post-sale p99 <= 1000ms": "p99 latency after the sale exceeded 1 s" };
+function verdict(r) {
+  if (!r.valid) return `<span class="badge b-inv">⚠ INVALID</span> ${r.invalid_reasons.map(k => REASON[k] || k).join("; ")}`;
+  if (r.sustainable) return `<span class="badge b-good">✓ VALID · sustainable</span>`;
+  const why = r.e502 && r.nginx_resets ? `affected by ${r.e502} intermittent nginx 502 (connection reset${r.e502 > 1 ? "s" : ""}); ` : "";
+  return `<span class="badge b-warn">◐ VALID · not sustainable</span> ${why}${r.sustain_fail.map(k => REASON[k] || k).join("; ")}`;
 }
-function defaultT() { const r = DATA[run]; return r.pg_down != null ? Math.min(r.T, Math.floor(r.pg_down) + 2) : 1; }
-function tiles(r) {
-  const tot = r.totals, e5 = (tot["500"] || 0) + (tot["502"] || 0);
-  const items = [["Requests", r.requests.toLocaleString(), `${r.rate}/s scheduled`],
-    ["Purchases (200)", (tot["200"] || 0).toLocaleString(), `${r.tickets} tickets; repeats of a request_id count again`],
-    ["Sold out (409)", (tot["409"] || 0).toLocaleString(), ""],
-    ["5xx", e5.toLocaleString(), `500: ${fmt(tot["500"] || 0)} · 502: ${fmt(tot["502"] || 0)}`],
-    ["No answer / not sent", ((tot["no answer"] || 0) + (tot["never sent"] || 0)).toLocaleString(), "timeouts, client-side"],
-    ["Latency p50 / p99", `${Math.round(r.p50).toLocaleString()} / ${Math.round(r.p99).toLocaleString()} ms`, "all answered requests"]];
-  $("tiles").innerHTML = items.map(([k, v, n]) => `<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
-}
-
-// ---- shared chart plumbing --------------------------------------------------------
-function frame(svg, h) {
-  const W = svg.clientWidth || 520, m = { l: 48, r: 12, t: 10, b: 24 };
-  svg.setAttribute("viewBox", `0 0 ${W} ${h}`); svg.innerHTML = "";
-  return { W, H: h, m, pw: W - m.l - m.r, ph: h - m.t - m.b };
-}
+const pass = ok => ok ? `<span class="ok">✓ PASS</span>` : `<span class="bad">✕ FAIL</span>`;
 const el = (svg, tag, attrs) => { const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; };
-function xAxis(svg, f, T, x) {
-  const step = T > 80 ? 20 : 10;
-  for (let s = 0; s <= T; s += step) {
-    el(svg, "line", { x1: x(s), x2: x(s), y1: f.m.t, y2: f.m.t + f.ph, stroke: css("--grid"), "stroke-width": 1 });
-    el(svg, "text", { x: x(s), y: f.H - 6, "text-anchor": "middle" }).textContent = `${s}s`;
-  }
-  el(svg, "line", { x1: f.m.l, x2: f.m.l + f.pw, y1: f.m.t + f.ph, y2: f.m.t + f.ph, stroke: css("--axis") });
+function box(svg, x, y, w, h, title, sub, strong) {
+  el(svg, "rect", { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: 9, fill: css("--surface-1"), stroke: css(strong || "--axis"), "stroke-width": strong ? 2 : 1 });
+  const a = el(svg, "text", { x, y: sub ? y - 3 : y + 4, "text-anchor": "middle", fill: css("--text-primary"), "font-size": 12, "font-weight": 600 }); a.textContent = title;
+  if (sub) { const b = el(svg, "text", { x, y: y + 13, "text-anchor": "middle", fill: css("--text-secondary") }); b.textContent = sub; }
 }
-function yGrid(svg, f, ticks, y, label) {
-  ticks.forEach(v => {
-    el(svg, "line", { x1: f.m.l, x2: f.m.l + f.pw, y1: y(v), y2: y(v), stroke: css("--grid") });
-    el(svg, "text", { x: f.m.l - 6, y: y(v) + 4, "text-anchor": "end" }).textContent = label(v);
+function arrow(svg, x1, y1, x2, y2, label, dashed) {
+  el(svg, "line", { x1, y1, x2, y2, stroke: css("--axis"), "stroke-width": 1.5, ...(dashed ? { "stroke-dasharray": "4 3" } : {}) });
+  const a = Math.atan2(y2 - y1, x2 - x1), s = 6;
+  el(svg, "path", { d: `M${x2} ${y2} L${x2 - s * Math.cos(a - .45)} ${y2 - s * Math.sin(a - .45)} L${x2 - s * Math.cos(a + .45)} ${y2 - s * Math.sin(a + .45)}Z`, fill: css("--axis") });
+  if (label) el(svg, "text", { x: (x1 + x2) / 2 + 8, y: (y1 + y2) / 2 + 4 }).textContent = label;
+}
+
+// ---- 1 overview -------------------------------------------------------------------------------
+function overview() {
+  const svg = $("ovArch"), W = svg.clientWidth || 480; svg.setAttribute("viewBox", `0 0 ${W} 300`); svg.innerHTML = "";
+  const cx = W / 2;
+  box(svg, cx, 22, 210, 30, "50,000 arrivals over ~60 s", "");
+  arrow(svg, cx, 37, cx, 58);
+  box(svg, cx, 76, 210, 34, "buyer / load generator", "open-loop, ~833 arrivals/s");
+  arrow(svg, cx, 93, cx, 116);
+  box(svg, cx, 134, 210, 34, "nginx", "round-robin load balancer");
+  [-1, 0, 1].forEach(i => { const x = cx + i * Math.min(150, W / 3.3);
+    arrow(svg, cx, 151, x, 178); box(svg, x, 196, Math.min(130, W / 3.6), 34, `seller ${i + 2}`, "stateless");
+    arrow(svg, x, 213, cx, 245); });
+  box(svg, cx, 266, 230, 38, "PostgreSQL", "the single source of truth", "--series-1");
+  const tot = S.benchmark[0];
+  $("ovTiles").innerHTML = [["Tickets for sale", "100", "exactly"], ["Arrivals", tot.arrivals.toLocaleString(), "open-loop, over ~60 s"],
+    ["Arrival rate", `≈${Math.round(tot.rate)}/s`, "the assignment workload"], ["Seller instances", "3", "stateless, behind nginx"],
+    ["Databases", "1", "PostgreSQL, the source of truth"]]
+    .map(([k, v, n]) => `<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
+}
+
+// ---- 2 correctness headline -----------------------------------------------------------------------
+function headline() {
+  const v1ok = r => r.rows <= r.total && r.dup_numbers === 0 && r.multi_ticket_ids === 0 && r.told_different === 0 && r.sold === r.rows;
+  // keyed by result name, so a run shown in two sections (e.g. the sweep's 833/s run) is counted once
+  const res = new Map([...S.race.runs.filter(r => r.kind === "safe").map(r => [r.label, v1ok(r)]),
+    ["m9_F2_functional", S.idempotency.checks.every(c => c.ok)],
+    ...S.benchmark.map(r => [r.name, r.checks_ok]), ...S.sweep.rows.map(r => [r.name, r.checks_ok]),
+    ...S.fastpath.map(r => [r.name, r.checks_ok]),
+    ...Object.entries(S.faults).map(([k, f]) => [k, f.checks.every(c => c.ok)]),
+    ["m12_commitdrop", S.commitdrop.checks.every(c => c.ok)]]);
+  const all = [...res.values()], n = all.length, okN = all.filter(Boolean).length;
+  const naive = S.race.runs.filter(r => r.kind === "naive"), naiveBad = naive.filter(r => !v1ok(r)).length;
+  $("heroChecks").textContent = okN === n ? "5 / 5" : `${okN} of ${n}`;
+  $("heroText").innerHTML = okN === n
+    ? `<b>All five checks passed in every run of the final design shown on this page — ${n} runs</b>, including overloaded runs, invalid runs and runs where PostgreSQL was paused or killed. (A run can be invalid as a <i>performance</i> measurement and still be checked for correctness.) For contrast, the naive design broke the rules in ${naiveBad} of ${naive.length} runs.`
+    : `<b>Not every run passed</b> — see the tables below.`;
+}
+
+// ---- 3 race -----------------------------------------------------------------------------------
+function raceChart() {
+  const runs = S.race.runs, svg = $("raceChart"), W = svg.clientWidth || 700, compact = W < 560;
+  // Compact (phone) layout: each run's label sits above its bar instead of in a side column.
+  const rowH = compact ? 36 : 24, top = compact ? 18 : 8, L = compact ? 8 : 175, R = compact ? 34 : 60;
+  const H = top + runs.length * rowH + 28; svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H); svg.innerHTML = "";
+  const max = 600, x = v => L + v / max * (W - L - R);
+  (compact ? [0, 200, 400, 600] : [0, 100, 200, 300, 400, 500, 600]).forEach(v => { el(svg, "line", { x1: x(v), x2: x(v), y1: top, y2: H - 22, stroke: css("--grid") });
+    el(svg, "text", { x: x(v), y: H - 8, "text-anchor": "middle" }).textContent = v; });
+  runs.forEach((r, i) => { const y = top + i * rowH, col = r.kind === "naive" ? "--series-2" : "--series-1";
+    if (compact) el(svg, "text", { x: L, y: y + 11, fill: css("--text-secondary"), stroke: css("--surface-1"), "stroke-width": 4,
+      "paint-order": "stroke" }).textContent = r.label;   // halo keeps the label legible over the 100-line
+    else el(svg, "text", { x: L - 8, y: y + 15, "text-anchor": "end", fill: css("--text-secondary") }).textContent = r.label;
+    const by = compact ? y + 15 : y + 4, bh = compact ? 14 : rowH - 8;
+    const bar = el(svg, "rect", { x: x(0), y: by, width: Math.max(2, x(r.rows) - x(0)), height: bh, rx: 4, fill: css(col) });
+    el(svg, "text", { x: x(r.rows) + 5, y: by + bh - 3, fill: css("--text-secondary") }).textContent = r.rows;
+    bar.addEventListener("mousemove", ev => showTip(ev, `<b>${r.label}</b><br>tickets issued: <b>${r.rows}</b> (for ${r.total})<br>ticket numbers issued more than once: ${r.dup_numbers}<br>request_ids holding more than one ticket: ${r.multi_ticket_ids}<br>stored sold_count: ${r.sold}`));
+    bar.addEventListener("mouseleave", hideTip); });
+  el(svg, "line", { x1: x(100), x2: x(100), y1: top, y2: H - 22, stroke: css("--text-primary"), "stroke-dasharray": "4 3", "stroke-width": 1.5 });
+  el(svg, "text", { x: x(100) + 4, y: compact ? 10 : top + 10, fill: css("--text-primary") }).textContent = "100 tickets exist";
+  $("lg-race").innerHTML = `<span><i style="background:${css("--series-2")}"></i>naive (read, then write)</span><span><i style="background:${css("--series-1")}"></i>safe (row lock + constraints)</span>`;
+  const rows = [...S.race.runs, ...S.race.backstop];
+  $("raceTable").innerHTML = `<thead><tr><th class="l">run</th><th>tickets issued</th><th>numbers issued twice+</th><th>request_ids with 2+ tickets</th><th>told different numbers</th><th>stored sold_count</th><th class="l">HTTP answers</th></tr></thead><tbody>` +
+    rows.map(r => `<tr><td class="l">${r.label}</td><td>${r.rows}</td><td>${r.dup_numbers}</td><td>${r.multi_ticket_ids}</td><td>${r.told_different}</td><td>${r.sold}</td><td class="l">${Object.entries(r.http).map(([k, v]) => `${v}×${k}`).join(", ")}${r.transport_errors ? `, ${r.transport_errors} network error` : ""}</td></tr>`).join("") + "</tbody>";
+}
+
+// ---- 4 idempotency ----------------------------------------------------------------------------------
+function idem() {
+  const i = S.idempotency, ex = i.example;
+  $("idemEvidence").innerHTML = `<div class="tiles">
+    <div class="card tile"><div class="k">Requests sent</div><div class="v">${i.requests.toLocaleString()}</div><div class="n">${i.request_ids} request_ids × ${Object.keys(i.copies_per_id).join("/")} copies</div></div>
+    <div class="card tile"><div class="k">request_ids served by more than one seller</div><div class="v">${i.ids_multi_instance}</div><div class="n">of ${i.request_ids}</div></div>
+    <div class="card tile"><div class="k">Ticket holders: all copies got the same ticket</div><div class="v">${i.holders_same_ticket} / ${i.holders}</div><div class="n">${i.tickets} tickets for sale</div></div></div>
+    <p class="explain">Example: <code>${ex.request_id}</code> was sent ${ex.copies} times, answered by ${ex.upstreams.length} different sellers — every copy returned ticket <b>${ex.ticket}</b>.</p>
+    <p class="explain">Five checks for this run: ${i.checks.every(c => c.ok) ? "<b>all passed</b>" : "see detail"}. The committed-but-unacknowledged experiment (section 7) tests idempotency after a lost confirmation.</p>`;
+}
+
+// ---- 5 benchmark ------------------------------------------------------------------------------------
+function bench() {
+  const rows = S.benchmark.slice().sort((a, b) => (b.valid && b.sustainable) - (a.valid && a.sustainable));
+  $("benchTable").innerHTML = `<thead><tr><th class="l">run</th><th class="l">verdict</th><th>throughput</th><th>p50</th><th>p99</th><th>5xx</th><th class="l">note</th></tr></thead><tbody>` +
+    rows.map(r => `<tr><td class="l">${r.title}</td><td class="l">${verdict(r)}</td><td>${fmt(r.served)}/s</td><td>${ms(r.p50)}</td><td>${ms(r.p99)}</td><td>${r.e5}</td><td class="l">${r.note}</td></tr>`).join("") + "</tbody>";
+  const clean = S.benchmark.filter(r => r.valid && r.sustainable), lo = Math.min(...clean.map(r => r.served)), hi = Math.max(...clean.map(r => r.served));
+  const inval = S.benchmark.filter(r => !r.valid).length, conf = S.benchmark.filter(r => r.valid && !r.sustainable && r.e502).length;
+  $("benchSummary").innerHTML = `<b>${clean.length} clean runs</b> answered every arrival at ${fmt(lo)}–${fmt(hi)} responses/s with no errors and all five checks passing. The other rows are shown for honesty: ${inval} failed a load-generator validity rule, and ${conf} had valid load generation but were disturbed by the intermittent nginx 502 issue — so they are not clean capacity results and are not averaged in.`;
+}
+
+// ---- 6 faults ---------------------------------------------------------------------------------------
+const FAULTS = [
+  ["m11_E1_pause", "PostgreSQL Pause", "E1", "PostgreSQL was frozen (docker pause) for about 10 s, then unfrozen.",
+   "Requests should stall while the database is frozen, then complete; committed state must stay correct."],
+  ["m11_E2_kill", "PostgreSQL Kill & Recovery", "E2", "PostgreSQL was killed (SIGKILL), left down about 10 s, then restarted.",
+   "In-flight database operations fail, PostgreSQL recovers from its write-ahead log on restart, and the sellers reconnect by themselves without corrupting the inventory."],
+  ["m11_E2b_kill_midsale_a1", "PostgreSQL Kill During the Sale", "E2b", "Same kill, timed to land while tickets were still being sold.",
+   "The purchase in progress at the moment of the crash must be either fully committed or fully rolled back — never half-written."]];
+function faults() {
+  $("faultCards").innerHTML = FAULTS.map(([name, title, id, what, expect]) => {
+    const f = S.faults[name], t = f.totals, ev = f.events;
+    const find = s => ev.find(e => e.label.startsWith(s));
+    const ready = f.pg_ready, sus = find("sustained service resumed");
+    const timing = name === "m11_E1_pause" || name === "m11_E2_kill"
+      ? `<p class="explain"><b>Limitation of this run:</b> the fault took effect after the 100th ticket was sold (Docker applies the fault ~2 s after the command), so no purchase was in flight at the moment of the fault.</p>` : "";
+    const mid = name === "m11_E2b_kill_midsale_a1" ? `<p class="explain"><b>The purchase in progress at the crash:</b> tickets #${f.tickets_pre[0]}–#${f.tickets_pre[1]} were confirmed before the kill; #${f.tickets_gap.map(g => g[0]).join(", ")} was confirmed ${f.tickets_gap.map(g => g[1]).join(", ")} ms after the kill, so its commit had already completed; #${f.tickets_post[0]}–#${f.tickets_post[1]} were sold only after recovery. The seller logs show ${f.in_tx_lock_wait} requests waiting for the lock and <b>${f.in_tx_insert} holding it, mid-INSERT, before COMMIT</b> — that purchase (the next ticket, #${f.tickets_post[0]}) was <b>rolled back</b>, and #${f.tickets_post[0]} was later sold normally. The ambiguous window (committed but unconfirmed) was <b>not</b> hit by this random kill — see section 7.</p>` : "";
+    return `<div class="card"><h3>${title}<span class="idtag">${id}</span></h3>
+      <p class="explain"><b>What we did:</b> ${what} <b>Expected:</b> ${expect}</p>
+      <div class="legend" id="fl-${name}"></div><svg id="fs-${name}" width="100%" height="150" role="img" aria-label="${title} component states"></svg>
+      <div class="grid3" style="margin-top:8px">
+        <div><b>During the fault</b><br><span class="explain">${fmt(t["500"] || 0)} database errors (HTTP 500 from sellers)<br>${fmt(t["502"] || 0)} × nginx 502${f.nginx_window ? ` (sellers out of rotation ≈ t ${f.nginx_window[0]}–${f.nginx_window[1]} s after ${f.nginx_resets} connection reset${f.nginx_resets === 1 ? "" : "s"})` : ""}<br>${fmt((t["no answer"] || 0))} unanswered requests</span></div>
+        <div><b>Recovery</b><br><span class="explain">${f.pg_down != null ? `fault took effect t = ${f.pg_down.toFixed(2)} s` : ""}${ready != null ? `<br>${name === "m11_E1_pause" ? "PostgreSQL unpaused" : "PostgreSQL ready after crash recovery"} t = ${ready.toFixed(2)} s` : ""}${sus ? `<br>steady service again t = ${sus.t.toFixed(2)} s` : ""}${sus && ready != null && sus.t - ready > 1 ? ` <b>(${(sus.t - ready).toFixed(1)} s later — the load balancer's delay)</b>` : ""}<br>${f.containers_unchanged ? "sellers were not restarted (same containers throughout)" : "container change detected — see detail"}</span></div>
+        <div><b>After recovery</b><br><span class="explain">five checks: ${f.checks.every(c => c.ok) ? "<b>all passed</b>" : "see detail"}<br>replay of every confirmed and uncertain request: ${f.replay.some(l => l.includes("REPLAY VERDICT: PASS")) ? "<b>matched the final state</b>" : "see detail"}<br>lost confirmed purchases: ${f.checks.every(c => c.ok) && f.replay.some(l => l.includes("REPLAY VERDICT: PASS")) ? "<b>none</b>" : "see detail"}</span></div>
+      </div>${mid}${timing}
+      <details><summary>Replay output</summary><div class="mono">${esc(f.replay.join("\n"))}</div></details></div>`;
+  }).join("");
+  FAULTS.forEach(([name]) => lanesInto(RUNS.find(r => r.name === name), `fs-${name}`, `fl-${name}`, null));
+}
+
+// ---- 7 committed but unacknowledged ------------------------------------------------------------
+function cua() {
+  // One vertical sequence so it reads at any width (the example ticket number is illustrative).
+  const svg = $("cuaFlow"), W = svg.clientWidth || 480, cx = Math.min(W / 2, 150), bw = Math.min(250, W - 16);
+  const H = 470; svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H); svg.innerHTML = "";
+  const bx = Math.max(bw / 2 + 4, cx);
+  const steps = [["Buyer", "sends purchase, request_id A", null, "1  purchase"],
+    ["Seller", "runs the purchase transaction", null, "2  COMMIT"],
+    ["PostgreSQL", "commits: ticket 57 now exists", "--series-1", null],
+    ["Buyer sees a failure", "…but already owns ticket 57", null, "4  retry (same id)"],
+    ["Seller → PostgreSQL", "request_id A already has a ticket", null, null],
+    ["Original ticket 57 returned", "no second ticket is created", "--good", null]];
+  steps.forEach(([title, sub, strong, next], i) => {
+    const y = 26 + i * 80; box(svg, bx, y, bw, 38, title, sub, strong);
+    if (i === 2) {   // the lost confirmation between PostgreSQL and the buyer
+      el(svg, "line", { x1: bx, y1: y + 19, x2: bx, y2: y + 61, stroke: css("--axis"), "stroke-dasharray": "4 3" });
+      const xs = el(svg, "text", { x: bx, y: y + 46, "text-anchor": "middle", fill: css("--bad-ink"), "font-size": 18, "font-weight": 700,
+        stroke: css("--surface-1"), "stroke-width": 5, "paint-order": "stroke" }); xs.textContent = "✕";
+      el(svg, "text", { x: bx + 14, y: y + 46, fill: css("--bad-ink"), stroke: css("--surface-1"), "stroke-width": 4, "paint-order": "stroke" }).textContent = "3  reply lost";
+    } else if (i < steps.length - 1) arrow(svg, bx, y + 19, bx, y + 61, next || "");
   });
+  const c = S.commitdrop;
+  $("cuaProbe").textContent = c.probe.join("\n");
+  const [ip, n] = c.routing[0].split("|");
+  $("cuaRouting").innerHTML = `Routing verified: all ${n} of the test seller's database connections came from the proxy (${ip}). Replay and verification afterwards went through the normal sellers, connected directly to PostgreSQL.`;
+  const cnt = c.count_before_after;
+  $("cuaTiles").innerHTML = [["Workload", `${c.requests} requests`, `${c.rate}/s, ${c.tickets} tickets`],
+    ["COMMIT replies dropped", `${c.dropped} of ${c.commits}`, "by the test proxy"],
+    ["Committed but unacknowledged", c.cua, "buyer saw only a failure; ticket exists"],
+    ["Replay returned the same ticket", `${c.table.filter(t => t.class === "COMMITTED BUT UNACKNOWLEDGED" && t.replay === `[(200, ${t.ticket}), (200, ${t.ticket})]`).length} / ${c.cua}`, "each replayed twice"],
+    ["Ticket rows before / after replays", `${cnt[0]} / ${cnt[1]}`, cnt[0] === cnt[1] ? "no duplicate purchase" : "CHANGED"],
+    ["Five checks", c.checks.every(x => x.ok) ? "5 / 5" : "see detail", "passed"]]
+    .map(([k, v, n2]) => `<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n2}</div></div>`).join("");
+  $("cuaTable").innerHTML = `<thead><tr><th>COMMIT #</th><th class="l">request_id</th><th>ticket</th><th class="l">every buyer answer for it</th><th>ticket row in DB</th><th class="l">replay ×2</th><th class="l">class</th></tr></thead><tbody>` +
+    c.table.map(t => t.insert === null ? `<tr><td>${t.commit}</td><td class="l" colspan="5">no ticket in this transaction (read-only)</td><td class="l">${t.class}</td></tr>` :
+      `<tr><td>${t.commit}</td><td class="l">${t.request_id}</td><td>#${t.ticket}</td><td class="l">${t.buyer.join(", ")}</td><td>#${t.db_row}</td><td class="l">${t.replay}</td><td class="l">${t.class === "COMMITTED BUT UNACKNOWLEDGED" ? `<b>${t.class}</b>` : t.class}</td></tr>`).join("") + "</tbody>";
+  $("cuaReplay").textContent = [...c.replay, "", ...c.checks.map(x => `${x.ok ? "PASS" : "FAIL"}  ${x.name}: ${x.detail}`)].join("\n");
 }
-function band(svg, f, r, x) {  // PostgreSQL-down window
-  if (r.pg_down == null) return;
-  const a = x(r.pg_down), b = x(r.pg_ready ?? r.T);
+
+// ---- 8 sweep ------------------------------------------------------------------------------------
+function sweep() {
+  const svg = $("sweepChart"), W = svg.clientWidth || 700, H = 340, m = { l: 56, r: 16, t: 14, b: 40 };
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.innerHTML = "";
+  const x = v => m.l + (v - 750) / (1500 - 750) * (W - m.l - m.r), y = v => H - m.b - (v - 750) / (1500 - 750) * (H - m.t - m.b);
+  [750, 900, 1050, 1200, 1350, 1500].forEach(v => {
+    el(svg, "line", { x1: x(v), x2: x(v), y1: m.t, y2: H - m.b, stroke: css("--grid") });
+    el(svg, "text", { x: x(v), y: H - m.b + 16, "text-anchor": "middle" }).textContent = v.toLocaleString();
+    el(svg, "line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: css("--grid") });
+    el(svg, "text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end" }).textContent = v.toLocaleString(); });
+  el(svg, "text", { x: (W + m.l) / 2, y: H - 6, "text-anchor": "middle", fill: css("--text-secondary") }).textContent = "offered arrival rate (per second)";
+  const yl = el(svg, "text", { x: 14, y: H / 2, "text-anchor": "middle", fill: css("--text-secondary"), transform: `rotate(-90 14 ${H / 2})` }); yl.textContent = "answered (per second)";
+  el(svg, "line", { x1: x(750), y1: y(750), x2: x(1500), y2: y(1500), stroke: css("--text-secondary"), "stroke-dasharray": "5 4" });
+  el(svg, "text", { x: x(1380), y: y(1400) - 6, "text-anchor": "end", fill: css("--text-secondary") }).textContent = "answered = offered";
+  // Markers are always drawn at their exact values; only the text labels are offset to avoid overlap.
+  const mark = (px, py, kind, label, html, dy = 0, size = 7) => {
+    if (kind === "good") el(svg, "circle", { cx: px, cy: py, r: size, fill: css("--good"), stroke: css("--surface-1"), "stroke-width": 2 });
+    else if (kind === "warn") el(svg, "circle", { cx: px, cy: py, r: size + 2, fill: "none", stroke: css("--warning"), "stroke-width": 3 });
+    else el(svg, "path", { d: `M${px - 6} ${py - 6}L${px + 6} ${py + 6}M${px + 6} ${py - 6}L${px - 6} ${py + 6}`, stroke: css("--serious"), "stroke-width": 3 });
+    const hit = el(svg, "circle", { cx: px, cy: py, r: 14, fill: "transparent" });
+    hit.addEventListener("mousemove", ev => showTip(ev, html)); hit.addEventListener("mouseleave", hideTip);
+    if (!label) return;
+    const above = dy === "above";   // label centred above the marker (clamped inside the plot)
+    const lx = above ? Math.min(Math.max(px, m.l + 24), W - m.r - 24) : px + 12;
+    el(svg, "text", { x: lx, y: above ? py - 13 : py + 4 + dy, "text-anchor": above ? "middle" : "start", fill: css("--text-secondary"),
+      stroke: css("--surface-1"), "stroke-width": 4, "paint-order": "stroke" }).textContent = label;
+  };
+  const e833 = S.sweep.earlier_833, lo = Math.min(...e833.map(r => r.served)), hi = Math.max(...e833.map(r => r.served));
+  e833.forEach(r => mark(x(833.33), y(r.served), "good", "", `<b>${r.title}</b> (earlier clean run)<br>answered ${fmt(r.served)}/s`, 0, 4));
+  el(svg, "text", { x: x(833.33) + 12, y: y((lo + hi) / 2) + 20, fill: css("--text-secondary"), stroke: css("--surface-1"), "stroke-width": 4,
+    "paint-order": "stroke" }).textContent = `${e833.length} earlier clean runs`;   // range in tooltip + table
+  S.sweep.rows.forEach(r => {
+    const kind = !r.valid ? "bad" : r.sustainable ? "good" : "warn";
+    // label placement only; the sweep's 833/s point sits on top of the earlier runs
+    const dy = r.title === "833/s" ? -12 : r.rate >= 1000 ? "above" : 0;
+    mark(x(r.rate), y(r.served), kind, `${fmt(r.served)}/s`,
+      `<b>${r.title}</b> · ${r.note}<br>answered ${fmt(r.served)}/s · p50 ${ms(r.p50)} · p99 ${ms(r.p99)}<br>${verdict(r).replace(/<[^>]+>/g, "")}`, dy);
+  });
+  $("lg-sweep").innerHTML = `<span><i style="background:${css("--good")};border-radius:50%"></i>✓ valid and sustainable</span><span><i style="background:transparent;border:2px solid ${css("--warning")};border-radius:50%"></i>◐ valid, not sustainable</span><span><b style="color:${css("--serious")}">✕</b> invalid (reason in table)</span>`;
+  $("sweepTable").innerHTML = `<thead><tr><th class="l">offered</th><th class="l">verdict</th><th>answered</th><th>p99 after the sale</th><th>seller CPU peak</th><th>PostgreSQL CPU mean / peak</th><th class="l">buyer</th></tr></thead><tbody>` +
+    S.sweep.rows.map(r => { const sc = Object.entries(r.cpu).filter(([k]) => k.startsWith("seller")).map(([, v]) => v[1]);
+      return `<tr><td class="l">${r.title}</td><td class="l">${verdict(r)}</td><td>${fmt(r.served)}/s</td><td>${ms(r.post_p99)}</td><td>${Math.min(...sc)}–${Math.max(...sc)}%</td><td>${(r.cpu["db-1"] || [])[0]}% / ${(r.cpu["db-1"] || [])[1]}%</td><td class="l">${r.note}</td></tr>`; }).join("") + "</tbody>";
+  const byT = t => S.sweep.rows.find(r => r.title === t);
+  const r1000 = byT("1,000/s (retry)"), r1200 = byT("1,200/s"), r1400 = byT("1,400/s"), r833 = byT("833/s"), r1000a = byT("1,000/s");
+  $("sweepFindings").innerHTML = [
+    `<b>1,000/s was sustainable in one valid run</b> (${fmt(r1000.served)}/s answered, p99 after the sale ${ms(r1000.post_p99)}). An earlier 1,000/s attempt with fewer load-generator processes was invalid because the load generator fell behind its schedule; it is not counted against the service.`,
+    `<b>Throughput saturated around ${fmt(r1200.served)}–${fmt(r1400.served)}/s in this environment.</b> Raising the offered rate from 1,200 to 1,400/s (+${Math.round((1400 / 1200 - 1) * 100)}%) added only ${((r1400.served / r1200.served - 1) * 100).toFixed(1)}% more answers. This is an <b>observed saturation region, not a formally proven maximum</b> — one run per rate, on one machine.`,
+    `1,200/s is <b>not a clean capacity measurement</b>: ${r1200.sna} request was never answered (a genuine server-side timeout), which makes the run invalid by the rules fixed beforehand.`,
+    `1,400/s did not sustain the offered rate and showed saturation: answered ${fmt(r1400.served)}/s, p50 latency ${ms(r1400.p50)}.`,
+    `833/s in this sweep was disturbed by ${r833.e502} intermittent nginx 502s (connection resets), which pushed its p99 to ${ms(r833.post_p99)}. It is shown separately from the ${S.sweep.earlier_833.length} earlier clean 833/s runs, not combined with them.`,
+    `<b>Observed limiting component: seller CPU.</b> The three single-process seller instances reached about 100% CPU (one core each) in the higher-rate tests, while PostgreSQL (mean ${r1400.cpu["db-1"][0]}%), nginx (mean ${r1400.cpu["lb-1"][0]}%) and the host (peak ${r1400.host_max}% of 1,600%) had headroom. Lock waiting appeared only during the ~2-second sale (up to ${r1400.waiters_max} connections waiting).`
+  ].map(s => `<li>${s}</li>`).join("");
+  $("profile").textContent = S.sweep.profile.join("\n");
+}
+
+// ---- 9 fast path --------------------------------------------------------------------------------
+function fastpath() {
+  $("fpTable").innerHTML = `<thead><tr><th class="l">run</th><th class="l">verdict</th><th>answered</th><th>“sold out” p50</th><th>“sold out” p99</th><th>connections waiting on the lock (mean)</th></tr></thead><tbody>` +
+    S.fastpath.map(r => `<tr><td class="l">${r.title}</td><td class="l">${verdict(r)}</td><td>${fmt(r.served)}/s</td><td>${ms(r.p409[0])}</td><td>${ms(r.p409[1])}</td><td>${r.waiters_mean}</td></tr>`).join("") + "</tbody>";
+}
+
+// ---- 11 limitations -----------------------------------------------------------------------------
+function limits() {
+  const inv = [...S.benchmark, ...S.sweep.rows].filter(r => !r.valid).length;
+  const captured = S.benchmark.filter(r => r.note.includes("packet capture")), capNo502 = captured.filter(r => r.e502 === 0).length;
+  const after = Object.values(S.faults).filter(f => f.hundredth != null && f.pg_down != null && f.pg_down > f.hundredth).length;
+  $("limitsList").innerHTML = [
+    `<b>One physical host.</b> Every component ran in Docker on one Windows machine. Results describe this environment; they are not a production capacity figure.`,
+    `<b>One PostgreSQL failure domain.</b> One database, one volume, one host. There is no replica, so losing the disk or host would lose the service and its data.`,
+    `<b>No power-loss or host-crash durability test.</b> The crash tests killed the PostgreSQL <i>process</i>; the operating system kept its disk cache, so durability through a power cut (fsync) was not tested.`,
+    `<b>No PostgreSQL HA and no multi-zone deployment</b> were implemented (see decisions).`,
+    `<b>No claim of a maximum capacity.</b> The ~1,060–1,070/s figure is an observed saturation region from single runs per rate, not an absolute limit.`,
+    `<b>Intermittent nginx 502s remain only partly explained.</b> When a seller hits a database error, the web framework sends a 500 and the server then closes the connection, which the load balancer tries to reuse — supported by the library source code and timing, not by a packet capture. Separately, <b>spontaneous 502s with no seller errors</b> occurred in some no-fault runs; their root cause is <b>not proven</b> (${capNo502} of ${captured.length} runs with a loss-free packet capture had none to catch).`,
+    `<b>Recovery is slower than the database.</b> After PostgreSQL came back, nginx kept the sellers out of rotation for several more seconds (its default: one failure → 10 s removal). Measured, documented, not fixed.`,
+    `<b>Some runs are invalid and stay labelled that way</b> (${inv} in the tables above): the load generator fell behind, or requests went unanswered. They are shown, not hidden or averaged in.`,
+    `<b>Fault timing.</b> ${after} of the ${Object.keys(S.faults).length} database-failure runs took effect after sell-out; only the mid-sale run exercised a purchase in progress, and the committed-but-unacknowledged window was tested with a proxy, not a real crash.`
+  ].map(s => `<li>${s}</li>`).join("");
+}
+
+// ---- 13 detailed viewer (unchanged behaviour; generalised lanes) -------------------------------------
+const RESP = [["409", "409 sold out", "--series-1"], ["200", "200 purchase", "--series-2"], ["500", "500 seller error", "--series-3"], ["502", "502 nginx", "--series-4"]];
+const LAT = [["lat_p50", "p50", "--series-1"], ["lat_p99", "p99", "--series-2"]];
+const SEL = [["seller1", "seller1", "--series-1"], ["seller2", "seller2", "--series-2"], ["seller3", "seller3", "--series-3"]];
+const STATE = { up: ["--good", "✓", "up"], routing: ["--good", "✓", "routing"], serving: ["--good", "✓", "serving"],
+  paused: ["--warning", "‖", "paused"], recovering: ["--warning", "↻", "crash recovery"],
+  errors: ["--serious", "▲", "returning 500s"], resets: ["--serious", "▲", "connection resets"],
+  down: ["--critical", "✕", "down"], "no upstream": ["--critical", "✕", "no live upstreams"], idle: ["--idle", "–", "no answers"] };
+let run = 0, t = 0, pinned = false, timer = null;
+function showTip(ev, html) { tip.innerHTML = html; tip.style.display = "block";
+  tip.style.left = Math.min(ev.clientX + 14, innerWidth - 330) + "px"; tip.style.top = (ev.clientY + 14) + "px"; }
+function hideTip() { tip.style.display = "none"; }
+function tabs() {
+  $("tabs").innerHTML = RUNS.map((r, i) => `<button role="tab" aria-selected="${i === run}" data-i="${i}">${r.label} <span style="color:var(--muted);font-size:11px">${r.id}</span></button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => { run = +b.dataset.i; stop(); t = defaultT(); render(); });
+}
+function defaultT() { const r = RUNS[run]; return r.pg_down != null ? Math.min(r.T, Math.floor(r.pg_down) + 2) : 1; }
+function tilesDetail(r) {
+  const tot = r.totals, e5 = (tot["500"] || 0) + (tot["502"] || 0);
+  $("tiles").innerHTML = [["Requests", r.requests.toLocaleString(), `${r.rate}/s scheduled`],
+    ["Purchases (200)", (tot["200"] || 0).toLocaleString(), `${r.tickets} tickets; a repeated request_id counts again`],
+    ["Sold out (409)", (tot["409"] || 0).toLocaleString(), ""], ["5xx", e5.toLocaleString(), `500: ${fmt(tot["500"] || 0)} · 502: ${fmt(tot["502"] || 0)}`],
+    ["No answer / not sent", ((tot["no answer"] || 0) + (tot["never sent"] || 0)).toLocaleString(), "client-side timeouts"],
+    ["Latency p50 / p99", `${Math.round(r.p50).toLocaleString()} / ${Math.round(r.p99).toLocaleString()} ms`, "all answered requests"]]
+    .map(([k, v, n]) => `<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
+}
+function frame(svg, h) { const W = svg.clientWidth || 520, m = { l: 48, r: 12, t: 10, b: 24 };
+  svg.setAttribute("viewBox", `0 0 ${W} ${h}`); svg.innerHTML = ""; return { W, H: h, m, pw: W - m.l - m.r, ph: h - m.t - m.b }; }
+function xAxis(svg, f, T, x) { const step = T > 80 ? 20 : 10;
+  for (let s = 0; s <= T; s += step) { el(svg, "line", { x1: x(s), x2: x(s), y1: f.m.t, y2: f.m.t + f.ph, stroke: css("--grid"), "stroke-width": 1 });
+    el(svg, "text", { x: x(s), y: f.H - 6, "text-anchor": "middle" }).textContent = `${s}s`; }
+  el(svg, "line", { x1: f.m.l, x2: f.m.l + f.pw, y1: f.m.t + f.ph, y2: f.m.t + f.ph, stroke: css("--axis") }); }
+function yGrid(svg, f, ticks, y, label) { ticks.forEach(v => { el(svg, "line", { x1: f.m.l, x2: f.m.l + f.pw, y1: y(v), y2: y(v), stroke: css("--grid") });
+  el(svg, "text", { x: f.m.l - 6, y: y(v) + 4, "text-anchor": "end" }).textContent = label(v); }); }
+function band(svg, f, r, x) { if (r.pg_down == null) return; const a = x(r.pg_down), b = x(r.pg_ready ?? r.T);
   el(svg, "rect", { x: a, y: f.m.t, width: Math.max(1, b - a), height: f.ph, fill: css("--band") });
-  el(svg, "text", { x: a + 4, y: f.m.t + 12, fill: css("--band-ink") }).textContent =
-    r.fault === "pause" ? "PostgreSQL paused" : "PostgreSQL down";
-}
-function cursor(svg, f, x) {
-  el(svg, "line", { x1: x(t + 0.5), x2: x(t + 0.5), y1: f.m.t, y2: f.m.t + f.ph, stroke: css("--text-secondary"),
-    "stroke-width": 1, "stroke-dasharray": "3 3" });
-}
+  el(svg, "text", { x: a + 4, y: f.m.t + 12, fill: css("--band-ink") }).textContent = r.fault === "pause" ? "PostgreSQL paused" : "PostgreSQL down"; }
+function cursor(svg, f, x) { el(svg, "line", { x1: x(t + 0.5), x2: x(t + 0.5), y1: f.m.t, y2: f.m.t + f.ph, stroke: css("--text-secondary"), "stroke-width": 1, "stroke-dasharray": "3 3" }); }
 function hover(svg, f, x0, T, tipHtml) {
   const hit = el(svg, "rect", { x: f.m.l, y: f.m.t, width: f.pw, height: f.ph, fill: "transparent" });
-  hit.addEventListener("mousemove", ev => {
-    const bb = svg.getBoundingClientRect(), px = (ev.clientX - bb.left) * (f.W / bb.width);
-    const s = Math.max(0, Math.min(T, Math.floor(x0(px))));
-    if (!pinned) { t = s; update(); }
-    tip.innerHTML = tipHtml(s); tip.style.display = "block";
-    tip.style.left = Math.min(ev.clientX + 14, innerWidth - 220) + "px"; tip.style.top = (ev.clientY + 14) + "px";
-  });
-  hit.addEventListener("mouseleave", () => tip.style.display = "none");
-  hit.addEventListener("click", () => { pinned = !pinned; });
-}
-const nice = m => { const p = Math.pow(10, Math.floor(Math.log10(m || 1))); const r = m / p;
-  return (r <= 1 ? 1 : r <= 2 ? 2 : r <= 5 ? 5 : 10) * p; };
+  hit.addEventListener("mousemove", ev => { const bb = svg.getBoundingClientRect(), px = (ev.clientX - bb.left) * (f.W / bb.width);
+    const s = Math.max(0, Math.min(T, Math.floor(x0(px)))); if (!pinned) { t = s; update(); } showTip(ev, tipHtml(s)); });
+  hit.addEventListener("mouseleave", hideTip); hit.addEventListener("click", () => { pinned = !pinned; }); }
+const nice = m => { const p = Math.pow(10, Math.floor(Math.log10(m || 1))); const r = m / p; return (r <= 1 ? 1 : r <= 2 ? 2 : r <= 5 ? 5 : 10) * p; };
 const sw = c => `<span class="sw" style="background:${css(c)}"></span>`;
-
 function legend(id, items) { $(id).innerHTML = items.map(([, l, c]) => `<span><i style="background:${css(c)}"></i>${l}</span>`).join(""); }
-
 function respChart(r) {
-  const svg = $("c-resp"), f = frame(svg, 220), T = r.T;
-  const tot = r.per_second.map(c => RESP.reduce((a, [k]) => a + (c[k] || 0), 0));
-  const top = nice(Math.max(...tot)), x = s => f.m.l + s / (T + 1) * f.pw, x0 = px => (px - f.m.l) / f.pw * (T + 1);
-  const y = v => f.m.t + f.ph - v / top * f.ph;
+  const svg = $("c-resp"), f = frame(svg, 220), T = r.T, tot = r.per_second.map(c => RESP.reduce((a, [k]) => a + (c[k] || 0), 0));
+  const top = nice(Math.max(...tot)), x = s => f.m.l + s / (T + 1) * f.pw, x0 = px => (px - f.m.l) / f.pw * (T + 1), y = v => f.m.t + f.ph - v / top * f.ph;
   yGrid(svg, f, [0, top / 2, top], y, v => v.toLocaleString()); band(svg, f, r, x); xAxis(svg, f, T, x);
   const bw = Math.max(1, f.pw / (T + 1) - 2);
-  r.per_second.forEach((c, s) => { let acc = 0;
-    RESP.forEach(([k, , col]) => { const v = c[k] || 0; if (!v) return;
-      const y1 = y(acc + v), y2 = y(acc); acc += v;
-      el(svg, "rect", { x: x(s) + 1, y: y1, width: bw, height: Math.max(0.5, y2 - y1 - (acc < tot[s] ? 1 : 0)), fill: css(col) });
-    }); });
+  r.per_second.forEach((c, s) => { let acc = 0; RESP.forEach(([k, , col]) => { const v = c[k] || 0; if (!v) return;
+    const y1 = y(acc + v), y2 = y(acc); acc += v;
+    el(svg, "rect", { x: x(s) + 1, y: y1, width: bw, height: Math.max(0.5, y2 - y1 - (acc < tot[s] ? 1 : 0)), fill: css(col) }); }); });
   cursor(svg, f, x);
-  hover(svg, f, x0, T, s => `<b>t = ${s}–${s + 1} s</b><br>` + RESP.map(([k, l, c]) =>
-    `${sw(c)}${l}: <b>${fmt(r.per_second[s][k] || 0)}</b>`).join("<br>") +
+  hover(svg, f, x0, T, s => `<b>t = ${s}–${s + 1} s</b><br>` + RESP.map(([k, l, c]) => `${sw(c)}${l}: <b>${fmt(r.per_second[s][k] || 0)}</b>`).join("<br>") +
     (r.per_second[s]["no answer"] ? `<br>no answer: <b>${r.per_second[s]["no answer"]}</b>` : ""));
 }
 function lineChart(id, r, keys, getter, opts) {
-  const svg = $(id), f = frame(svg, 220), T = r.T;
-  const x = s => f.m.l + (s + 0.5) / (T + 1) * f.pw, x0 = px => (px - f.m.l) / f.pw * (T + 1) - 0.5;
-  const vals = keys.flatMap(([k]) => getter(k).filter(v => v != null));
-  let y, ticks, lab;
-  if (opts.log) { const lo = 1, hi = Math.pow(10, Math.ceil(Math.log10(Math.max(10, ...vals))));
-    y = v => f.m.t + f.ph - (Math.log10(Math.max(lo, v)) - 0) / Math.log10(hi) * f.ph;
-    ticks = []; for (let p = 1; p <= hi; p *= 10) ticks.push(p); lab = v => v >= 1000 ? (v / 1000) + "s" : v + "ms";
-  } else { const top = opts.max || nice(Math.max(1, ...vals)); y = v => f.m.t + f.ph - v / top * f.ph;
-    ticks = [0, top / 2, top]; lab = v => v.toLocaleString(); }
+  const svg = $(id), f = frame(svg, 220), T = r.T, x = s => f.m.l + (s + 0.5) / (T + 1) * f.pw, x0 = px => (px - f.m.l) / f.pw * (T + 1) - 0.5;
+  const vals = keys.flatMap(([k]) => getter(k).filter(v => v != null)); let y, ticks, lab;
+  if (opts.log) { const hi = Math.pow(10, Math.ceil(Math.log10(Math.max(10, ...vals))));
+    y = v => f.m.t + f.ph - Math.log10(Math.max(1, v)) / Math.log10(hi) * f.ph; ticks = []; for (let p = 1; p <= hi; p *= 10) ticks.push(p);
+    lab = v => v >= 1000 ? (v / 1000) + "s" : v + "ms";
+  } else { const top = opts.max || nice(Math.max(1, ...vals)); y = v => f.m.t + f.ph - v / top * f.ph; ticks = [0, top / 2, top]; lab = v => v.toLocaleString(); }
   yGrid(svg, f, ticks, y, lab); band(svg, f, r, s => f.m.l + s / (T + 1) * f.pw); xAxis(svg, f, T, s => f.m.l + s / (T + 1) * f.pw);
   const ends = [];
   keys.forEach(([k, l, col]) => { const v = getter(k); let d = "", pen = false;
-    v.forEach((val, s) => { if (val == null) { pen = false; return; }
-      d += (pen ? "L" : "M") + x(s) + " " + y(val) + (opts.step ? " H" + (x(s) + f.pw / (T + 1)) : ""); pen = true; });
+    v.forEach((val, s) => { if (val == null) { pen = false; return; } d += (pen ? "L" : "M") + x(s) + " " + y(val) + (opts.step ? " H" + (x(s) + f.pw / (T + 1)) : ""); pen = true; });
     el(svg, "path", { d, fill: "none", stroke: css(col), "stroke-width": 2, "stroke-linejoin": "round" });
-    const last = v.map((val, s) => [val, s]).filter(p => p[0] != null).pop();
-    if (keys.length > 1 && last) ends.push({ y: y(last[0]) - 4, l });
-  });
-  // Direct end labels, spaced >= 12px apart so they never collide (order preserved).
+    const last = v.map((val, s) => [val, s]).filter(p => p[0] != null).pop(); if (keys.length > 1 && last) ends.push({ y: y(last[0]) - 4, l }); });
   ends.sort((a, b) => a.y - b.y).forEach((e, i, arr) => { if (i) e.y = Math.max(e.y, arr[i - 1].y + 12); });
   const over = ends.length ? ends[ends.length - 1].y - (f.m.t + f.ph - 2) : 0;
-  ends.forEach(e => { el(svg, "text", { x: f.W - f.m.r - 2, y: e.y - Math.max(0, over), "text-anchor": "end",
-    fill: css("--text-secondary") }).textContent = e.l; });
-  cursor(svg, { ...f }, s => f.m.l + s / (T + 1) * f.pw);
-  hover(svg, f, x0, T, s => `<b>t = ${s}–${s + 1} s</b><br>` + keys.map(([k, l, c]) =>
-    `${keys.length > 1 ? sw(c) : ""}${l}: <b>${fmt(getter(k)[s])}${opts.unit || ""}</b>`).join("<br>"));
+  ends.forEach(e => { el(svg, "text", { x: f.W - f.m.r - 2, y: e.y - Math.max(0, over), "text-anchor": "end", fill: css("--text-secondary") }).textContent = e.l; });
+  cursor(svg, f, s => f.m.l + s / (T + 1) * f.pw);
+  hover(svg, f, x0, T, s => `<b>t = ${s}–${s + 1} s</b><br>` + keys.map(([k, l, c]) => `${keys.length > 1 ? sw(c) : ""}${l}: <b>${fmt(getter(k)[s])}${opts.unit || ""}</b>`).join("<br>"));
 }
-
-// ---- status lanes -----------------------------------------------------------------
-function lanes(r) {
-  const svg = $("lanes"), names = Object.keys(r.lanes), f = frame(svg, 24 + names.length * 24), T = r.T;
-  f.m.l = 86; f.pw = f.W - f.m.l - f.m.r;
+function lanesInto(r, svgId, legendId, cursorT) {
+  const svg = $(svgId), names = Object.keys(r.lanes), f = frame(svg, 24 + names.length * 24), T = r.T;
+  svg.setAttribute("height", 24 + names.length * 24); f.m.l = 86; f.pw = f.W - f.m.l - f.m.r;
   const x = s => f.m.l + s / (T + 1) * f.pw, cw = f.pw / (T + 1);
-  names.forEach((n, i) => {
-    const y0 = f.m.t + i * 24;
+  names.forEach((n, i) => { const y0 = f.m.t + i * 24;
     el(svg, "text", { x: f.m.l - 8, y: y0 + 15, "text-anchor": "end", fill: css("--text-secondary") }).textContent = n;
-    r.lanes[n].forEach((st, s) => {
-      const c = el(svg, "rect", { x: x(s) + 0.5, y: y0 + 2, width: Math.max(1, cw - 1), height: 18, rx: 2, fill: css(STATE[st][0]) });
-      c.addEventListener("mousemove", ev => { if (!pinned) { t = s; update(); }
-        tip.innerHTML = `<b>${n}, t = ${s}–${s + 1} s</b><br>${STATE[st][1]} ${STATE[st][2]}`; tip.style.display = "block";
-        tip.style.left = Math.min(ev.clientX + 14, innerWidth - 220) + "px"; tip.style.top = (ev.clientY + 14) + "px"; });
-      c.addEventListener("mouseleave", () => tip.style.display = "none");
-      c.addEventListener("click", () => { pinned = !pinned; });
-    });
-  });
+    r.lanes[n].forEach((st, s) => { const c = el(svg, "rect", { x: x(s) + 0.5, y: y0 + 2, width: Math.max(1, cw - 1), height: 18, rx: 2, fill: css(STATE[st][0]) });
+      c.addEventListener("mousemove", ev => { if (cursorT !== null && !pinned) { t = s; update(); } showTip(ev, `<b>${n}, t = ${s}–${s + 1} s</b><br>${STATE[st][1]} ${STATE[st][2]}`); });
+      c.addEventListener("mouseleave", hideTip); if (cursorT !== null) c.addEventListener("click", () => { pinned = !pinned; }); }); });
   xAxis(svg, f, T, x);
-  el(svg, "line", { x1: x(t) + cw / 2, x2: x(t) + cw / 2, y1: f.m.t, y2: f.m.t + names.length * 24, stroke: css("--text-primary"), "stroke-width": 1.5 });
+  if (cursorT !== null) el(svg, "line", { x1: x(cursorT) + cw / 2, x2: x(cursorT) + cw / 2, y1: f.m.t, y2: f.m.t + names.length * 24, stroke: css("--text-primary"), "stroke-width": 1.5 });
   const used = [...new Set(Object.values(r.lanes).flat())];
-  $("laneLegend").innerHTML = used.map(k => `<span><i style="background:${css(STATE[k][0])}"></i>${STATE[k][1]} ${STATE[k][2]}</span>`).join("");
+  $(legendId).innerHTML = used.map(k => `<span><i style="background:${css(STATE[k][0])}"></i>${STATE[k][1]} ${STATE[k][2]}</span>`).join("");
 }
-
-// ---- architecture -----------------------------------------------------------------
 function arch(r) {
   const svg = $("arch"), W = svg.clientWidth || 600, H = 270; svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.innerHTML = "";
-  const st = n => r.lanes[n][t], col = n => css(STATE[st(n)][0]);
-  const cx = [W * 0.09, W * 0.33, W * 0.62, W * 0.9], ys = [60, 135, 210];
-  const node = (x, y, w, title, n, sub) => {
-    const s = n ? STATE[st(n)] : null;
-    el(svg, "rect", { x: x - w / 2, y: y - 24, width: w, height: 48, rx: 10, fill: css("--surface-1"),
-      stroke: n ? css(s[0]) : css("--axis"), "stroke-width": n ? 2.5 : 1 });
-    const a = el(svg, "text", { x, y: y - 5, "text-anchor": "middle", fill: css("--text-primary") }); a.textContent = title;
-    a.setAttribute("font-weight", "600"); a.setAttribute("font-size", "12");
-    const b = el(svg, "text", { x, y: y + 12, "text-anchor": "middle", fill: css("--text-secondary") });
-    b.textContent = n ? `${s[1]} ${s[2]}` : sub;
-  };
-  const edge = (x1, y1, x2, y2, label, dim) => {
-    el(svg, "line", { x1, y1, x2, y2, stroke: css(dim ? "--grid" : "--axis"), "stroke-width": dim ? 1 : 1.5 });
-    if (label) el(svg, "text", { x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 5, "text-anchor": "middle" }).textContent = label;
-  };
+  const st = n => r.lanes[n][t], cx = [W * 0.09, W * 0.33, W * 0.62, W * 0.9], ys = [60, 135, 210];
+  const node = (x, y, w, title, n, sub) => { const s = n ? STATE[st(n)] : null;
+    el(svg, "rect", { x: x - w / 2, y: y - 24, width: w, height: 48, rx: 10, fill: css("--surface-1"), stroke: n ? css(s[0]) : css("--axis"), "stroke-width": n ? 2.5 : 1 });
+    const a = el(svg, "text", { x, y: y - 5, "text-anchor": "middle", fill: css("--text-primary"), "font-weight": 600, "font-size": 12 }); a.textContent = title;
+    const b = el(svg, "text", { x, y: y + 12, "text-anchor": "middle", fill: css("--text-secondary") }); b.textContent = n ? `${s[1]} ${s[2]}` : sub; };
+  const edge = (x1, y1, x2, y2, label, dim) => { el(svg, "line", { x1, y1, x2, y2, stroke: css(dim ? "--grid" : "--axis"), "stroke-width": dim ? 1 : 1.5 });
+    if (label) el(svg, "text", { x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 5, "text-anchor": "middle" }).textContent = label; };
   const c = r.per_second[t] || {};
   edge(cx[0] + 44, 135, cx[1] - 44, 135, `${fmt(r.arrivals[t] || 0)}/s`);
-  ["seller1", "seller2", "seller3"].forEach((n, i) => {
-    const a = r.seller_answers[n][t] || 0;
-    edge(cx[1] + 44, 135, cx[2] - 50, ys[i], `${fmt(a)}/s`, a === 0);
-    edge(cx[2] + 50, ys[i], cx[3] - 50, 135, "", r.lanes.PostgreSQL[t] !== "up");
-  });
-  node(cx[0], 135, 88, "buyer", null, "50k arrivals");
-  node(cx[1], 135, 96, "nginx", "nginx");
-  ["seller1", "seller2", "seller3"].forEach((n, i) => node(cx[2], ys[i], 110, n, n));
-  node(cx[3], 135, 108, "PostgreSQL", "PostgreSQL");
-  const own = (c["502"] || 0);
-  if (own) el(svg, "text", { x: cx[1], y: 182, "text-anchor": "middle", fill: css("--text-secondary") }).textContent = `${fmt(own)} × 502 this second`;
+  ["seller1", "seller2", "seller3"].forEach((n, i) => { const a = r.seller_answers[n][t] || 0;
+    edge(cx[1] + 44, 135, cx[2] - 50, ys[i], `${fmt(a)}/s`, a === 0); edge(cx[2] + 50, ys[i], cx[3] - 50, 135, "", r.lanes.PostgreSQL[t] !== "up"); });
+  node(cx[0], 135, 88, "buyer", null, "arrivals"); node(cx[1], 135, 96, "nginx", "nginx");
+  ["seller1", "seller2", "seller3"].forEach((n, i) => node(cx[2], ys[i], 110, n, n)); node(cx[3], 135, 108, "PostgreSQL", "PostgreSQL");
+  if (c["502"]) el(svg, "text", { x: cx[1], y: 182, "text-anchor": "middle", fill: css("--text-secondary") }).textContent = `${fmt(c["502"])} × 502 this second`;
 }
-
 function nowPanel(r) {
-  const c = r.per_second[t] || {}, rows = [
-    ["answers", RESP.map(([k, l]) => c[k] ? `${fmt(c[k])} × ${k}` : null).filter(Boolean).join(" · ") || "none"],
-    ["tickets sold so far", r.sold[t]],
-    ["latency p50 / p99", r.lat_p50[t] == null ? "–" : `${fmt(r.lat_p50[t])} / ${fmt(r.lat_p99[t])} ms`],
+  const c = r.per_second[t] || {}, rows = [["answers", RESP.map(([k]) => c[k] ? `${fmt(c[k])} × ${k}` : null).filter(Boolean).join(" · ") || "none"],
+    ["tickets sold so far", r.sold[t]], ["latency p50 / p99", r.lat_p50[t] == null ? "–" : `${fmt(r.lat_p50[t])} / ${fmt(r.lat_p99[t])} ms`],
     ...Object.keys(r.lanes).map(n => [n, `${STATE[r.lanes[n][t]][1]} ${STATE[r.lanes[n][t]][2]}`])];
-  const near = r.events.filter(e => e.t >= t && e.t < t + 1).map(e => e.label);
-  if (near.length) rows.push(["events", near.join("; ")]);
+  const near = r.events.filter(e => e.t >= t && e.t < t + 1).map(e => e.label); if (near.length) rows.push(["events", near.join("; ")]);
   $("now").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
 }
-
 function staticParts(r) {
-  $("caption").textContent = r.caption; tiles(r);
-  $("checks").innerHTML = r.checks.map(c => `<li><span class="${c.ok ? "ok" : "bad"}">${c.ok ? "✓ PASS" : "✕ FAIL"}</span> ${c.name}<br><span style="color:var(--text-secondary);font-size:12px">${c.detail}</span></li>`).join("");
-  $("replay").textContent = r.replay.length ? r.replay.join("\n") : "No replay check was run for this run (no-fault baseline).";
-  const ev = r.events.map(e => `<tr><td>${e.t.toFixed(3)}</td><td>${e.label}</td></tr>`);
-  if (r.nginx_window) ev.push(`<tr><td>${r.nginx_window[0]}–${r.nginx_window[1]}</td><td>nginx "no live upstreams" window (${r.nginx_resets} connection-reset 502s before it)</td></tr>`);
-  $("events").querySelector("tbody").innerHTML = ev.length ? ev.join("") : `<tr><td>–</td><td>no fault injected</td></tr>`;
+  $("caption").textContent = r.caption; tilesDetail(r);
+  $("checks").innerHTML = r.checks.map(c => `<li>${pass(c.ok)} ${c.name}<br><span style="color:var(--text-secondary);font-size:12px">${c.detail}</span></li>`).join("");
+  $("replay").textContent = r.replay.length ? r.replay.join("\n") : "No replay check for this run (no fault injected).";
+  const ev = r.events.map(e => `<tr><td class="l">${e.t.toFixed(3)}</td><td class="l">${e.label}</td></tr>`);
+  if (r.nginx_window) ev.push(`<tr><td class="l">${r.nginx_window[0]}–${r.nginx_window[1]}</td><td class="l">nginx "no live upstreams" window (1 s log resolution; ${r.nginx_resets} connection-reset 502s)</td></tr>`);
+  $("events").querySelector("tbody").innerHTML = ev.length ? ev.join("") : `<tr><td class="l">–</td><td class="l">no fault injected</td></tr>`;
   const head = ["t", "arrivals", ...RESP.map(x => x[0]), "no answer", "sold", "p50 ms", "p99 ms", "seller1", "seller2", "seller3", ...Object.keys(r.lanes)];
-  const body = r.per_second.map((c, s) => [s, r.arrivals[s], ...RESP.map(([k]) => c[k] || 0), c["no answer"] || 0, r.sold[s],
-    fmt(r.lat_p50[s]), fmt(r.lat_p99[s]), r.seller_answers.seller1[s], r.seller_answers.seller2[s], r.seller_answers.seller3[s],
-    ...Object.keys(r.lanes).map(n => STATE[r.lanes[n][s]][2])]);
-  $("dtable").innerHTML = `<thead><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>` +
-    body.map(row => `<tr>${row.map(v => `<td>${v}</td>`).join("")}</tr>`).join("") + "</tbody>";
+  const body = r.per_second.map((c, s) => [s, r.arrivals[s], ...RESP.map(([k]) => c[k] || 0), c["no answer"] || 0, r.sold[s], fmt(r.lat_p50[s]), fmt(r.lat_p99[s]),
+    r.seller_answers.seller1[s], r.seller_answers.seller2[s], r.seller_answers.seller3[s], ...Object.keys(r.lanes).map(n => STATE[r.lanes[n][s]][2])]);
+  $("dtable").innerHTML = `<thead><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>` + body.map(row => `<tr>${row.map(v => `<td>${v}</td>`).join("")}</tr>`).join("") + "</tbody>";
   legend("lg-resp", RESP); legend("lg-lat", LAT); legend("lg-sel", SEL);
 }
+function rawTable() {
+  const rows = [...S.benchmark.map(r => ["833/s workload", r]), ...S.sweep.rows.map(r => ["arrival-rate sweep", r]), ...S.fastpath.map(r => ["fast-path A/B", r])];
+  const cpu = (r, k) => r.cpu[k] ? `${r.cpu[k][0]}/${r.cpu[k][1]}` : "–";
+  $("rawTable").innerHTML = `<thead><tr><th class="l">group</th><th class="l">run</th><th class="l">result files</th><th>offered</th><th>delivered</th><th>sched lag p99</th><th>answered</th><th>QueueTimeouts</th><th>5xx</th><th>no answer</th><th>p50</th><th>p99</th><th>buyer CPU</th><th>nginx</th><th>seller1</th><th>seller2</th><th>seller3</th><th>PostgreSQL</th><th>host peak</th><th>lock waiters mean/max</th><th class="l">verdict</th></tr></thead><tbody>` +
+    rows.map(([g, r]) => `<tr><td class="l">${g}</td><td class="l">${r.title}</td><td class="l"><code>${r.name}</code></td><td>${fmt(r.rate)}</td><td>${fmt(r.delivered)}</td><td>${fmt(r.sched99)} ms</td><td>${fmt(r.served)}</td><td>${r.qto}</td><td>${r.e5}</td><td>${r.sna}</td><td>${ms(r.p50)}</td><td>${ms(r.p99)}</td><td>${cpu(r, "buyer")}</td><td>${cpu(r, "lb-1")}</td><td>${cpu(r, "seller1-1")}</td><td>${cpu(r, "seller2-1")}</td><td>${cpu(r, "seller3-1")}</td><td>${cpu(r, "db-1")}</td><td>${r.host_max}%</td><td>${r.waiters_mean}/${r.waiters_max}</td><td class="l">${verdict(r)}</td></tr>`).join("") +
+    `</tbody>`;
+}
 function update() {
-  const r = DATA[run]; $("t").value = t;
+  const r = RUNS[run]; $("t").value = t;
   $("tlabel").textContent = `t = ${t}–${t + 1} s of ${r.T}` + (pinned ? " (pinned; click a chart to release)" : "");
-  arch(r); nowPanel(r); lanes(r); respChart(r);
+  arch(r); nowPanel(r); lanesInto(r, "lanes", "laneLegend", t); respChart(r);
   lineChart("c-sold", r, [["sold", "tickets sold", "--series-1"]], k => r.sold, { step: true, max: r.tickets });
   lineChart("c-lat", r, LAT, k => r[k], { log: true, unit: " ms" });
   lineChart("c-sel", r, SEL, k => r.seller_answers[k], {});
 }
-function render() { tabs(); const r = DATA[run]; $("t").max = r.T; staticParts(r); update(); }
+function render() { tabs(); const r = RUNS[run]; $("t").max = r.T; staticParts(r); update(); }
 function stop() { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; }
 $("t").oninput = e => { t = +e.target.value; pinned = true; update(); };
-$("play").onclick = () => { if (timer) return stop(); pinned = true; if (t >= DATA[run].T) t = 0;
-  $("play").textContent = "❚❚ Pause"; timer = setInterval(() => { if (t >= DATA[run].T) return stop(); t++; update(); }, 250); };
-addEventListener("resize", () => update());
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => render());
-t = defaultT(); render();
+$("play").onclick = () => { if (timer) return stop(); pinned = true; if (t >= RUNS[run].T) t = 0;
+  $("play").textContent = "❚❚ Pause"; timer = setInterval(() => { if (t >= RUNS[run].T) return stop(); t++; update(); }, 250); };
+function renderAll() { overview(); headline(); raceChart(); idem(); bench(); faults(); cua(); sweep(); fastpath(); limits(); rawTable(); render(); }
+addEventListener("resize", () => { overview(); raceChart(); cua(); sweep(); faults(); update(); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => renderAll());
+t = defaultT(); renderAll();
 </script>
 </body>
 </html>

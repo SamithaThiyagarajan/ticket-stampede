@@ -17,16 +17,21 @@ R = ROOT / "results"
 sys.path.insert(0, str(ROOT / "buyer"))
 from buyer import NEVER_SENT, verify  # noqa: E402
 
-RUNS = [  # (result name, tab label, caption) — captions state the pre-registered verdicts
-    ("m11_E2b_kill_midsale_a1", "E2b · kill mid-sale",
-     "PostgreSQL SIGKILLed while the sale was in progress (34 tickets confirmed), restarted after 10 s. "
-     "VALID run. In-flight INSERT rolled back; 0 lost confirmed purchases; replay PASS."),
-    ("m11_E2_kill", "E2 · kill after sell-out",
-     "PostgreSQL SIGKILLed after the 100th sale, restarted after 10 s. Fault landed after sell-out (Docker delay)."),
-    ("m11_E1_pause", "E1 · pause",
-     "PostgreSQL frozen with docker pause for 10 s, after sell-out. Requests hang instead of failing."),
-    ("m10_50k_833rps_3sellers_aiohttp_4buyer", "Baseline · no fault",
-     "Valid 50k @ 833/s benchmark on the 3-seller cluster (M10). The reference for everything else."),
+RUNS = [  # (result name, human title, internal id, caption) — captions carry no numbers; all figures are derived
+    ("m10_50k_833rps_3sellers_aiohttp_4buyer", "50k Arrival Test", "M10",
+     "The assignment workload with no fault injected: the reference run for everything else."),
+    ("m11_E1_pause", "PostgreSQL Pause", "E1",
+     "PostgreSQL frozen with docker pause, then unpaused. The fault took effect after the tickets had sold out."),
+    ("m11_E2_kill", "PostgreSQL Kill & Recovery (after sell-out)", "E2",
+     "PostgreSQL killed with SIGKILL and restarted. The fault took effect after the tickets had sold out."),
+    ("m11_E2b_kill_midsale_a1", "PostgreSQL Kill & Recovery (mid-sale)", "E2b",
+     "PostgreSQL killed while tickets were still being sold, then restarted. Valid on the first attempt."),
+    ("m12_sweep_833rps", "Arrival-Rate Sweep · 833/s", "M12 sweep",
+     "Valid load generation, but affected by intermittent nginx 502s (connection resets) — not a clean capacity measurement."),
+    ("m12_sweep_1000rps_6w", "Arrival-Rate Sweep · 1,000/s", "M12 sweep",
+     "Valid and sustainable in this single run (6 buyer processes)."),
+    ("m12_sweep_1400rps", "Arrival-Rate Sweep · 1,400/s", "M12 sweep",
+     "Offered load above what the sellers could answer: invalid by the pre-registered rules and not sustained."),
 ]
 
 
@@ -39,7 +44,7 @@ def pct(xs, p):
     return xs[max(0, math.ceil(p * len(xs)) - 1)] if xs else None
 
 
-def build(name, label, caption):
+def build(name, label, rid, caption):
     d = json.load(gzip.open(R / f"{name}.json.gz", "rt"))
     rate, recs = d["args"]["rate"], d["records"]
     t0 = d.get("start_at")
@@ -137,7 +142,7 @@ def build(name, label, caption):
     tot = Counter(cls(r["status"]) for r in recs)
     served = [r for r in recs if isinstance(r["status"], int)]
     return {
-        "name": name, "label": label, "caption": caption, "T": T, "fault": fault_kind,
+        "name": name, "label": label, "id": rid, "caption": caption, "T": T, "fault": fault_kind,
         "rate": rate, "requests": len(recs), "tickets": d["status"]["total_tickets"],
         "totals": {k: tot[k] for k in kinds if tot[k]},
         "served_per_s": round(len(served) / d["storm_seconds"], 1),
@@ -159,12 +164,199 @@ def build(name, label, caption):
     }
 
 
+# ---------------------------------------------------------------------------------------------
+# Story sections: every number below is computed from saved results, never typed in.
+# ---------------------------------------------------------------------------------------------
+sys.path.insert(0, str(ROOT / "scripts"))
+from sweep_rate_eval import compute  # noqa: E402  (the same pre-registered evaluation used in the log)
+
+
+def checks_of(d):
+    res, _ = verify(d)
+    return [{"name": k, "ok": ok, "detail": det} for k, (ok, det) in res.items()]
+
+
+def v1_summary(path, label, kind):
+    """Early (v1) result files: per-request_id responses + final /status."""
+    d = json.load(open(path))
+    t = d["status"]["tickets"]
+    nums = Counter(x["ticket_number"] for x in t)
+    users = Counter(x["user_id"] for x in t)
+    told_diff = sum(1 for ns in d["responses_by_request_id"].values() if len(set(ns)) > 1)
+    return {"label": label, "kind": kind, "rows": len(t), "total": d["status"]["total_tickets"],
+            "sold": d["status"]["sold"], "dup_numbers": sum(1 for c in nums.values() if c > 1),
+            "dup_rows": sum(c for c in nums.values() if c > 1), "multi_ticket_ids": sum(1 for c in users.values() if c > 1),
+            "told_different": told_diff, "transport_errors": sum(d["transport_errors"].values()),
+            "http": {str(k): v for k, v in d["http_codes"].items()}}
+
+
+def story_race():
+    out = []
+    for delay in ("50", "0"):
+        for i in (1, 2, 3):
+            out.append(v1_summary(R / f"m3_naive_{delay}ms_run{i}.json", f"naive · {delay} ms delay · run {i}", "naive"))
+    for delay in ("50", "0"):
+        for i in (1, 2, 3):
+            out.append(v1_summary(R / f"m4_safe_{delay}ms_run{i}.json", f"safe · {delay} ms delay · run {i}", "safe"))
+    back = [v1_summary(R / f"m4_backstop_naivecode_safeschema_run{i}.json", f"naive code + constraints · run {i}", "backstop")
+            for i in (1, 2, 3)]
+    return {"runs": out, "backstop": back}
+
+
+def story_idempotency():
+    d = json.load(gzip.open(R / "m9_F2_functional.json.gz", "rt"))
+    by = defaultdict(list)
+    for r in d["records"]:
+        by[r["request_id"]].append(r)
+    copies = Counter(len(v) for v in by.values())
+    multi = [v for v in by.values() if len({r.get("upstream") for r in v}) > 1]
+    holders = [v for v in multi if any(r["status"] == 200 for r in v)]
+    same = sum(1 for v in holders if all(r["status"] == 200 for r in v) and len({r["ticket_number"] for r in v}) == 1)
+    ex = next(v for v in holders if all(r["status"] == 200 for r in v))
+    return {"requests": len(d["records"]), "request_ids": len(by), "copies_per_id": dict(copies),
+            "tickets": d["status"]["total_tickets"], "ids_multi_instance": len(multi), "holders": len(holders),
+            "holders_same_ticket": same, "checks": checks_of(d),
+            "example": {"request_id": ex[0]["request_id"], "ticket": ex[0]["ticket_number"],
+                        "upstreams": sorted({r["upstream"] for r in ex}), "copies": len(ex)}}
+
+
+def verdict(c):
+    valid = all(c["valid"].values())
+    reasons = [k for k, ok in c["valid"].items() if not ok]
+    sustain = valid and all(c["sustain"].values())
+    return {"valid": valid, "invalid_reasons": reasons, "sustainable": sustain,
+            "sustain_fail": [k for k, ok in c["sustain"].items() if not ok]}
+
+
+def nginx_resets(name):
+    p = R / f"{name}.nginx.log"
+    return sum(1 for l in p.read_text().splitlines() if "reset by peer" in l) if p.exists() else 0
+
+
+def run_row(name, title, note=""):
+    c = compute(name)
+    v = verdict(c)
+    st = c["st"]
+    return {"name": name, "title": title, "note": note, "rate": c["rate"], "arrivals": len(c["recs"]),
+            "processes": c["d"]["args"]["processes"], "delivered": round(c["delivered"], 1), "served": round(c["srate"], 1),
+            "sched99": round(c["sched99"], 1), "qto": c["qto"], "e5": c["e5"], "e500": st.get(500, 0), "e502": st.get(502, 0),
+            "sna": c["sna"], "p50": round(c["lat_all"][0], 1), "p99": round(c["lat_all"][1], 1),
+            "post_p50": round(c["lat_post"][0], 1), "post_p99": round(c["lat_post"][1], 1),
+            "p409": [round(x, 1) if x is not None else None for x in c["lat409"]],
+            "cpu": c["cpu"], "host_max": round(max(c["host"])), "waiters_mean": round(sum(c["waiters"]) / max(1, len(c["waiters"])), 2),
+            "waiters_max": max(c["waiters"], default=0), "nginx_resets": nginx_resets(name),
+            "checks_ok": all(ok for ok, _ in c["res"].values()), **v}
+
+
+def story_benchmark():
+    rows = [run_row("m10_50k_833rps_3sellers_aiohttp_4buyer", "50k Arrival Test (M10)", "reference run")]
+    for i in (1, 2, 3, 4, 5):
+        rows.append(run_row(f"m11c_rep{i}", f"50k repeat {i} (M11c)", "diagnostic packet capture running"))
+    rows.append(run_row("m11_C0_control", "50k control before fault tests (M11 C0)", ""))
+    rows.append(run_row("m12_sweep_833rps", "Arrival-rate sweep · 833/s (M12)", ""))
+    return rows
+
+
+def story_sweep():
+    rows = [run_row("m12_sweep_833rps", "833/s", "4 buyer processes"),
+            run_row("m12_sweep_1000rps", "1,000/s", "4 buyer processes"),
+            run_row("m12_sweep_1000rps_6w", "1,000/s (retry)", "6 buyer processes — the pre-registered buyer-only retry"),
+            run_row("m12_sweep_1200rps", "1,200/s", "4 buyer processes"),
+            run_row("m12_sweep_1400rps", "1,400/s", "4 buyer processes")]
+    prof = (R / "m7prof_833rps_fastpath1.profile.txt").read_text().splitlines()
+    return {"rows": rows, "earlier_833": [r for r in story_benchmark()[:6] if r["valid"] and r["sustainable"]],
+            "profile": [l.strip() for l in prof if l.strip()][:14]}
+
+
+def story_fastpath():
+    out = []
+    for fp in (0, 1):
+        for i in (1, 2, 3):
+            r = run_row(f"m7rep_300rps_rep{i}_fastpath{fp}", f"{'with' if fp else 'without'} fast path · run {i}")
+            r["fastpath"] = fp
+            out.append(r)
+    return out
+
+
+def story_faults(runs):
+    by = {r["name"]: r for r in runs}
+    out = {}
+    for name in ("m11_E1_pause", "m11_E2_kill", "m11_E2b_kill_midsale_a1"):
+        r = by[name]
+        d = json.load(gzip.open(R / f"{name}.json.gz", "rt"))
+        rate, t0 = d["args"]["rate"], d["start_at"]
+        ans = lambda x: x["i"] / rate + x["latency_ms"] / 1000
+        first_ok = {}
+        for x in sorted((x for x in d["records"] if x["status"] == 200), key=ans):
+            first_ok.setdefault(x["ticket_number"], ans(x))
+        f = {"totals": r["totals"], "pg_down": r["pg_down"], "pg_ready": r["pg_ready"], "events": r["events"],
+             "nginx_window": r["nginx_window"], "nginx_resets": r["nginx_resets"], "checks": r["checks"], "replay": r["replay"],
+             "containers_unchanged": "containers unchanged" in (R / f"{name}.env").read_text(),
+             "sold_before_fault": sum(1 for t in first_ok.values() if r["pg_down"] is not None and t < r["pg_down"]),
+             "hundredth": round(sorted(first_ok.values())[99], 3) if len(first_ok) >= 100 else None}
+        if name == "m11_E2b_kill_midsale_a1":
+            sl = (R / f"{name}.sellers.log").read_text()
+            f["in_tx_lock_wait"] = len(re.findall(r'File "/app/app.py", line 93, in buy_safe', sl))
+            f["in_tx_insert"] = len(re.findall(r'File "/app/app.py", line 113, in buy_safe', sl))
+            f["new_conn_refused"] = len(re.findall(r'File "/app/app.py", line 69, in buy_safe', sl))
+            kill = r["pg_down"]
+            pre = sorted(n for n, t in first_ok.items() if t < kill)
+            gap = sorted(n for n, t in first_ok.items() if kill <= t < r["pg_ready"])
+            post = sorted(n for n, t in first_ok.items() if t >= r["pg_ready"])
+            f["tickets_pre"] = [pre[0], pre[-1], len(pre)]
+            f["tickets_gap"] = [(n, round((first_ok[n] - kill) * 1000, 1)) for n in gap]
+            f["tickets_post"] = [post[0], post[-1], len(post)]
+        out[name] = f
+    return out
+
+
+def story_commitdrop():
+    d = json.load(gzip.open(R / "m12_commitdrop.json.gz", "rt"))
+    by = defaultdict(list)
+    for x in d["records"]:
+        by[x["request_id"]].append(x)
+    rows = {t["user_id"]: t["ticket_number"] for t in d["status"]["tickets"]}
+    ev = [json.loads(l) for l in (R / "m12_commitdrop.proxy.log").read_text().splitlines() if l.startswith("{")]
+    commits = [e for e in ev if e.get("ev") == "commit"]
+    analysis = (R / "m12_commitdrop.analysis.txt").read_text()
+    replays = {m.group(1): m.group(2) for m in re.finditer(
+        r"COMMIT #\d+: proxy saw INSERT ticket #\d+ for (req-\d+)/.*?replay x2 -> (\[.*?\])", analysis, re.S)}
+    count = re.findall(r"count\(\*\) = (\d+)", analysis)
+    table = []
+    for e in (e for e in commits if e["dropped"]):
+        ins = e["insert"]
+        if not ins:
+            table.append({"commit": e["n"], "insert": None, "class": "read-only transaction (no ticket)"})
+            continue
+        rid = ins["request_id"]
+        statuses = [x["status"] for x in sorted(by[rid], key=lambda x: x["i"])]
+        got200 = 200 in statuses
+        table.append({"commit": e["n"], "ticket": ins["ticket_number"], "request_id": rid, "user_id": ins["user_id"],
+                      "buyer": statuses, "db_row": rows.get(ins["user_id"]), "replay": replays.get(rid),
+                      "class": "another copy received 200 (same ticket)" if got200 else "COMMITTED BUT UNACKNOWLEDGED"})
+    probe = [l for l in (R / "m12_probe.txt").read_text().splitlines() if l.startswith("tx#")]
+    routing = (R / "m12_commitdrop.routing.txt").read_text().split()
+    a = d["args"]
+    return {"requests": a["requests"], "rate": a["rate"], "tickets": a["tickets"], "commits": len(commits),
+            "dropped": sum(1 for e in commits if e["dropped"]), "table": table,
+            "cua": sum(1 for t in table if t["class"] == "COMMITTED BUT UNACKNOWLEDGED"),
+            "covered": sum(1 for t in table if t["class"].startswith("another")),
+            "readonly": sum(1 for t in table if t.get("insert", 1) is None),
+            "totals": {str(k): v for k, v in Counter(x["status"] for x in d["records"]).items()},
+            "count_before_after": count[:2], "probe": probe, "routing": routing, "checks": checks_of(d),
+            "replay": [l for l in (R / "m12_commitdrop.replay.txt").read_text().splitlines() if l.strip()]}
+
+
 def main():
-    data = [build(*run) for run in RUNS]
+    runs = [build(*run) for run in RUNS]
+    story = {"race": story_race(), "idempotency": story_idempotency(), "benchmark": story_benchmark(),
+             "faults": story_faults(runs), "commitdrop": story_commitdrop(), "sweep": story_sweep(),
+             "fastpath": story_fastpath()}
+    data = {"runs": runs, "story": story}
     html = (ROOT / "viewer" / "template.html").read_text(encoding="utf-8")
-    out = html.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
+    out = html.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":"), default=str))
     (ROOT / "viewer" / "index.html").write_text(out, encoding="utf-8")
-    print(f"wrote viewer/index.html ({len(out) // 1024} KiB) with runs: " + ", ".join(r["name"] for r in data))
+    print(f"wrote viewer/index.html ({len(out) // 1024} KiB); detail runs: " + ", ".join(r["name"] for r in runs))
 
 
 if __name__ == "__main__":

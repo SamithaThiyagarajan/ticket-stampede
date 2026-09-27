@@ -22,7 +22,9 @@ def cpu_by_container(name):
     return by, list(host.values())
 
 
-def evaluate(name):
+def compute(name):
+    """The pre-registered validity/sustainability evaluation, returned as data (also used by
+    scripts/build_viewer.py, so the viewer shows exactly the verdicts this script reports)."""
     d = json.load(gzip.open(R / f"{name}.json.gz", "rt"))
     rate, recs = d["args"]["rate"], d["records"]
     arr = sorted(r["i"] / rate + r["sched_lag_ms"] / 1000 for r in recs)
@@ -47,10 +49,28 @@ def evaluate(name):
     waiters = [s["categories"].get("waiting_lock", 0) for s in busy]
     valid = {"arrivals +-2%": abs(delivered - rate) / rate <= .02, "sched p99<100ms": sched99 < 100,
              "worker>=90% <=3s": max(hot.values()) <= 3, "0 sent-no-answer": sna == 0,
-             "containers unchanged": "containers unchanged" in env, "host < 1400%": max(host) < 1400}
+             # bench_cluster.sh writes "all containers unchanged", bench.sh "seller container unchanged"
+             "containers unchanged": "containers unchanged" in env or "container unchanged" in env,
+             "host < 1400%": max(host) < 1400}
     sustain = {"0 QueueTimeouts": qto == 0, "0 x 5xx": e5 == 0, "served >= 97%": srate >= .97 * rate,
                "post-sale p99 <= 1000ms": pct(post, .99) <= 1000}
     res, _ = verify(d)
+    cpu = {k: (round(sum(v) / len(v)), round(max(v))) for k, v in by.items()}
+    lat409 = [r["latency_ms"] for r in served if r["status"] == 409]
+    return dict(name=name, d=d, rate=rate, recs=recs, delivered=delivered, sched99=sched99, hot=hot, st=st, sna=sna,
+                qto=qto, e5=e5, served=served, srate=srate, post=post, by=by, host=host, samples=samples, busy=busy,
+                waiters=waiters, valid=valid, sustain=sustain, res=res, cpu=cpu,
+                lat_all=(pct([r["latency_ms"] for r in served], .5), pct([r["latency_ms"] for r in served], .99)),
+                lat_post=(pct(post, .5), pct(post, .99)),
+                lat409=(pct(lat409, .5), pct(lat409, .99)) if lat409 else (None, None))
+
+
+def evaluate(name):
+    c = compute(name)
+    (d, rate, recs, delivered, sched99, hot, st, sna, qto, e5, served, srate, post, by, host, samples, busy,
+     waiters, valid, sustain, res) = (c[k] for k in ("d", "rate", "recs", "delivered", "sched99", "hot", "st", "sna", "qto",
+                                                    "e5", "served", "srate", "post", "by", "host", "samples", "busy",
+                                                    "waiters", "valid", "sustain", "res"))
     m = lambda k: f"{sum(by[k]) / len(by[k]):.0f}/{max(by[k]):.0f}%" if by.get(k) else "-"
     print(f"\n=== {name}: target {rate}/s, {len(recs)} arrivals, buyer processes {d['args']['processes']}")
     print(f"  delivered {delivered:.1f}/s  sched p99 {sched99:.1f}ms  max worker hot s {max(hot.values())}  "
@@ -67,5 +87,6 @@ def evaluate(name):
     print("  correctness: " + "  ".join(f"{k.split()[0]}:{'PASS' if ok else 'FAIL'}" for k, (ok, _) in res.items()))
 
 
-for n in sys.argv[1:]:
-    evaluate(n)
+if __name__ == "__main__":
+    for n in sys.argv[1:]:
+        evaluate(n)
