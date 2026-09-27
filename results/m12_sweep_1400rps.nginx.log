@@ -1,0 +1,1 @@
+2026/09/27 06:06:48 [error] 30#30: *3250 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.3:8000/buy", host: "lb"

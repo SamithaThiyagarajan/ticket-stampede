@@ -1,0 +1,22 @@
+# TEST-ONLY override (M12 commit-reply-drop experiment). Used only as:
+#   docker compose -f docker-compose.yml -f diag/compose.commitdrop.yml ...
+# Routes the single `seller` service's database connections through commitproxy.
+services:
+  commitproxy:
+    build:
+      context: ./diag
+      dockerfile: Dockerfile.commitproxy
+    environment:
+      UPSTREAM: db:5432
+      DROP_EVERY: ${DROP_EVERY:-0}
+      MAX_DROPS: ${MAX_DROPS:-0}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  seller:
+    environment:
+      DATABASE_URL: postgresql://tickets:tickets@commitproxy:6543/tickets?sslmode=disable
+    depends_on:
+      commitproxy:
+        condition: service_started

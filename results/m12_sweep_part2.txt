@@ -1,0 +1,20 @@
+
+=== m12_sweep_1000rps_6w: target 1000.0/s, 60000 arrivals, buyer processes 6
+  delivered 1004.9/s  sched p99 5.3ms  max worker hot s 0  sent-no-answer 0  host CPU max 608% (mean 391%)
+  VALID: True
+  served 60000 = 1004.2/s  QueueTimeouts 0  5xx 0  outcomes {200: 129, 409: 59871}
+  latency all p50/p99 8.6/1985.8ms; arrivals after t=5s p50/p99 8.3/410.3ms
+  SUSTAINABLE: True
+  CPU mean/max: buyer 130/176%  nginx 30/50%  seller1 64/101%  seller2 64/102%  seller3 64/102%  postgres 53/88%
+  pg: busy samples 162/792, lock waiters mean 2.04 max 29
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m12_sweep_1200rps: target 1200.0/s, 72000 arrivals, buyer processes 4
+  delivered 1209.2/s  sched p99 66.8ms  max worker hot s 0  sent-no-answer 1  host CPU max 600% (mean 428%)
+  VALID: False  failed ['0 sent-no-answer']
+  served 71999 = 1060.4/s  QueueTimeouts 0  5xx 0  outcomes {200: 132, 409: 71867, 'ReadTimeout': 1}
+  latency all p50/p99 5991.0/15325.4ms; arrivals after t=5s p50/p99 6193.6/15454.3ms
+  SUSTAINABLE: False  failed ['served >= 97%', 'post-sale p99 <= 1000ms']
+  CPU mean/max: buyer 139/266%  nginx 31/47%  seller1 69/103%  seller2 71/102%  seller3 70/102%  postgres 58/96%
+  pg: busy samples 171/876, lock waiters mean 2.02 max 29
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

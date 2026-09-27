@@ -1,0 +1,20 @@
+
+=== m12_sweep_833rps: target 833.33/s, 50000 arrivals, buyer processes 4
+  delivered 838.8/s  sched p99 40.8ms  max worker hot s 0  sent-no-answer 0  host CPU max 598% (mean 384%)
+  VALID: True
+  served 50000 = 838.7/s  QueueTimeouts 0  5xx 2  outcomes {200: 124, 409: 49874, 502: 2}
+  latency all p50/p99 729.1/18228.3ms; arrivals after t=5s p50/p99 477.6/18563.8ms
+  SUSTAINABLE: False  failed ['0 x 5xx', 'post-sale p99 <= 1000ms']
+  CPU mean/max: buyer 130/304%  nginx 29/48%  seller1 71/103%  seller2 57/103%  seller3 58/103%  postgres 49/84%
+  pg: busy samples 133/740, lock waiters mean 2.53 max 29
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
+
+=== m12_sweep_1000rps: target 1000.0/s, 60000 arrivals, buyer processes 4
+  delivered 1010.1/s  sched p99 151.2ms  max worker hot s 0  sent-no-answer 0  host CPU max 587% (mean 443%)
+  VALID: False  failed ['sched p99<100ms']
+  served 60000 = 894.6/s  QueueTimeouts 0  5xx 0  outcomes {200: 123, 409: 59877}
+  latency all p50/p99 4869.0/14798.6ms; arrivals after t=5s p50/p99 5037.8/14879.7ms
+  SUSTAINABLE: False  failed ['served >= 97%', 'post-sale p99 <= 1000ms']
+  CPU mean/max: buyer 144/200%  nginx 32/44%  seller1 72/102%  seller2 74/102%  seller3 74/102%  postgres 59/110%
+  pg: busy samples 174/827, lock waiters mean 2.52 max 29
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS

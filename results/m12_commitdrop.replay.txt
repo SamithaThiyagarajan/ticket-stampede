@@ -1,0 +1,8 @@
+S1 == buyer's final snapshot: True
+confirmed (200) request_ids replayed: 90; mismatches: 0; replay transport errors: 0
+unknown-outcome request_ids replayed: 22 (of which hold a row in S1 = committed-but-unacknowledged: 10); mismatches: 0; replay transport errors: 0
+S2 == S1 byte-for-byte (replays changed nothing): True
+SQL audit: count(*)=100 sold_count=100 max(ticket_number)=100 (total 100) distinct ticket_number=100 distinct request_id=100 -> CONSISTENT
+constraints present and validated: 7/7 -> OK
+
+REPLAY VERDICT: PASS

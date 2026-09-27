@@ -1,0 +1,126 @@
+{"t": 1790486892.779343, "ev": "listening", "port": 6543, "upstream": "db:5432", "drop_every": 5, "max_drops": 15}
+{"t": 1790486942.767745, "ev": "commit", "n": 1, "conn": 1, "dropped": false, "insert": {"ticket_number": 1, "user_id": "user-2", "request_id": "req-2"}}
+{"t": 1790486942.787409, "ev": "commit", "n": 2, "conn": 7, "dropped": false, "insert": {"ticket_number": 2, "user_id": "user-3", "request_id": "req-3"}}
+{"t": 1790486942.80174, "ev": "commit", "n": 3, "conn": 4, "dropped": false, "insert": {"ticket_number": 3, "user_id": "user-0", "request_id": "req-0"}}
+{"t": 1790486942.815079, "ev": "commit", "n": 4, "conn": 3, "dropped": false, "insert": {"ticket_number": 4, "user_id": "user-1", "request_id": "req-1"}}
+{"t": 1790486942.827162, "ev": "commit", "n": 5, "conn": 9, "dropped": true, "insert": {"ticket_number": 5, "user_id": "user-7", "request_id": "req-7"}}
+{"t": 1790486942.965134, "ev": "commit", "n": 6, "conn": 8, "dropped": false, "insert": {"ticket_number": 6, "user_id": "user-6", "request_id": "req-6"}}
+{"t": 1790486942.979893, "ev": "commit", "n": 7, "conn": 10, "dropped": false, "insert": {"ticket_number": 7, "user_id": "user-8", "request_id": "req-8"}}
+{"t": 1790486942.987509, "ev": "commit", "n": 8, "conn": 1, "dropped": false, "insert": null}
+{"t": 1790486943.002058, "ev": "commit", "n": 9, "conn": 11, "dropped": false, "insert": {"ticket_number": 8, "user_id": "user-11", "request_id": "req-11"}}
+{"t": 1790486943.014154, "ev": "commit", "n": 10, "conn": 2, "dropped": true, "insert": null}
+{"t": 1790486943.044839, "ev": "commit", "n": 11, "conn": 5, "dropped": false, "insert": {"ticket_number": 9, "user_id": "user-4", "request_id": "req-4"}}
+{"t": 1790486943.169138, "ev": "commit", "n": 12, "conn": 6, "dropped": false, "insert": {"ticket_number": 10, "user_id": "user-5", "request_id": "req-5"}}
+{"t": 1790486943.189035, "ev": "commit", "n": 13, "conn": 7, "dropped": false, "insert": {"ticket_number": 11, "user_id": "user-9", "request_id": "req-9"}}
+{"t": 1790486943.203791, "ev": "commit", "n": 14, "conn": 12, "dropped": false, "insert": {"ticket_number": 12, "user_id": "user-16", "request_id": "req-16"}}
+{"t": 1790486943.21383, "ev": "commit", "n": 15, "conn": 6, "dropped": true, "insert": {"ticket_number": 13, "user_id": "user-18", "request_id": "req-18"}}
+{"t": 1790486943.227663, "ev": "commit", "n": 16, "conn": 4, "dropped": false, "insert": null}
+{"t": 1790486943.379147, "ev": "commit", "n": 17, "conn": 3, "dropped": false, "insert": {"ticket_number": 14, "user_id": "user-10", "request_id": "req-10"}}
+{"t": 1790486943.388474, "ev": "commit", "n": 18, "conn": 8, "dropped": false, "insert": {"ticket_number": 15, "user_id": "user-12", "request_id": "req-12"}}
+{"t": 1790486943.400719, "ev": "commit", "n": 19, "conn": 12, "dropped": false, "insert": {"ticket_number": 16, "user_id": "user-19", "request_id": "req-19"}}
+{"t": 1790486943.412027, "ev": "commit", "n": 20, "conn": 4, "dropped": true, "insert": {"ticket_number": 17, "user_id": "user-20", "request_id": "req-20"}}
+{"t": 1790486943.430357, "ev": "commit", "n": 21, "conn": 8, "dropped": false, "insert": {"ticket_number": 18, "user_id": "user-22", "request_id": "req-22"}}
+{"t": 1790486943.510622, "ev": "commit", "n": 22, "conn": 10, "dropped": false, "insert": {"ticket_number": 19, "user_id": "user-13", "request_id": "req-13"}}
+{"t": 1790486943.516069, "ev": "commit", "n": 23, "conn": 1, "dropped": false, "insert": null}
+{"t": 1790486943.522972, "ev": "commit", "n": 24, "conn": 13, "dropped": false, "insert": null}
+{"t": 1790486943.53385, "ev": "commit", "n": 25, "conn": 11, "dropped": true, "insert": {"ticket_number": 20, "user_id": "user-15", "request_id": "req-15"}}
+{"t": 1790486943.552285, "ev": "commit", "n": 26, "conn": 5, "dropped": false, "insert": {"ticket_number": 21, "user_id": "user-17", "request_id": "req-17"}}
+{"t": 1790486943.626099, "ev": "commit", "n": 27, "conn": 7, "dropped": false, "insert": null}
+{"t": 1790486943.639272, "ev": "commit", "n": 28, "conn": 3, "dropped": false, "insert": {"ticket_number": 22, "user_id": "user-21", "request_id": "req-21"}}
+{"t": 1790486943.654358, "ev": "commit", "n": 29, "conn": 12, "dropped": false, "insert": {"ticket_number": 23, "user_id": "user-23", "request_id": "req-23"}}
+{"t": 1790486943.670283, "ev": "commit", "n": 30, "conn": 7, "dropped": true, "insert": {"ticket_number": 24, "user_id": "user-31", "request_id": "req-31"}}
+{"t": 1790486943.687342, "ev": "commit", "n": 31, "conn": 8, "dropped": false, "insert": {"ticket_number": 25, "user_id": "user-25", "request_id": "req-25"}}
+{"t": 1790486943.770211, "ev": "commit", "n": 32, "conn": 12, "dropped": false, "insert": {"ticket_number": 26, "user_id": "user-33", "request_id": "req-33"}}
+{"t": 1790486943.78452, "ev": "commit", "n": 33, "conn": 14, "dropped": false, "insert": {"ticket_number": 27, "user_id": "user-24", "request_id": "req-24"}}
+{"t": 1790486943.797306, "ev": "commit", "n": 34, "conn": 15, "dropped": false, "insert": {"ticket_number": 28, "user_id": "user-28", "request_id": "req-28"}}
+{"t": 1790486943.805834, "ev": "commit", "n": 35, "conn": 10, "dropped": true, "insert": {"ticket_number": 29, "user_id": "user-26", "request_id": "req-26"}}
+{"t": 1790486943.821118, "ev": "commit", "n": 36, "conn": 8, "dropped": false, "insert": {"ticket_number": 30, "user_id": "user-35", "request_id": "req-35"}}
+{"t": 1790486943.941828, "ev": "commit", "n": 37, "conn": 1, "dropped": false, "insert": null}
+{"t": 1790486943.95571, "ev": "commit", "n": 38, "conn": 13, "dropped": false, "insert": {"ticket_number": 31, "user_id": "user-27", "request_id": "req-27"}}
+{"t": 1790486943.970168, "ev": "commit", "n": 39, "conn": 5, "dropped": false, "insert": {"ticket_number": 32, "user_id": "user-30", "request_id": "req-30"}}
+{"t": 1790486943.983212, "ev": "commit", "n": 40, "conn": 3, "dropped": true, "insert": {"ticket_number": 33, "user_id": "user-32", "request_id": "req-32"}}
+{"t": 1790486944.000389, "ev": "commit", "n": 41, "conn": 13, "dropped": false, "insert": {"ticket_number": 34, "user_id": "user-40", "request_id": "req-40"}}
+{"t": 1790486944.08511, "ev": "commit", "n": 42, "conn": 16, "dropped": false, "insert": {"ticket_number": 35, "user_id": "user-34", "request_id": "req-34"}}
+{"t": 1790486944.097447, "ev": "commit", "n": 43, "conn": 12, "dropped": false, "insert": null}
+{"t": 1790486944.113536, "ev": "commit", "n": 44, "conn": 17, "dropped": false, "insert": {"ticket_number": 36, "user_id": "user-38", "request_id": "req-38"}}
+{"t": 1790486944.122109, "ev": "commit", "n": 45, "conn": 14, "dropped": true, "insert": {"ticket_number": 37, "user_id": "user-36", "request_id": "req-36"}}
+{"t": 1790486944.136574, "ev": "commit", "n": 46, "conn": 15, "dropped": false, "insert": {"ticket_number": 38, "user_id": "user-37", "request_id": "req-37"}}
+{"t": 1790486944.205997, "ev": "commit", "n": 47, "conn": 8, "dropped": false, "insert": {"ticket_number": 39, "user_id": "user-39", "request_id": "req-39"}}
+{"t": 1790486944.212544, "ev": "commit", "n": 48, "conn": 1, "dropped": false, "insert": null}
+{"t": 1790486944.221084, "ev": "commit", "n": 49, "conn": 5, "dropped": false, "insert": {"ticket_number": 40, "user_id": "user-41", "request_id": "req-41"}}
+{"t": 1790486944.230377, "ev": "commit", "n": 50, "conn": 13, "dropped": true, "insert": {"ticket_number": 41, "user_id": "user-42", "request_id": "req-42"}}
+{"t": 1790486944.243882, "ev": "commit", "n": 51, "conn": 18, "dropped": false, "insert": null}
+{"t": 1790486944.334195, "ev": "commit", "n": 52, "conn": 16, "dropped": false, "insert": {"ticket_number": 42, "user_id": "user-43", "request_id": "req-43"}}
+{"t": 1790486944.343397, "ev": "commit", "n": 53, "conn": 12, "dropped": false, "insert": {"ticket_number": 43, "user_id": "user-44", "request_id": "req-44"}}
+{"t": 1790486944.352536, "ev": "commit", "n": 54, "conn": 18, "dropped": false, "insert": {"ticket_number": 44, "user_id": "user-53", "request_id": "req-53"}}
+{"t": 1790486944.362187, "ev": "commit", "n": 55, "conn": 17, "dropped": true, "insert": {"ticket_number": 45, "user_id": "user-45", "request_id": "req-45"}}
+{"t": 1790486944.378445, "ev": "commit", "n": 56, "conn": 15, "dropped": false, "insert": {"ticket_number": 46, "user_id": "user-48", "request_id": "req-48"}}
+{"t": 1790486944.468314, "ev": "commit", "n": 57, "conn": 19, "dropped": false, "insert": {"ticket_number": 47, "user_id": "user-47", "request_id": "req-47"}}
+{"t": 1790486944.4792, "ev": "commit", "n": 58, "conn": 8, "dropped": false, "insert": {"ticket_number": 48, "user_id": "user-49", "request_id": "req-49"}}
+{"t": 1790486944.486601, "ev": "commit", "n": 59, "conn": 1, "dropped": false, "insert": {"ticket_number": 49, "user_id": "user-50", "request_id": "req-50"}}
+{"t": 1790486944.496283, "ev": "commit", "n": 60, "conn": 19, "dropped": true, "insert": {"ticket_number": 50, "user_id": "user-58", "request_id": "req-58"}}
+{"t": 1790486944.514296, "ev": "commit", "n": 61, "conn": 5, "dropped": false, "insert": {"ticket_number": 51, "user_id": "user-51", "request_id": "req-51"}}
+{"t": 1790486944.58708, "ev": "commit", "n": 62, "conn": 20, "dropped": false, "insert": {"ticket_number": 52, "user_id": "user-52", "request_id": "req-52"}}
+{"t": 1790486944.601528, "ev": "commit", "n": 63, "conn": 21, "dropped": false, "insert": {"ticket_number": 53, "user_id": "user-56", "request_id": "req-56"}}
+{"t": 1790486944.610703, "ev": "commit", "n": 64, "conn": 1, "dropped": false, "insert": {"ticket_number": 54, "user_id": "user-60", "request_id": "req-60"}}
+{"t": 1790486944.619432, "ev": "commit", "n": 65, "conn": 16, "dropped": true, "insert": {"ticket_number": 55, "user_id": "user-54", "request_id": "req-54"}}
+{"t": 1790486944.635555, "ev": "commit", "n": 66, "conn": 12, "dropped": false, "insert": {"ticket_number": 56, "user_id": "user-55", "request_id": "req-55"}}
+{"t": 1790486944.701785, "ev": "commit", "n": 67, "conn": 18, "dropped": false, "insert": null}
+{"t": 1790486944.715518, "ev": "commit", "n": 68, "conn": 15, "dropped": false, "insert": {"ticket_number": 57, "user_id": "user-57", "request_id": "req-57"}}
+{"t": 1790486944.727002, "ev": "commit", "n": 69, "conn": 8, "dropped": false, "insert": {"ticket_number": 58, "user_id": "user-59", "request_id": "req-59"}}
+{"t": 1790486944.738291, "ev": "commit", "n": 70, "conn": 5, "dropped": true, "insert": {"ticket_number": 59, "user_id": "user-62", "request_id": "req-62"}}
+{"t": 1790486944.757971, "ev": "commit", "n": 71, "conn": 18, "dropped": false, "insert": {"ticket_number": 60, "user_id": "user-69", "request_id": "req-69"}}
+{"t": 1790486944.851381, "ev": "commit", "n": 72, "conn": 8, "dropped": false, "insert": {"ticket_number": 61, "user_id": "user-71", "request_id": "req-71"}}
+{"t": 1790486944.874261, "ev": "commit", "n": 73, "conn": 22, "dropped": false, "insert": {"ticket_number": 62, "user_id": "user-61", "request_id": "req-61"}}
+{"t": 1790486944.899969, "ev": "commit", "n": 74, "conn": 23, "dropped": false, "insert": {"ticket_number": 63, "user_id": "user-67", "request_id": "req-67"}}
+{"t": 1790486944.911207, "ev": "commit", "n": 75, "conn": 18, "dropped": true, "insert": {"ticket_number": 64, "user_id": "user-72", "request_id": "req-72"}}
+{"t": 1790486944.928559, "ev": "commit", "n": 76, "conn": 20, "dropped": false, "insert": {"ticket_number": 65, "user_id": "user-63", "request_id": "req-63"}}
+{"t": 1790486945.001952, "ev": "commit", "n": 77, "conn": 21, "dropped": false, "insert": {"ticket_number": 66, "user_id": "user-64", "request_id": "req-64"}}
+{"t": 1790486945.011349, "ev": "commit", "n": 78, "conn": 1, "dropped": false, "insert": {"ticket_number": 67, "user_id": "user-65", "request_id": "req-65"}}
+{"t": 1790486945.022295, "ev": "commit", "n": 79, "conn": 12, "dropped": false, "insert": {"ticket_number": 68, "user_id": "user-68", "request_id": "req-68"}}
+{"t": 1790486945.035062, "ev": "commit", "n": 80, "conn": 20, "dropped": false, "insert": {"ticket_number": 69, "user_id": "user-77", "request_id": "req-77"}}
+{"t": 1790486945.045971, "ev": "commit", "n": 81, "conn": 15, "dropped": false, "insert": {"ticket_number": 70, "user_id": "user-70", "request_id": "req-70"}}
+{"t": 1790486945.052348, "ev": "commit", "n": 82, "conn": 24, "dropped": false, "insert": null}
+{"t": 1790486945.062337, "ev": "commit", "n": 83, "conn": 21, "dropped": false, "insert": {"ticket_number": 71, "user_id": "user-78", "request_id": "req-78"}}
+{"t": 1790486945.071531, "ev": "commit", "n": 84, "conn": 8, "dropped": false, "insert": {"ticket_number": 72, "user_id": "user-73", "request_id": "req-73"}}
+{"t": 1790486945.079208, "ev": "commit", "n": 85, "conn": 25, "dropped": false, "insert": null}
+{"t": 1790486945.08849, "ev": "commit", "n": 86, "conn": 22, "dropped": false, "insert": {"ticket_number": 73, "user_id": "user-74", "request_id": "req-74"}}
+{"t": 1790486945.098739, "ev": "commit", "n": 87, "conn": 23, "dropped": false, "insert": {"ticket_number": 74, "user_id": "user-75", "request_id": "req-75"}}
+{"t": 1790486945.109922, "ev": "commit", "n": 88, "conn": 1, "dropped": false, "insert": {"ticket_number": 75, "user_id": "user-79", "request_id": "req-79"}}
+{"t": 1790486945.124346, "ev": "commit", "n": 89, "conn": 12, "dropped": false, "insert": {"ticket_number": 76, "user_id": "user-80", "request_id": "req-80"}}
+{"t": 1790486945.134846, "ev": "commit", "n": 90, "conn": 20, "dropped": false, "insert": {"ticket_number": 77, "user_id": "user-82", "request_id": "req-82"}}
+{"t": 1790486945.145333, "ev": "commit", "n": 91, "conn": 15, "dropped": false, "insert": {"ticket_number": 78, "user_id": "user-83", "request_id": "req-83"}}
+{"t": 1790486945.157987, "ev": "commit", "n": 92, "conn": 12, "dropped": false, "insert": {"ticket_number": 79, "user_id": "user-91", "request_id": "req-91"}}
+{"t": 1790486945.16325, "ev": "commit", "n": 93, "conn": 1, "dropped": false, "insert": null}
+{"t": 1790486945.174349, "ev": "commit", "n": 94, "conn": 24, "dropped": false, "insert": {"ticket_number": 80, "user_id": "user-84", "request_id": "req-84"}}
+{"t": 1790486945.184204, "ev": "commit", "n": 95, "conn": 21, "dropped": false, "insert": {"ticket_number": 81, "user_id": "user-85", "request_id": "req-85"}}
+{"t": 1790486945.194597, "ev": "commit", "n": 96, "conn": 8, "dropped": false, "insert": {"ticket_number": 82, "user_id": "user-86", "request_id": "req-86"}}
+{"t": 1790486945.205162, "ev": "commit", "n": 97, "conn": 25, "dropped": false, "insert": {"ticket_number": 83, "user_id": "user-88", "request_id": "req-88"}}
+{"t": 1790486945.214401, "ev": "commit", "n": 98, "conn": 22, "dropped": false, "insert": {"ticket_number": 84, "user_id": "user-89", "request_id": "req-89"}}
+{"t": 1790486945.224271, "ev": "commit", "n": 99, "conn": 21, "dropped": false, "insert": {"ticket_number": 85, "user_id": "user-99", "request_id": "req-99"}}
+{"t": 1790486945.233598, "ev": "commit", "n": 100, "conn": 25, "dropped": false, "insert": {"ticket_number": 86, "user_id": "user-100", "request_id": "req-100"}}
+{"t": 1790486945.244081, "ev": "commit", "n": 101, "conn": 22, "dropped": false, "insert": {"ticket_number": 87, "user_id": "user-101", "request_id": "req-101"}}
+{"t": 1790486945.252988, "ev": "commit", "n": 102, "conn": 23, "dropped": false, "insert": {"ticket_number": 88, "user_id": "user-90", "request_id": "req-90"}}
+{"t": 1790486945.263859, "ev": "commit", "n": 103, "conn": 20, "dropped": false, "insert": {"ticket_number": 89, "user_id": "user-93", "request_id": "req-93"}}
+{"t": 1790486945.273223, "ev": "commit", "n": 104, "conn": 25, "dropped": false, "insert": {"ticket_number": 90, "user_id": "user-103", "request_id": "req-103"}}
+{"t": 1790486945.282035, "ev": "commit", "n": 105, "conn": 22, "dropped": false, "insert": {"ticket_number": 91, "user_id": "user-104", "request_id": "req-104"}}
+{"t": 1790486945.29148, "ev": "commit", "n": 106, "conn": 15, "dropped": false, "insert": {"ticket_number": 92, "user_id": "user-94", "request_id": "req-94"}}
+{"t": 1790486945.30109, "ev": "commit", "n": 107, "conn": 12, "dropped": false, "insert": {"ticket_number": 93, "user_id": "user-95", "request_id": "req-95"}}
+{"t": 1790486945.310623, "ev": "commit", "n": 108, "conn": 1, "dropped": false, "insert": {"ticket_number": 94, "user_id": "user-96", "request_id": "req-96"}}
+{"t": 1790486945.320395, "ev": "commit", "n": 109, "conn": 24, "dropped": false, "insert": {"ticket_number": 95, "user_id": "user-97", "request_id": "req-97"}}
+{"t": 1790486945.332145, "ev": "commit", "n": 110, "conn": 12, "dropped": false, "insert": {"ticket_number": 96, "user_id": "user-111", "request_id": "req-111"}}
+{"t": 1790486945.337936, "ev": "commit", "n": 111, "conn": 8, "dropped": false, "insert": null}
+{"t": 1790486945.349068, "ev": "commit", "n": 112, "conn": 21, "dropped": false, "insert": {"ticket_number": 97, "user_id": "user-102", "request_id": "req-102"}}
+{"t": 1790486945.360034, "ev": "commit", "n": 113, "conn": 23, "dropped": false, "insert": {"ticket_number": 98, "user_id": "user-105", "request_id": "req-105"}}
+{"t": 1790486945.370335, "ev": "commit", "n": 114, "conn": 20, "dropped": false, "insert": {"ticket_number": 99, "user_id": "user-106", "request_id": "req-106"}}
+{"t": 1790486945.381334, "ev": "commit", "n": 115, "conn": 8, "dropped": false, "insert": {"ticket_number": 100, "user_id": "user-114", "request_id": "req-114"}}
+{"t": 1790486945.388609, "ev": "commit", "n": 116, "conn": 21, "dropped": false, "insert": null}
+{"t": 1790486945.399342, "ev": "commit", "n": 117, "conn": 25, "dropped": false, "insert": null}
+{"t": 1790486945.414905, "ev": "commit", "n": 118, "conn": 22, "dropped": false, "insert": null}
+{"t": 1790486945.429222, "ev": "commit", "n": 119, "conn": 15, "dropped": false, "insert": null}
+{"t": 1790486945.448962, "ev": "commit", "n": 120, "conn": 1, "dropped": false, "insert": null}
+{"t": 1790486945.464383, "ev": "commit", "n": 121, "conn": 24, "dropped": false, "insert": null}
+{"t": 1790486945.478458, "ev": "commit", "n": 122, "conn": 12, "dropped": false, "insert": null}
+{"t": 1790486945.493603, "ev": "commit", "n": 123, "conn": 23, "dropped": false, "insert": null}
+{"t": 1790486945.510761, "ev": "commit", "n": 124, "conn": 20, "dropped": false, "insert": null}
+{"t": 1790486946.700438, "ev": "commit", "n": 125, "conn": 15, "dropped": false, "insert": null}

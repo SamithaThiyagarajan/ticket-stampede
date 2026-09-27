@@ -1,0 +1,5 @@
+# TEST-ONLY: protocol-aware proxy that drops PostgreSQL COMMIT replies (M12 experiment).
+FROM python:3.12-slim
+WORKDIR /app
+COPY commit_drop_proxy.py .
+ENTRYPOINT ["python", "-u", "commit_drop_proxy.py"]

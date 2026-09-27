@@ -1,0 +1,64 @@
+proxy: 125 COMMIT replies seen, 15 dropped (14 of them in a purchase transaction with a ticket INSERT)
+SQL before targeted replay: count(*) = 100
+
+COMMIT #5: proxy saw INSERT ticket #5 for req-7/user-7, COMMIT reply dropped
+   buyer responses for req-7 (all copies): [500]
+   PostgreSQL row for req-7: ['5|user-7']
+   replay x2 -> [(200, 5), (200, 5)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #10: dropped reply of a transaction WITHOUT an INSERT (read-only commit)
+COMMIT #15: proxy saw INSERT ticket #13 for req-18/user-18, COMMIT reply dropped
+   buyer responses for req-18 (all copies): [500]
+   PostgreSQL row for req-18: ['13|user-18']
+   replay x2 -> [(200, 13), (200, 13)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #20: proxy saw INSERT ticket #17 for req-20/user-20, COMMIT reply dropped
+   buyer responses for req-20 (all copies): [200, 500]; 200 said ticket #[17]
+   PostgreSQL row for req-20: ['17|user-20']
+   replay x2 -> [(200, 17), (200, 17)]   => another copy of this request_id received 200
+COMMIT #25: proxy saw INSERT ticket #20 for req-15/user-15, COMMIT reply dropped
+   buyer responses for req-15 (all copies): [500]
+   PostgreSQL row for req-15: ['20|user-15']
+   replay x2 -> [(200, 20), (200, 20)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #30: proxy saw INSERT ticket #24 for req-31/user-31, COMMIT reply dropped
+   buyer responses for req-31 (all copies): [500]
+   PostgreSQL row for req-31: ['24|user-31']
+   replay x2 -> [(200, 24), (200, 24)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #35: proxy saw INSERT ticket #29 for req-26/user-26, COMMIT reply dropped
+   buyer responses for req-26 (all copies): [500, 200]; 200 said ticket #[29]
+   PostgreSQL row for req-26: ['29|user-26']
+   replay x2 -> [(200, 29), (200, 29)]   => another copy of this request_id received 200
+COMMIT #40: proxy saw INSERT ticket #33 for req-32/user-32, COMMIT reply dropped
+   buyer responses for req-32 (all copies): [500]
+   PostgreSQL row for req-32: ['33|user-32']
+   replay x2 -> [(200, 33), (200, 33)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #45: proxy saw INSERT ticket #37 for req-36/user-36, COMMIT reply dropped
+   buyer responses for req-36 (all copies): [500]
+   PostgreSQL row for req-36: ['37|user-36']
+   replay x2 -> [(200, 37), (200, 37)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #50: proxy saw INSERT ticket #41 for req-42/user-42, COMMIT reply dropped
+   buyer responses for req-42 (all copies): [200, 500]; 200 said ticket #[41]
+   PostgreSQL row for req-42: ['41|user-42']
+   replay x2 -> [(200, 41), (200, 41)]   => another copy of this request_id received 200
+COMMIT #55: proxy saw INSERT ticket #45 for req-45/user-45, COMMIT reply dropped
+   buyer responses for req-45 (all copies): [500]
+   PostgreSQL row for req-45: ['45|user-45']
+   replay x2 -> [(200, 45), (200, 45)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #60: proxy saw INSERT ticket #50 for req-58/user-58, COMMIT reply dropped
+   buyer responses for req-58 (all copies): [500]
+   PostgreSQL row for req-58: ['50|user-58']
+   replay x2 -> [(200, 50), (200, 50)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #65: proxy saw INSERT ticket #55 for req-54/user-54, COMMIT reply dropped
+   buyer responses for req-54 (all copies): [500]
+   PostgreSQL row for req-54: ['55|user-54']
+   replay x2 -> [(200, 55), (200, 55)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #70: proxy saw INSERT ticket #59 for req-62/user-62, COMMIT reply dropped
+   buyer responses for req-62 (all copies): [500]
+   PostgreSQL row for req-62: ['59|user-62']
+   replay x2 -> [(200, 59), (200, 59)]   => COMMITTED BUT UNACKNOWLEDGED
+COMMIT #75: proxy saw INSERT ticket #64 for req-72/user-72, COMMIT reply dropped
+   buyer responses for req-72 (all copies): [200, 500]; 200 said ticket #[64]
+   PostgreSQL row for req-72: ['64|user-72']
+   replay x2 -> [(200, 64), (200, 64)]   => another copy of this request_id received 200
+
+SQL after targeted replay: count(*) = 100 (unchanged)
+summary: dropped COMMIT replies 15 = committed-but-unacknowledged 10 + covered by another copy's 200 4 + no INSERT 1
+buyer outcome totals: {200: 101, 500: 15, 'ClientOSError': 15, 409: 269}

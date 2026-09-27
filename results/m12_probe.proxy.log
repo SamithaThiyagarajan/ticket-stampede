@@ -1,0 +1,3 @@
+{"t": 1790486810.764528, "ev": "listening", "port": 6543, "upstream": "db:5432", "drop_every": 2, "max_drops": 1}
+{"t": 1790486822.621157, "ev": "commit", "n": 1, "conn": 1, "dropped": false, "insert": null}
+{"t": 1790486822.701379, "ev": "commit", "n": 2, "conn": 2, "dropped": true, "insert": null}

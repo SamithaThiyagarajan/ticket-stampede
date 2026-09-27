@@ -1,0 +1,10 @@
+
+=== m12_sweep_1400rps: target 1400.0/s, 84000 arrivals, buyer processes 4
+  delivered 1414.4/s  sched p99 159.6ms  max worker hot s 0  sent-no-answer 5  host CPU max 597% (mean 434%)
+  VALID: False  failed ['sched p99<100ms', '0 sent-no-answer']
+  served 83995 = 1069.9/s  QueueTimeouts 0  5xx 1  outcomes {200: 129, 409: 83865, 'ReadTimeout': 5, 502: 1}
+  latency all p50/p99 12002.8/24709.6ms; arrivals after t=5s p50/p99 12626.5/24962.4ms
+  SUSTAINABLE: False  failed ['0 x 5xx', 'served >= 97%', 'post-sale p99 <= 1000ms']
+  CPU mean/max: buyer 140/331%  nginx 33/50%  seller1 62/102%  seller2 75/104%  seller3 76/104%  postgres 55/84%
+  pg: busy samples 224/1004, lock waiters mean 1.75 max 29
+  correctness: 1:PASS  2:PASS  3:PASS  4:PASS  5:PASS
