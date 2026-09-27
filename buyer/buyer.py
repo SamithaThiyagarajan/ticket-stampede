@@ -189,7 +189,14 @@ def run(args):
     then read /status once for verification."""
     with httpx.Client(base_url=args.url, timeout=args.timeout) as c:
         c.post("/reset", json={"tickets": args.tickets}).raise_for_status()
-    start_at = time.time() + 3.0          # headroom for worker processes to spawn and import
+    if args.start_at:
+        # Shared t=0 with an external actor (the fault injector). Too little headroom
+        # would silently shift where in the sale the fault lands, so refuse instead.
+        start_at = args.start_at
+        if start_at - time.time() < 2.0:
+            raise SystemExit(f"--start-at is only {start_at - time.time():.2f}s away after /reset; need >= 2s")
+    else:
+        start_at = time.time() + 3.0      # headroom for worker processes to spawn and import
     n = args.processes
     if n == 1:
         parts = [storm_worker(args, 0, 1, start_at)]
@@ -201,7 +208,7 @@ def run(args):
     with httpx.Client(base_url=args.url, timeout=args.timeout) as c:
         status = c.get("/status").json()
 
-    return {"args": vars(args), "storm_seconds": storm_s,
+    return {"args": vars(args), "start_at": start_at, "storm_seconds": storm_s,
             "max_in_flight": sum(p["max_in_flight"] for p in parts),   # upper bound when n > 1
             "max_in_flight_per_worker": [p["max_in_flight"] for p in parts],
             "timeline": [s for p in parts for s in p["timeline"]],
@@ -284,6 +291,9 @@ def report(data):
           f"requests={len(records)}  {mode}  tickets={data['status']['total_tickets']}  "
           f"request_ids sent >1 time={n_dup_ids}")
     print(f"responses: {dict(codes)}")
+    server_errors = Counter(r["status"] for r in records if isinstance(r["status"], int) and r["status"] >= 500)
+    if server_errors:
+        print(f"server errors (5xx, outcome unknown until verified): {dict(server_errors)}")
     transport = [r["status"] for r in records if not isinstance(r["status"], int)]
     if transport:
         never = sum(1 for s in transport if s in NEVER_SENT)
@@ -355,6 +365,8 @@ def main():
     p.add_argument("--rate", type=float, help="open loop: arrivals per second")
     p.add_argument("--client", choices=("httpx", "aiohttp"), default="httpx",
                    help="HTTP library for /buy (httpx = all runs before M10)")
+    p.add_argument("--start-at", type=float,
+                   help="wall-clock epoch for t=0 (shared with an external fault injector)")
     p.add_argument("--processes", type=int, default=1,
                    help="worker processes; arrivals split by i %% processes, connections split evenly")
     p.add_argument("--dup-fraction", type=float, default=0.2)

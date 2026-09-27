@@ -1,0 +1,3 @@
+2026/09/26 17:10:37 [error] 30#30: *328 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.5:8000/buy", host: "lb"
+2026/09/26 17:10:37 [error] 30#30: *43 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.5:8000/buy", host: "lb"
+2026/09/26 17:10:37 [error] 30#30: *420 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.5:8000/buy", host: "lb"

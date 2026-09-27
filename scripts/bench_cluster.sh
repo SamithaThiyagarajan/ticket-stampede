@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 # One instrumented run against 3 seller instances behind nginx, all on ONE Postgres.
-#   [FASTPATH=0|1] scripts/bench_cluster.sh NAME WORK_DELAY_MS DB_POOL_SIZE [buyer args...]
-# Writes results/NAME.{txt,json.gz,pgsample.jsonl,pgsample.txt,dockerstats.csv,env,instances}
+#   [FASTPATH=0|1] [FAULT=pause|kill:OFFSET:DURATION] scripts/bench_cluster.sh NAME WORK_DELAY_MS DB_POOL_SIZE [buyer args...]
+# FAULT (optional): scripts/inject_db_fault.sh runs against the db at start_at + OFFSET.
+# Writes results/NAME.{txt,json.gz,pgsample.jsonl,pgsample.txt,dockerstats.csv,env,instances,
+#                      db.log,nginx.log,sellers.log[,fault.log]}
 set -euo pipefail
 export MSYS_NO_PATHCONV=1          # Git Bash on Windows would rewrite /results/... paths
 cd "$(dirname "$0")/.."
 NAME=$1 DELAY=$2 POOL=$3; shift 3
 FASTPATH=${FASTPATH:-1}
+FAULT=${FAULT:-}
 R=results/$NAME
+RUN_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 SELLERS="seller1 seller2 seller3"
 PSQL="docker compose exec -T db psql -U tickets -tAc"
 
@@ -42,7 +46,10 @@ for S in $SELLERS; do
 done
 echo "one Postgres: $CONNS client connections = 3 x $POOL; by client IP: $BY_IP; seller IPs:$IPS" | tee -a "$R.env"
 IDS=$(for S in $SELLERS lb db; do docker compose ps -q $S | cut -c1-12; done | tr '\n' ' ')
+DBVOL=$(docker inspect -f '{{range .Mounts}}{{.Name}}{{end}}' "$(docker compose ps -q db)")
 echo "containers: $IDS" | tee -a "$R.env"
+echo "db volume: $DBVOL" | tee -a "$R.env"
+echo "fault: ${FAULT:-none}" | tee -a "$R.env"
 
 docker compose run --rm -T --no-deps --name "${NAME}_sampler" --entrypoint python buyer \
   pgsample.py --duration 1800 --out "/$R.pgsample.jsonl" >/dev/null 2>&1 &
@@ -53,18 +60,42 @@ docker compose run --rm -T --no-deps --name "${NAME}_sampler" --entrypoint pytho
 STATS=$!
 sleep 2
 
-docker compose run --rm -T --no-deps buyer --url http://lb:80 "$@" --out "/$R.json.gz" 2>/dev/null | tee "$R.txt" || true
+# Shared t=0 for buyer and injector; 12s covers buyer container start + /reset (the buyer
+# refuses to start if less than 2s remain).
+START_AT=$(awk -v n="$(date +%s.%N)" 'BEGIN{printf "%.3f", n + 12}')
+echo "start_at: $START_AT" | tee -a "$R.env"
+if [ -n "$FAULT" ]; then
+  IFS=: read -r FMODE FOFF FDUR <<< "$FAULT"
+  scripts/inject_db_fault.sh "$FMODE" "$FOFF" "$FDUR" "$START_AT" "$R.fault.log" < /dev/null > /dev/null 2>&1 &
+  INJECTOR=$!
+fi
 
+docker compose run --rm -T --no-deps buyer --url http://lb:80 "$@" --start-at "$START_AT" --out "/$R.json.gz" 2>/dev/null | tee "$R.txt" || true
+
+[ -n "$FAULT" ] && wait $INJECTOR
 touch "$R.done"; wait $STATS; rm -f "$R.done"
 docker stop "${NAME}_sampler" >/dev/null 2>&1 || true
 NOW=$(for S in $SELLERS lb db; do docker compose ps -q $S | cut -c1-12; done | tr '\n' ' ')
 [ "$NOW" = "$IDS" ] && echo "all containers unchanged during run" | tee -a "$R.env" \
   || { echo "INVALID: containers changed during run ($IDS -> $NOW)" | tee -a "$R.env"; exit 1; }
+[ "$(docker inspect -f '{{range .Mounts}}{{.Name}}{{end}}' "$(docker compose ps -q db)")" = "$DBVOL" ] \
+  && echo "db volume unchanged" | tee -a "$R.env" \
+  || { echo "INVALID: db volume changed" | tee -a "$R.env"; exit 1; }
+
+# Evidence, always collected: Postgres log for this run, nginx errors, seller non-access lines.
+docker compose logs --no-log-prefix --since "$RUN_START" db > "$R.db.log" 2>&1 || true
+docker compose logs --no-log-prefix lb 2>&1 | grep -E '\[(error|warn|crit|alert|emerg)\]' > "$R.nginx.log" || true
+for S in $SELLERS; do
+  docker compose logs $S 2>&1 | grep -vE '"(POST /buy|POST /reset|GET /status) HTTP' > "$R.sellers.log.$S" || true
+done
+cat "$R.sellers.log."* > "$R.sellers.log"; rm -f "$R.sellers.log."*
 
 echo; echo "===== /buy handled per instance (each seller's own access log) =====" | tee "$R.instances"
 for S in $SELLERS; do
-  echo "  $S ($(echo "$IPS" | tr ' ' '\n' | grep "^$S=" | cut -d= -f2)): $(docker compose logs $S 2>&1 | grep -c 'POST /buy')" | tee -a "$R.instances"
+  L=$(docker compose logs $S 2>&1 | grep 'POST /buy')
+  echo "  $S ($(echo "$IPS" | tr ' ' '\n' | grep "^$S=" | cut -d= -f2)): $(echo "$L" | grep -c 'POST /buy')  by status: $(echo "$L" | grep -oE 'HTTP/1.1" [0-9]{3}' | awk '{print $2}' | sort | uniq -c | awk '{printf "%s=%s ", $2, $1}')" | tee -a "$R.instances"
 done
+echo "  nginx [error]-level lines: $(wc -l < "$R.nginx.log"); db log lines this run: $(wc -l < "$R.db.log")" | tee -a "$R.instances"
 echo; echo "===== docker stats: mean / max CPU per container ====="
 awk -F, 'NR>1{gsub(/%/,"",$3); s[$2]+=$3; n[$2]++; if($3+0>m[$2]+0)m[$2]=$3+0}
          END{for(k in s) printf "  %-40s mean %6.1f%%  max %6.1f%%\n", k, s[k]/n[k], m[k]}' "$R.dockerstats.csv"

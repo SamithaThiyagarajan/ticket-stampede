@@ -31,17 +31,32 @@ def category(s):
 
 
 async def sample(args):
-    conn = await asyncpg.connect(args.dsn)
-    start = time.time()
+    # Must survive a Postgres outage. When the db is paused, queries and connects HANG
+    # rather than fail, so every call has a timeout. A failed sample is written as
+    # "unreachable" (with the error), never silently skipped; then we reconnect.
+    start, conn = time.time(), None
     with open(args.out, "w") as f:
         while time.time() - start < args.duration:
-            sessions = await conn.fetch(SESSIONS)
-            ungranted = {r["locktype"]: r["n"] for r in await conn.fetch(UNGRANTED)}
+            t = round(time.time() - start, 3)
+            try:
+                if conn is None:
+                    conn = await asyncio.wait_for(asyncpg.connect(args.dsn), timeout=args.call_timeout)
+                sessions = await asyncio.wait_for(conn.fetch(SESSIONS), timeout=args.call_timeout)
+                ungranted = {r["locktype"]: r["n"] for r in
+                             await asyncio.wait_for(conn.fetch(UNGRANTED), timeout=args.call_timeout)}
+            except (OSError, asyncio.TimeoutError, asyncpg.PostgresError, asyncpg.InterfaceError) as e:
+                f.write(json.dumps({"t": t, "unreachable": True, "error": type(e).__name__}) + "\n")
+                f.flush()
+                if conn is not None:
+                    conn.terminate()             # never await close() on a dead/hung socket
+                    conn = None
+                await asyncio.sleep(args.interval)
+                continue
             blocked = {s["pid"]: list(s["blockers"]) for s in sessions if s["blockers"]}
             # Root blockers: pids that block someone but are not themselves blocked.
             roots = sorted({b for bs in blocked.values() for b in bs} - set(blocked))
             f.write(json.dumps({
-                "t": round(time.time() - start, 3),
+                "t": t,
                 "categories": Counter(category(s) for s in sessions),
                 "holder_state": [category(s) for s in sessions if s["pid"] in roots],
                 "ungranted": ungranted,
@@ -50,11 +65,17 @@ async def sample(args):
             }) + "\n")
             f.flush()   # the run script may stop this container early; keep every sample
             await asyncio.sleep(args.interval)
-    await conn.close()
+    if conn is not None:
+        conn.terminate()
 
 
 def summarize(path):
-    samples = [json.loads(line) for line in open(path)]
+    all_samples = [json.loads(line) for line in open(path)]
+    down = [s for s in all_samples if s.get("unreachable")]
+    if down:
+        print(f"UNREACHABLE samples: {len(down)} of {len(all_samples)}, t={down[0]['t']}..{down[-1]['t']}s, "
+              f"errors: {dict(Counter(s['error'] for s in down))}")
+    samples = [s for s in all_samples if not s.get("unreachable")]
     busy = [s for s in samples if any(k != "idle" for k in s["categories"])]
     if not busy:
         print("no busy samples"); return
@@ -85,6 +106,8 @@ def main():
     p.add_argument("--dsn", default="postgresql://tickets:tickets@db:5432/tickets")
     p.add_argument("--interval", type=float, default=0.1)
     p.add_argument("--duration", type=float, default=150)
+    p.add_argument("--call-timeout", type=float, default=1.0,
+                   help="timeout per connect/query; a paused db hangs instead of failing")
     p.add_argument("--out", required=True, help="JSONL, one line per sample")
     p.add_argument("--summarize", action="store_true", help="only summarize an existing --out file")
     args = p.parse_args()
