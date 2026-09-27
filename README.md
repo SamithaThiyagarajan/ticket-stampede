@@ -1,8 +1,8 @@
 # Ticket Stampede
 
-A ticket-selling backend that sells **exactly 100 tickets** when tens of thousands of purchase requests arrive within about a minute, and stays correct when its database fails. It comes with a load-testing buyer that independently verifies correctness from raw responses and the final database state.
+A ticket-selling backend that sells **exactly 100 tickets** when tens of thousands of purchase requests arrive within about a minute, and stayed correct in the database-failure tests that were run. It comes with a load-testing buyer that independently verifies correctness from raw responses and the final database state.
 
-**The correctness problem.** A naive seller reads the sold count, checks capacity, then writes — so many concurrent buyers read the same count and the service oversells and issues duplicate ticket numbers (measured: 466–570 tickets issued for 100). This implementation guarantees, and every run is checked for:
+**The correctness problem.** A naive seller reads the sold count, checks capacity, then writes — so many concurrent buyers read the same count and the service oversells and issues duplicate ticket numbers (saved runs: 466–570 tickets issued for 100). This implementation guarantees, and every run is checked for:
 
 1. no overselling (at most 100 tickets),
 2. no duplicate ticket numbers,
@@ -71,7 +71,7 @@ curl -s localhost:8000/status       # sold count and every ticket_number -> user
 docker compose run --rm buyer --url http://seller:8000 --requests 1000 --tickets 100 --concurrency 200
 ```
 
-This fires 1,000 concurrent purchases (20% of `request_id`s sent twice), reads `/status`, recomputes all five checks and prints `OVERALL: PASS` / `FAIL` / `INCONCLUSIVE`. To see the race it prevents, run the same load against the deliberately naive seller (`--no-deps` keeps `docker compose run` from recreating the seller with default settings):
+This fires 1,000 concurrent purchases (20% of `request_id`s sent twice), reads `/status`, recomputes all five checks and prints `OVERALL: PASS` / `FAIL` / `INCONCLUSIVE`. INCONCLUSIVE means the checks held but some request got no answer, so the buyer will not claim a clean pass; with this closed-loop httpx client an occasional `ReadError` (sent, no answer, nothing logged by the seller) is a known, unexplained client-side effect (see `DECISIONS_LOG.md`). To see the race it prevents, run the same load against the deliberately naive seller (`--no-deps` keeps `docker compose run` from recreating the seller with default settings):
 
 ```bash
 SELLER_MODE=naive docker compose up -d seller
@@ -117,6 +117,8 @@ python diag/analyze_commit_drop.py my_commitdrop   # per dropped COMMIT: buyer a
 ## Evidence and the viewer
 
 Open **`viewer/index.html`** in a browser (offline, no server). It walks through the problem, the fix and every experiment with the numbers computed from `results/`. The optional replay at the bottom **plays back saved per-second data embedded in the page; it does not start the backend or send any request**. To rebuild it from `results/`: `python scripts/build_viewer.py`.
+
+Raw packet captures from the 502 diagnosis (`results/*.pcap`, ~91 MB) are git-ignored; their analyses (`*.resets.txt`, `*.capstats`) are committed with the other run files.
 
 AI coding-session logs: **`logs/`**.
 
