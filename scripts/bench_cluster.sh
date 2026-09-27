@@ -51,11 +51,15 @@ echo "containers: $IDS" | tee -a "$R.env"
 echo "db volume: $DBVOL" | tee -a "$R.env"
 echo "fault: ${FAULT:-none}" | tee -a "$R.env"
 # Optional packet capture of nginx's upstream side (measurement only; system under test untouched).
+# 256 MiB kernel buffer; written to the sidecar's own /tmp (a Windows bind mount is too slow
+# at ~1k packets/s) and copied out after stop; only SYN/FIN/RST or payload-bearing packets.
+CAPFILTER='tcp port 8000 and (tcp[tcpflags] & (tcp-syn|tcp-fin|tcp-rst) != 0 or (ip[2:2] - ((ip[0]&0xf)<<2) - ((tcp[12]&0xf0)>>2)) != 0)'
 if [ "${CAPTURE:-0}" = 1 ]; then
-  docker run -d --rm --name "${NAME}_pcap" --net "container:$(docker compose ps -q lb)" \
-    --cap-add NET_RAW --cap-add NET_ADMIN -v "$(pwd -W)/results:/out" ticket-tcpdump \
-    -i eth0 -s 128 -U -w "/out/$NAME.pcap" "tcp port 8000" > /dev/null
-  sleep 1; echo "capture: tcpdump on lb eth0, tcp port 8000 -> $R.pcap" | tee -a "$R.env"
+  docker rm -f "${NAME}_pcap" > /dev/null 2>&1 || true
+  docker run -d --name "${NAME}_pcap" --net "container:$(docker compose ps -q lb)" \
+    --cap-add NET_RAW --cap-add NET_ADMIN ticket-tcpdump \
+    -i eth0 -B 262144 -s 96 -w /tmp/cap.pcap "$CAPFILTER" > /dev/null
+  sleep 2; echo "capture: tcpdump on lb eth0, -B 262144 -s 96, filter: $CAPFILTER" | tee -a "$R.env"
 fi
 
 docker compose run --rm -T --no-deps --name "${NAME}_sampler" --entrypoint python buyer \
@@ -82,7 +86,13 @@ docker compose run --rm -T --no-deps buyer --url http://lb:80 "$@" --start-at "$
 [ -n "$FAULT" ] && wait $INJECTOR
 touch "$R.done"; wait $STATS; rm -f "$R.done"
 docker stop "${NAME}_sampler" >/dev/null 2>&1 || true
-[ "${CAPTURE:-0}" = 1 ] && { docker stop "${NAME}_pcap" > /dev/null 2>&1 || true; }
+if [ "${CAPTURE:-0}" = 1 ]; then
+  docker stop "${NAME}_pcap" > /dev/null 2>&1 || true        # SIGTERM: tcpdump flushes + prints stats
+  docker logs "${NAME}_pcap" 2>&1 | grep -E "packets (captured|received|dropped)" > "$R.capstats" || true
+  docker cp "${NAME}_pcap:/tmp/cap.pcap" "$R.pcap" > /dev/null
+  docker rm "${NAME}_pcap" > /dev/null
+  echo "capture stats: $(tr '\n' ';' < "$R.capstats")" | tee -a "$R.env"
+fi
 NOW=$(for S in $SELLERS lb db; do docker compose ps -q $S | cut -c1-12; done | tr '\n' ' ')
 [ "$NOW" = "$IDS" ] && echo "all containers unchanged during run" | tee -a "$R.env" \
   || { echo "INVALID: containers changed during run ($IDS -> $NOW)" | tee -a "$R.env"; exit 1; }

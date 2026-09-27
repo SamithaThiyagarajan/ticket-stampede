@@ -1,0 +1,11 @@
+tcpdump: 3030 packets captured; 3030 packets received by filter; 0 packets dropped by kernel
+consistency: packets without a captured SYN = 0; data after full close = 0
+CAPTURE VALID (requires kernel drops = 0 and both consistency counts = 0)
+capture: 3030 packets, 6 upstream TCP connections, t=-7.57s .. (relative to buyer start)
+new upstream connections (SYN) per seller: {'172.22.0.4': 2, '172.22.0.3': 2, '172.22.0.5': 2}
+who closed each connection (first FIN): {'seller': 6}
+  seller-initiated closes: idle before FIN min 5.001s  p50 5.001s  max 5.002s; within 4.9-5.3s: 6 of 6
+nginx sent request data AFTER the seller's FIN had arrived: 0 time(s)
+
+RST sent by a seller: 0 connection(s)
+502s in buyer records: 0

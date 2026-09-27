@@ -1,0 +1,12 @@
+seller1-1  | INFO:     Started server process [1]
+seller1-1  | INFO:     Waiting for application startup.
+seller1-1  | INFO:     Application startup complete.
+seller1-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+seller2-1  | INFO:     Started server process [1]
+seller2-1  | INFO:     Waiting for application startup.
+seller2-1  | INFO:     Application startup complete.
+seller2-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+seller3-1  | INFO:     Started server process [1]
+seller3-1  | INFO:     Waiting for application startup.
+seller3-1  | INFO:     Application startup complete.
+seller3-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)

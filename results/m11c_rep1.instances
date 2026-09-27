@@ -1,0 +1,5 @@
+===== /buy handled per instance (each seller's own access log) =====
+  seller1 (172.22.0.4): 16666  by status: 200=41 409=16625 
+  seller2 (172.22.0.3): 16667  by status: 200=47 409=16620 
+  seller3 (172.22.0.5): 16667  by status: 200=47 409=16620 
+  nginx [error]-level lines: 0; db log lines this run: 1

@@ -1,0 +1,783 @@
+{"t": 0.011, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.217, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.323, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.429, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.535, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.64, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.744, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.848, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 0.952, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.056, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.16, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.264, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.368, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.472, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.576, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.68, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.784, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.889, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 1.994, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.098, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.202, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.306, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.41, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.515, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.618, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.722, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.826, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 2.93, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.034, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.137, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.24, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.345, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.448, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.553, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.657, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.761, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.865, "categories": {"idle": 29, "active:IO:DataFileImmediateSync": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 3.969, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.075, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.18, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.284, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.388, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.492, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.596, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.7, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.804, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 4.909, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.012, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.116, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.221, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.325, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.428, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.532, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.636, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.74, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.844, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 5.948, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.051, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.154, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.259, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.362, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.466, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.573, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.681, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.785, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.889, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 6.996, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.102, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.206, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.311, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.416, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.52, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.624, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.73, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.835, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 7.939, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.045, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.152, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.258, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.364, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.47, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.575, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.679, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.783, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.887, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 8.994, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.1, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.205, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.311, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.417, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.523, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.627, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.733, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.839, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 9.945, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.048, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.155, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.261, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.367, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.472, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.576, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.683, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.787, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.892, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 10.995, "categories": {"active:Client:ClientRead": 19, "waiting_lock": 1, "idle in transaction": 5, "idle": 5}, "holder_state": ["idle in transaction"], "ungranted": {"transactionid": 1}, "n_blocked": 1, "roots": [84847]}
+{"t": 11.1, "categories": {"active:Client:ClientRead": 8, "waiting_lock": 3, "idle": 16, "idle in transaction": 3}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 2, "transactionid": 1}, "n_blocked": 3, "roots": [84847]}
+{"t": 11.207, "categories": {"waiting_lock": 8, "idle in transaction": 16, "idle": 3, "active:Client:ClientRead": 3}, "holder_state": ["active:Client:ClientRead"], "ungranted": {"tuple": 7, "transactionid": 1}, "n_blocked": 8, "roots": [84847]}
+{"t": 11.312, "categories": {"waiting_lock": 27, "idle": 1, "active:cpu:-": 1, "active:Client:ClientRead": 1}, "holder_state": ["waiting_lock", "active:Client:ClientRead"], "ungranted": {"tuple": 27, "transactionid": 2}, "n_blocked": 27, "roots": [84842, 84864]}
+{"t": 11.417, "categories": {"waiting_lock": 24, "idle in transaction": 1, "active:cpu:-": 2, "active:LWLock:LockManager": 1, "idle": 2}, "holder_state": ["idle in transaction", "waiting_lock", "waiting_lock", "waiting_lock", "waiting_lock"], "ungranted": {"tuple": 26, "transactionid": 1}, "n_blocked": 23, "roots": [84837, 84845, 84851, 84852, 84859]}
+{"t": 11.528, "categories": {"waiting_lock": 29, "active:IO:WALSync": 1}, "holder_state": ["active:IO:WALSync"], "ungranted": {"tuple": 25, "transactionid": 1}, "n_blocked": 29, "roots": [84846]}
+{"t": 11.633, "categories": {"idle in transaction": 1, "waiting_lock": 28, "idle": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 26, "transactionid": 2}, "n_blocked": 28, "roots": [84836]}
+{"t": 11.737, "categories": {"waiting_lock": 28, "idle in transaction": 1, "idle": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 26, "transactionid": 2}, "n_blocked": 28, "roots": [84858]}
+{"t": 11.842, "categories": {"waiting_lock": 29, "idle in transaction": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 28, "transactionid": 1}, "n_blocked": 29, "roots": [84865]}
+{"t": 11.947, "categories": {"waiting_lock": 28, "idle in transaction": 1, "idle": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 25, "transactionid": 3}, "n_blocked": 28, "roots": [84840]}
+{"t": 12.054, "categories": {"waiting_lock": 29, "active:IO:WALSync": 1}, "holder_state": ["active:IO:WALSync", "waiting_lock"], "ungranted": {"tuple": 21, "transactionid": 7}, "n_blocked": 28, "roots": [84837, 84854]}
+{"t": 12.164, "categories": {"waiting_lock": 28, "idle in transaction": 2}, "holder_state": ["waiting_lock", "idle in transaction", "waiting_lock"], "ungranted": {"tuple": 22, "transactionid": 7}, "n_blocked": 26, "roots": [84841, 84858, 84863]}
+{"t": 12.271, "categories": {"waiting_lock": 28, "idle": 1, "idle in transaction": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 26, "transactionid": 2}, "n_blocked": 28, "roots": [84850]}
+{"t": 12.376, "categories": {"waiting_lock": 29, "idle in transaction": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 28, "transactionid": 1}, "n_blocked": 29, "roots": [84857]}
+{"t": 12.48, "categories": {"waiting_lock": 28, "idle": 1, "idle in transaction": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 26, "transactionid": 2}, "n_blocked": 28, "roots": [84860]}
+{"t": 12.585, "categories": {"waiting_lock": 23, "idle": 6, "idle in transaction": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 22, "transactionid": 1}, "n_blocked": 23, "roots": [84850]}
+{"t": 12.69, "categories": {"waiting_lock": 12, "active:cpu:-": 1, "idle": 16, "idle in transaction": 1}, "holder_state": ["idle in transaction"], "ungranted": {"tuple": 11, "transactionid": 1}, "n_blocked": 12, "roots": [84851]}
+{"t": 12.794, "categories": {"waiting_lock": 5, "idle": 23, "active:Client:ClientRead": 1, "active:cpu:-": 1}, "holder_state": ["active:Client:ClientRead"], "ungranted": {"tuple": 4, "transactionid": 1}, "n_blocked": 5, "roots": [84842]}
+{"t": 12.898, "categories": {"idle in transaction": 1, "idle": 28, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.002, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.106, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.21, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.315, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.42, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.529, "categories": {"idle": 28, "active:Client:ClientRead": 1, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.633, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.741, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.844, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 13.948, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.053, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.159, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.263, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.367, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.472, "categories": {"idle": 27, "active:Client:ClientRead": 2, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.575, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.679, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.784, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.888, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 14.992, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.096, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.2, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.303, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.406, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.51, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.614, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.718, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.822, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 15.926, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.029, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.132, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.236, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.339, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.443, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.546, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.651, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.754, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.858, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 16.962, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.066, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.17, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.274, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.378, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.481, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.585, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.689, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.793, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 17.896, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.0, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.104, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.208, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.311, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.415, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.518, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.622, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.726, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.829, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 18.932, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.037, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.141, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.244, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.348, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.453, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.556, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.66, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.764, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.869, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 19.972, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.076, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.179, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.283, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.387, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.492, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.596, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.701, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.804, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 20.908, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.012, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.115, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.219, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.323, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.427, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.531, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.635, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.739, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.848, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 21.955, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.06, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.167, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.272, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.38, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.486, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.591, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.694, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.799, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 22.903, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.007, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.11, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.214, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.318, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.422, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.526, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.63, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.737, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.842, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 23.946, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.05, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.154, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.257, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.361, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.465, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.569, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.673, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.777, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.88, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 24.984, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.089, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.192, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.296, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.4, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.503, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.607, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.71, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.814, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 25.918, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.021, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.125, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.228, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.332, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.436, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.54, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.644, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.748, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.853, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 26.958, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.062, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.166, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.27, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.373, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.477, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.581, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.684, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.788, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.892, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 27.996, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.1, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.204, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.307, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.411, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.515, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.619, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.723, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.828, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 28.931, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.035, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.139, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.243, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.347, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.451, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.555, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.658, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.762, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.865, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 29.969, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.073, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.177, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.281, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.385, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.491, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.594, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.699, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.803, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 30.908, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.012, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.115, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.219, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.323, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.427, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.531, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.635, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.745, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.849, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 31.953, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.057, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.161, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.266, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.373, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.481, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.586, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.691, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.796, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 32.9, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.005, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.109, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.213, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.317, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.423, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.527, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.63, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.734, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.838, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 33.941, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.045, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.149, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.254, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.357, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.461, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.568, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.673, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.777, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.882, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 34.985, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.089, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.193, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.297, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.401, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.505, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.609, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.713, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.817, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 35.921, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.025, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.129, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.233, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.338, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.442, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.545, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.649, "categories": {"idle": 27, "active:cpu:-": 2, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.753, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.857, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 36.961, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.064, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.169, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.272, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.377, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.481, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.587, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.691, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.796, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 37.9, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.004, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.109, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.213, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.317, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.421, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.526, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.63, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.735, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.838, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 38.942, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.046, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.153, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.257, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.361, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.466, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.57, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.673, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.777, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.892, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 39.997, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.101, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.204, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.308, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.411, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.515, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.619, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.724, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.828, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 40.932, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.037, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.142, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.246, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.349, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.453, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.557, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.66, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.764, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.868, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 41.974, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.082, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.187, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.293, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.397, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.501, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.608, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.711, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.815, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 42.918, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.022, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.125, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.229, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.333, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.436, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.541, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.645, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.749, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.853, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 43.956, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.06, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.165, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.269, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.372, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.476, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.581, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.685, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.789, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.893, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 44.997, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.101, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.205, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.308, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.413, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.519, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.622, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.726, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.83, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 45.933, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.037, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.141, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.245, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.349, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.454, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.559, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.663, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.767, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.871, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 46.976, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.08, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.185, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.289, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.392, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.496, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.6, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.704, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.807, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 47.912, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.016, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.12, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.225, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.328, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.433, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.537, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.64, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.745, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.849, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 48.952, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.057, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.161, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.265, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.369, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.473, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.578, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.681, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.786, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.89, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 49.994, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.1, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.203, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.309, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.413, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.517, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.621, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.726, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.831, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 50.936, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.04, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.144, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.248, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.352, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.456, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.56, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.663, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.768, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.872, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 51.978, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.084, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.192, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.298, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.406, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.512, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.616, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.72, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.826, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 52.93, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.033, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.137, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.242, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.347, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.45, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.554, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.658, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.781, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.884, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 53.988, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.092, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.196, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.301, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.405, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.511, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.615, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.718, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.823, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 54.927, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.031, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.135, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.239, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.343, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.447, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.552, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.656, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.76, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.864, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 55.967, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.071, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.175, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.279, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.383, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.486, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.591, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.694, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.798, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 56.901, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.005, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.108, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.212, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.316, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.42, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.524, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.627, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.731, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.835, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 57.939, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.043, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.147, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.251, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.355, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.459, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.563, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.667, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.771, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.874, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 58.978, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.081, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.185, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.289, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.393, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.497, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.601, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.705, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.81, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 59.913, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.018, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.123, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.226, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.33, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.433, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.538, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.642, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.747, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.851, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 60.956, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.06, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.163, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.267, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.371, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.474, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.578, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.682, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.787, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.892, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 61.995, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.104, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.209, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.325, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.433, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.538, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.643, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.747, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.85, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 62.954, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.058, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.164, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.267, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.371, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.475, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.579, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.684, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.788, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.892, "categories": {"idle": 29, "active:Client:ClientRead": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 63.995, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.099, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.204, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.309, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.413, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.516, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.619, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.723, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.827, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 64.931, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.034, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.138, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.242, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.346, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.45, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.553, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.658, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.761, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.865, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 65.969, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.073, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.177, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.28, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.384, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.487, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.591, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.695, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.799, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 66.903, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.007, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.11, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.214, "categories": {"idle": 28, "active:cpu:-": 2}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.318, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.421, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.525, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.629, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.733, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.837, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 67.94, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.043, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.147, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.251, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.354, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.458, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.561, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.665, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.77, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.874, "categories": {"active:cpu:-": 1, "idle": 29}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 68.978, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.081, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.186, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.29, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.397, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.502, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.606, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.71, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.813, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 69.918, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.021, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.127, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.231, "categories": {"idle": 29, "active:cpu:-": 1}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.335, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.439, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.543, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.647, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.752, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.856, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 70.961, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.066, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.17, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.275, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.38, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.486, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.591, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.696, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.801, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 71.905, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.01, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.114, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.218, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.326, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.43, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.536, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.645, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.749, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.854, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 72.958, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.061, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.17, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.275, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.379, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.483, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.589, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.696, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.801, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 73.905, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.009, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.113, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.216, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.32, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.425, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.531, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.635, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.739, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.844, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 74.947, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.052, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.157, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.263, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.367, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.47, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.575, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.679, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.783, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.888, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 75.992, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.096, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.201, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.305, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.411, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.516, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.62, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.726, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.834, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 76.937, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.041, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.145, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.248, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.354, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.457, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.561, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.666, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.77, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.874, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 77.979, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.083, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.187, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.292, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.397, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.502, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.607, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.712, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.817, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 78.921, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.028, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.133, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.237, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.343, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.448, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.553, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.657, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.761, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.866, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 79.97, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.075, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.179, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.284, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.388, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.493, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.598, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.704, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.81, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 80.913, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.018, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.122, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.226, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.333, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.438, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.542, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.645, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}
+{"t": 81.75, "categories": {"idle": 30}, "holder_state": [], "ungranted": {}, "n_blocked": 0, "roots": []}

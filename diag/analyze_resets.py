@@ -59,7 +59,23 @@ def main(name):
         elif sp == 8000:
             k = (dst, dp, src)
             conns[k + (gen[k],)].append((t, "S>N", f, n))
-    conns = {k: v for k, v in conns.items() if k[3] > 0}    # drop connections opened before the capture
+    # Capture-quality checks (a second, independent loss detector besides tcpdump's counter):
+    orphan = sum(len(v) for k, v in conns.items() if k[3] == 0)   # packets whose connection's SYN was never captured
+    post_close = 0                                                 # data after a full FIN/FIN close, no new SYN
+    for v in conns.values():
+        fins = set()
+        for t, dr, f, n in v:
+            if n > 0 and len(fins) == 2:
+                post_close += 1
+            if f & FIN:
+                fins.add(dr)
+    stats = (R / f"{name}.capstats").read_text() if (R / f"{name}.capstats").exists() else ""
+    kdrop = next((int(l.split()[0]) for l in stats.splitlines() if "dropped by kernel" in l), None)
+    valid = kdrop == 0 and orphan == 0 and post_close == 0
+    print("tcpdump: " + "; ".join(l.strip() for l in stats.splitlines()))
+    print(f"consistency: packets without a captured SYN = {orphan}; data after full close = {post_close}")
+    print(f"CAPTURE {'VALID' if valid else 'INVALID'} (requires kernel drops = 0 and both consistency counts = 0)")
+    conns = {k: v for k, v in conns.items() if k[3] > 0}
 
     t_first = min(ev[0][0] for ev in conns.values())
     d = json.load(gzip.open(R / f"{name}.json.gz", "rt"))
@@ -87,12 +103,23 @@ def main(name):
     print(f"capture: {sum(len(v) for v in conns.values())} packets, {len(conns)} upstream TCP connections, "
           f"t={rel(t_first):.2f}s .. (relative to buyer start)")
     print(f"new upstream connections (SYN) per seller: {dict(syns)}")
-    print(f"connections closed by nginx (FIN from nginx): {nginx_fins}")
-    print(f"connections closed by a seller (FIN from seller): {len(seller_fin_idle)}")
-    if seller_fin_idle:
-        s = sorted(seller_fin_idle)
-        print(f"  idle time before the seller's FIN: min {s[0]:.3f}s  p50 {s[len(s)//2]:.3f}s  max {s[-1]:.3f}s; "
-              f"within 4.9–5.3s: {sum(4.9 <= x <= 5.3 for x in s)} of {len(s)}")
+    # Who closed: the side whose FIN came FIRST (the other side's FIN is just the reply).
+    initiator, idle_by = Counter(), defaultdict(list)
+    for ev in conns.values():
+        first = next(((t, dr) for t, dr, f, n in ev if f & FIN), None)
+        if first is None:
+            initiator["still open at capture end"] += 1
+            continue
+        side = "seller" if first[1] == "S>N" else "nginx"
+        initiator[side] += 1
+        data = [t for t, dr, f, n in ev if n > 0 and t < first[0]]
+        if data:
+            idle_by[side].append(first[0] - data[-1])
+    print(f"who closed each connection (first FIN): {dict(initiator)}")
+    for side, xs in sorted(idle_by.items()):
+        s = sorted(xs)
+        print(f"  {side}-initiated closes: idle before FIN min {s[0]:.3f}s  p50 {s[len(s)//2]:.3f}s  max {s[-1]:.3f}s; "
+              f"within 4.9-5.3s: {sum(4.9 <= x <= 5.3 for x in s)} of {len(s)}")
     print(f"nginx sent request data AFTER the seller's FIN had arrived: {len(reuse_after_fin)} time(s)")
     for key, gap in reuse_after_fin[:10]:
         print(f"  {key[0]}:{key[1]} -> {key[2]}  request sent {gap*1000:.2f} ms after the seller's FIN arrived")
@@ -117,7 +144,14 @@ def main(name):
                   f"-> idle {sfin - data_before[-1]:.3f}s")
             print(f"  nginx request after the FIN: " + (f"t={rel(req_after[0]):.4f}s (+{(req_after[0]-sfin)*1000:.2f} ms)"
                                                         if req_after else "none"))
-        print(f"  seller RST: t={rel(rst):.4f}s")
+        print(f"  seller RST: t={rel(rst):.4f}s  (epoch {rst:.4f})")
+        near = [r for r in bad if abs(r["i"] / rate + r["latency_ms"] / 1000 - rel(rst)) < 0.5]
+        for r in near:
+            print(f"  matching buyer 502: answered t={r['i']/rate + r['latency_ms']/1000:.4f}s, upstream {r.get('upstream')}, "
+                  f"{(r['i']/rate + r['latency_ms']/1000 - rel(rst))*1000:+.1f} ms from the RST")
+    nginx_log = R / f"{name}.nginx.log"
+    if nginx_log.exists() and nginx_log.read_text().strip():
+        print("\nnginx error log:\n" + nginx_log.read_text().rstrip())
 
 
 if __name__ == "__main__":

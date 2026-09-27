@@ -341,6 +341,29 @@
   - **Capture unreliable at 50k — per-connection results NOT valid:** raw dump of one 4-tuple shows a full FIN/FIN close at t=11.83s followed by data until t=60s with no SYN (impossible without a new handshake) → SYNs (and other packets) were lost by the capture; ~31,700 packets sat on 4-tuples with no captured SYN; the "request 46s after FIN" and idle-time figures are artifacts. Likely kernel buffer drops at ~90k packets; tcpdump's own drop counter was lost because the sidecar ran with `--rm` (my omission). Parser also initially merged reused source ports (fixed: new generation per SYN).
   - Still unproven: that a 502 is a request sent on a connection the seller had just closed after 5s idle. Missing: a loss-free capture of a run that actually produces a 502.
 
+- **M11c repeat-until-502 series — PRE-REGISTERED (user-approved; measurement only; no nginx/uvicorn/seller/Postgres/Docker config, app or db changes; no fault injection; no timeout changes).**
+  - Capture fixes: tcpdump `-B 262144` (256 MiB buffer); write to the sidecar's own /tmp (not the Windows bind mount), copy out with `docker cp` after stop; no `-U`; filter = tcp port 8000 AND (SYN|FIN|RST OR payload > 0) (pure ACKs excluded); snaplen 96; tcpdump's exit statistics saved (`.capstats`).
+  - **Diagnostically valid capture iff:** "dropped by kernel" = 0 AND analyzer consistency = 0 (no data on a 4-tuple after a full FIN/FIN close without a new SYN; no packets on 4-tuples whose SYN was not captured).
+  - Series: normal 50k @ 833.33/s, 3-seller cluster, C0/M10 settings; up to 5 runs; **stop at the first run with a 502 and a valid capture.**
+  - **Keep-alive race PROVEN for that 502 only if** the capture shows on its connection: last data (t₀) → seller FIN at ≈ t₀ + 5s → nginx request data after the FIN arrived → seller RST, and the RST coincides with the buyer's 502 answer time and nginx's error-log line. Otherwise report the actual sequence.
+  - If no valid 502 in 5 runs: hypothesis remains unproven; report idle-close behavior and capture quality.
+
+- **M11c series RESULTS — 5 of 5 captures VALID, 0 × 502 → keep-alive race NOT proven** (`results/m11c_*`):
+  - Low-rate check of the fixed capture (`m11c_capture_smoke`): 3,030 packets, 0 kernel drops, consistency 0/0; 6/6 connections closed by the seller at 5.001–5.002s idle (positive control reproduced).
+  - Analyzer improvement during the series: who closed a connection = the side whose FIN came first (earlier counts mixed initiating FINs with reply FINs). Re-run on saved pcaps.
+
+    | rep | capture (kernel drops / consistency) | 502 | seller-initiated closes (idle) | nginx-initiated closes (idle p50) | nginx request after seller FIN | seller RST | client (benchmark rule) | 5 checks |
+    |---|---|---|---|---|---|---|---|---|
+    | 1 | 155,553 pkts, 0 / 0 VALID | 0 | 328 (4.990–5.005s) | 1,056 (0.43s) | 0 | 0 | clean | PASS |
+    | 2 | 163,348 pkts, 0 / 0 VALID | 0 | 566 (4.991–5.003s) | 2,755 (0.81s) | 0 | 0 | not clean (sched p99) | PASS |
+    | 3 | 156,208 pkts, 0 / 0 VALID | 0 | 525 (4.994–5.007s) | 1,004 (0.42s) | 0 | 0 | clean | PASS |
+    | 4 | 157,144 pkts, 0 / 0 VALID | 0 | 387 (5.000–5.022s) | 1,392 (0.40s) | 0 | 0 | clean | PASS |
+    | 5 | 157,598 pkts, 0 / 0 VALID | 0 | 502 (4.998–5.012s) | 1,389 (0.66s) | 0 | 0 | clean | PASS |
+
+  - **Proven (measured, loss-free):** uvicorn closes idle nginx upstream connections at 4.990–5.022s (2,308 closes across 5 runs, all in that band); nginx never idle-closes first (its own closes are cache trimming at 0–3.7s, not idle timeouts); in these runs nginx never sent a request on a connection after the seller's FIN arrived, and no seller ever sent a RST.
+  - **Not proven:** that the observed 502s (M9, C0) are this race — no 502 occurred under a valid capture.
+  - Frequency tally, 50k @ 833/s cluster runs: 502 in 2 of 10 (M9, C0); 0 of 6 with capture on vs 2 of 4 without — too few runs to separate an observer effect (the capture sidecar shares the lb network namespace and adds CPU) from chance.
+
 ## Open questions / to revisit
 - **nginx ↔ uvicorn keep-alive reset (2 × 502 at 50k)** — test the timeout-mismatch hypothesis before changing timeouts.
 - **Postgres connection budget:** instances × pool must stay under `max_connections` (100): at pool 10 that caps at ~9 instances; more connections also means more lock waiters in the sale phase (F2 mean 18.7 with 30 conns).
