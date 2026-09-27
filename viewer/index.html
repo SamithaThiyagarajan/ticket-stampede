@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticket Stampede Replay</title>
+<style>
+.viz-root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface-1: #fcfcfb; --text-primary: #0b0b0b; --text-secondary: #52514e;
+  --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100;
+  --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  --band: rgba(208,59,59,0.08); --band-ink: #b03030; --idle: #d8d7d0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #ffffff; --text-secondary: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+    --band: rgba(208,59,59,0.16); --band-ink: #f08a8a; --idle: #383835;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #ffffff; --text-secondary: #c3c2b7;
+  --muted: #898781; --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+  --band: rgba(208,59,59,0.16); --band-ink: #f08a8a; --idle: #383835;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); }
+.viz-root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text-primary);
+  background: var(--page); min-height: 100vh; padding: 20px 16px 48px; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+h1 { font-size: 20px; margin: 0 0 2px; font-weight: 650; }
+.sub { color: var(--text-secondary); font-size: 13px; margin: 0 0 14px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tabs button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); }
+.tabs button[aria-selected="true"] { color: var(--text-primary); border-color: var(--text-secondary); font-weight: 600; }
+.caption { font-size: 14px; color: var(--text-secondary); margin: 0 0 12px; max-width: 900px; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.tile .k { font-size: 12px; color: var(--text-secondary); }
+.tile .v { font-size: 22px; font-weight: 650; margin-top: 2px; }
+.tile .n { font-size: 12px; color: var(--muted); }
+.row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+@media (max-width: 820px) { .row { grid-template-columns: 1fr; } }
+.card h2 { font-size: 14px; margin: 0 0 8px; font-weight: 650; }
+.card h2 .hint { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 6px; }
+.scrub { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.scrub input[type=range] { flex: 1; accent-color: var(--text-secondary); }
+.scrub button { font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+.tlabel { font-variant-numeric: tabular-nums; font-size: 13px; min-width: 150px; color: var(--text-secondary); }
+.now dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; font-size: 13px; }
+.now dt { color: var(--text-secondary); } .now dd { margin: 0; font-variant-numeric: tabular-nums; }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+@media (max-width: 820px) { .charts { grid-template-columns: 1fr; } }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--text-secondary); margin: -2px 0 6px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+svg text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.tip { position: fixed; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 9px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  color: var(--text-primary); display: none; z-index: 5; font-variant-numeric: tabular-nums; }
+.tip b { font-weight: 600; } .tip .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+.checks li { list-style: none; margin: 0 0 6px; font-size: 13px; }
+.checks ul { padding: 0; margin: 0; }
+.ok { color: var(--good); font-weight: 700; } .bad { color: var(--critical); font-weight: 700; }
+.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; white-space: pre-wrap; color: var(--text-secondary); }
+table { border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+th, td { padding: 3px 8px; text-align: right; border-bottom: 1px solid var(--grid); }
+th { color: var(--text-secondary); font-weight: 600; } td:first-child, th:first-child { text-align: left; }
+details summary { cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+.tablewrap { overflow-x: auto; max-height: 420px; margin-top: 8px; }
+.lanes-legend span { margin-right: 14px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="viz-root"><div class="wrap">
+  <h1>Ticket Stampede: experiment replay</h1>
+  <p class="sub">buyer → nginx → seller1/2/3 → one PostgreSQL · 50,000 arrivals at ≈833/s, 100 tickets · rebuilt from saved results by <code>scripts/build_viewer.py</code></p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <p class="caption" id="caption"></p>
+  <div class="tiles" id="tiles"></div>
+
+  <div class="scrub">
+    <button id="play" type="button">▶ Play</button>
+    <input type="range" id="t" min="0" max="60" value="0" step="1" aria-label="Time in seconds">
+    <span class="tlabel" id="tlabel"></span>
+  </div>
+
+  <div class="row">
+    <div class="card"><h2>Architecture at the selected second<span class="hint">state and traffic per component</span></h2>
+      <svg id="arch" width="100%" height="270" role="img" aria-label="Architecture state"></svg></div>
+    <div class="card now"><h2>At this second</h2><dl id="now"></dl></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h2>Component state per second<span class="hint">hover a cell to move the time cursor</span></h2>
+    <div class="legend lanes-legend" id="laneLegend"></div>
+    <svg id="lanes" width="100%" height="150" role="img" aria-label="Component state lanes"></svg>
+  </div>
+
+  <div class="charts">
+    <div class="card"><h2>Responses per second<span class="hint">by the second the buyer got its answer</span></h2>
+      <div class="legend" id="lg-resp"></div><svg id="c-resp" width="100%" height="220"></svg></div>
+    <div class="card"><h2>Tickets sold<span class="hint">distinct tickets confirmed to a buyer, cumulative</span></h2>
+      <svg id="c-sold" width="100%" height="220"></svg></div>
+    <div class="card"><h2>Latency, ms (log scale)<span class="hint">p50 and p99 of answers in each second</span></h2>
+      <div class="legend" id="lg-lat"></div><svg id="c-lat" width="100%" height="220"></svg></div>
+    <div class="card"><h2>Answers per seller per second<span class="hint">from nginx's X-Upstream header</span></h2>
+      <div class="legend" id="lg-sel"></div><svg id="c-sel" width="100%" height="220"></svg></div>
+  </div>
+
+  <div class="row">
+    <div class="card checks"><h2>Five correctness checks<span class="hint">recomputed by verify() from the raw results</span></h2><ul id="checks"></ul></div>
+    <div class="card"><h2>Replay after recovery<span class="hint">scripts/replay_check.py</span></h2><div class="mono" id="replay"></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px"><h2>Timeline</h2>
+    <table id="events"><thead><tr><th>t (s)</th><th>event</th></tr></thead><tbody></tbody></table></div>
+
+  <div class="card"><details><summary>Data table: every second (the same numbers as the charts)</summary>
+    <div class="tablewrap"><table id="dtable"></table></div></details></div>
+</div></div>
+<div class="tip" id="tip"></div>
+<script>
+const DATA = [{"name":"m11_E2b_kill_midsale_a1","label":"E2b \u00b7 kill mid-sale","caption":"PostgreSQL SIGKILLed while the sale was in progress (34 tickets confirmed), restarted after 10 s. VALID run. In-flight INSERT rolled back; 0 lost confirmed purchases; replay PASS.","T":61,"fault":"kill","rate":833.33,"requests":50000,"tickets":100,"totals":{"409":32422,"200":123,"500":105,"502":17350},"served_per_s":833.2,"p50":7.0,"p99":23418.1,"per_second":[{},{"200":36,"500":105,"502":371},{"502":833},{"502":832},{"502":834},{"502":834},{"502":833},{"502":833},{"502":833},{"502":834},{"502":833},{"502":833},{"502":831},{"502":834},{"502":832},{"502":834},{"502":833},{"502":833},{"502":833},{"502":834},{"502":833},{"502":834},{"200":37,"502":316},{"409":429,"200":46},{"409":1020},{"409":1197,"200":3},{"409":905,"200":1},{"409":1206},{"409":1164},{"409":1337},{"409":934},{"409":885},{"409":839},{"409":825},{"409":843},{"409":817},{"409":849},{"409":833},{"409":832},{"409":836},{"409":826},{"409":840},{"409":832},{"409":834},{"409":834},{"409":831},{"409":835},{"409":811},{"409":851},{"409":838},{"409":829},{"409":839},{"409":830},{"409":805},{"409":800},{"409":898},{"409":823},{"409":842},{"409":834},{"409":833},{"409":6},{}],"arrivals":[834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,0,0],"lat_p50":[null,40.7,2.3,2.3,2.3,2.3,2.3,2.1,2.2,2.5,2.3,2.3,2.2,2.2,2.4,2.3,2.3,2.5,2.5,2.8,2.3,2.3,2.5,23087.0,2292.0,1917.1,1564.2,1329.8,897.0,453.8,21.6,7.3,7.5,9.3,7.8,12.2,7.1,8.8,7.0,6.3,7.5,8.5,8.4,8.1,8.6,6.2,9.0,7.6,8.9,6.6,7.4,7.3,7.4,26.8,15.7,9.2,9.5,23.6,7.4,7.6,7.0,null],"lat_p99":[null,1787.9,4.0,4.7,4.1,4.7,3.9,3.7,3.7,7.6,3.4,7.1,7.2,3.8,6.8,7.7,4.8,23.4,4.1,19.2,3.6,4.9,22826.4,23650.1,23466.3,25131.2,25195.0,26612.8,27013.9,5919.6,2715.0,136.1,15.4,62.2,21.6,113.6,24.1,38.7,18.7,15.2,134.4,21.1,14.7,15.4,31.0,12.1,26.9,120.4,89.4,24.9,14.4,15.9,22.3,63.2,113.4,223.2,27.5,53.4,14.4,27.9,8.5,null],"sold":[0,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,68,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100],"seller_answers":{"seller1":[0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,34,180,331,399,241,415,381,449,404,307,281,272,284,269,286,278,277,279,277,278,277,278,278,277,279,265,290,278,277,279,276,278,247,310,276,279,278,278,2,0],"seller2":[0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,118,331,391,337,389,391,432,263,291,279,277,279,273,282,278,277,279,277,278,278,278,278,277,278,270,284,279,276,280,278,251,289,293,274,281,278,278,2,0],"seller3":[0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,177,358,410,328,402,392,456,267,287,279,276,280,275,281,277,278,278,272,284,277,278,278,277,278,276,277,281,276,280,276,276,264,295,273,282,278,277,2,0]},"lanes":{"PostgreSQL":["up","down","down","down","down","down","down","down","down","down","down","down","down","down","down","down","down","down","recovering","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up"],"nginx":["routing","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing"],"seller1":["idle","errors","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"],"seller2":["idle","errors","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"],"seller3":["idle","errors","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"]},"events":[{"t":1.59,"label":"docker kill"},{"t":2.13,"label":"docker die"},{"t":17.307,"label":"docker start"},{"t":18.809,"label":"PostgreSQL ready"},{"t":22.381,"label":"first 200/409 answer after PostgreSQL ready"},{"t":22.381,"label":"sustained service resumed (every later second answered)"}],"pg_down":1.59,"pg_ready":18.809,"nginx_window":[1.5,22.5],"nginx_resets":3,"recovery":{"seller1":22.381,"seller2":22.779,"seller3":22.463},"checks":[{"name":"1 no oversell","ok":true,"detail":"100 tickets issued for 100 available"},{"name":"2 no duplicate ticket","ok":true,"detail":"0 ticket numbers issued >1 time (0 rows); 0 out of range"},{"name":"3 idempotency","ok":true,"detail":"0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)"},{"name":"4 no drift","ok":true,"detail":"/status sold=100, actual rows=100"},{"name":"5 responses = state","ok":true,"detail":"0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)"}],"replay":["S1 == buyer's final snapshot: True","confirmed (200) request_ids replayed: 100; mismatches: 0; replay transport errors: 0","unknown-outcome request_ids replayed: 14492 (of which hold a row in S1 = committed-but-unacknowledged: 0); mismatches: 0; replay transport errors: 0","S2 == S1 byte-for-byte (replays changed nothing): True","SQL audit: count(*)=100 sold_count=100 max(ticket_number)=100 (total 100) distinct ticket_number=100 distinct request_id=100 -> CONSISTENT","constraints present and validated: 7/7 -> OK","REPLAY VERDICT: PASS"]},{"name":"m11_E2_kill","label":"E2 \u00b7 kill after sell-out","caption":"PostgreSQL SIGKILLed after the 100th sale, restarted after 10 s. Fault landed after sell-out (Docker delay).","T":61,"fault":"kill","rate":833.33,"requests":50000,"tickets":100,"totals":{"409":32554,"200":122,"500":189,"502":17135},"served_per_s":833.2,"p50":6.2,"p99":21930.7,"per_second":[{"200":21},{"409":192,"200":97},{"409":1018,"200":1},{"409":123,"500":110,"502":648},{"502":833},{"502":833},{"502":834},{"500":1,"502":834},{"502":832},{"502":834},{"502":834},{"500":1,"502":831},{"502":835},{"502":833},{"500":1,"502":825},{"502":834},{"502":833},{"500":47,"502":833},{"409":192,"500":29,"502":833},{"409":92,"502":834},{"502":832},{"502":836},{"502":832},{"409":140,"502":662},{"409":747,"200":3},{"409":1002},{"409":1250},{"409":1124},{"409":835},{"409":834},{"409":833},{"409":833},{"409":834},{"409":834},{"409":807},{"409":783},{"409":909},{"409":834},{"409":830},{"409":837},{"409":833},{"409":832},{"409":833},{"409":834},{"409":832},{"409":832},{"409":835},{"409":835},{"409":833},{"409":832},{"409":835},{"409":834},{"409":834},{"409":833},{"409":832},{"409":834},{"409":818},{"409":850},{"409":830},{"409":834},{"409":6},{}],"arrivals":[834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,0,0],"lat_p50":[655.1,1474.9,1448.3,2.6,2.4,2.4,2.5,2.2,2.2,2.4,2.3,2.1,2.3,2.2,2.5,2.4,2.5,2.5,2.5,2.4,2.4,2.2,2.3,2.4,1076.8,1021.2,751.5,22.1,7.1,6.8,5.7,5.7,6.8,6.6,9.0,9.4,24.1,6.6,6.6,6.9,6.7,6.4,6.6,6.7,8.5,8.8,11.3,6.8,7.7,6.4,6.9,7.2,6.1,6.9,7.4,9.4,42.8,6.7,6.0,7.3,6.1,null],"lat_p99":[931.5,1883.6,1876.7,3015.3,3.9,4.3,8.2,3.7,4.0,5.5,4.6,3.4,4.5,3.6,5.8,9.4,6.7,17351.0,17804.7,17437.6,4.0,3.3,5.3,23705.5,23472.8,24456.5,25700.5,24855.6,12.2,14.6,8.7,9.5,27.5,11.3,142.6,108.1,192.7,14.3,16.9,14.7,10.7,10.6,10.3,10.3,73.7,20.5,35.1,13.0,54.4,26.5,15.6,13.3,10.4,71.8,20.9,43.2,179.7,32.1,14.3,29.1,7.7,null],"sold":[21,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100],"seller_answers":{"seller1":[9,105,333,82,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,59,370,386,495,387,279,278,277,278,278,278,253,277,303,278,277,279,277,278,277,278,278,276,279,279,277,278,278,278,278,278,277,278,272,284,276,279,2,0],"seller2":[11,87,343,83,0,0,0,1,0,0,0,1,0,0,2,0,0,47,221,92,0,0,0,9,0,246,282,277,278,278,278,278,278,278,277,250,306,278,276,279,278,277,278,278,277,278,278,278,278,277,279,278,278,277,278,278,273,283,277,277,2,0],"seller3":[1,97,343,78,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,380,370,473,460,278,278,278,277,278,278,277,256,300,278,277,279,278,277,278,278,277,278,278,278,278,277,278,278,278,278,277,278,273,283,277,278,2,0]},"lanes":{"PostgreSQL":["up","up","up","down","down","down","down","down","down","down","down","down","down","down","down","down","down","recovering","recovering","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up"],"nginx":["routing","routing","routing","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","no upstream","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing"],"seller1":["serving","serving","serving","errors","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"],"seller2":["serving","serving","serving","errors","idle","idle","idle","errors","idle","idle","idle","errors","idle","idle","errors","idle","idle","errors","errors","serving","idle","idle","idle","serving","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"],"seller3":["serving","serving","serving","errors","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"]},"events":[{"t":3.102,"label":"docker kill"},{"t":3.758,"label":"docker die"},{"t":16.85,"label":"docker start"},{"t":18.407,"label":"PostgreSQL ready"},{"t":18.537,"label":"first 200/409 answer after PostgreSQL ready"},{"t":23.75,"label":"sustained service resumed (every later second answered)"}],"pg_down":3.102,"pg_ready":18.407,"nginx_window":[3.1,24.1],"nginx_resets":11,"recovery":{"seller1":23.817,"seller2":18.537,"seller3":23.794},"checks":[{"name":"1 no oversell","ok":true,"detail":"100 tickets issued for 100 available"},{"name":"2 no duplicate ticket","ok":true,"detail":"0 ticket numbers issued >1 time (0 rows); 0 out of range"},{"name":"3 idempotency","ok":true,"detail":"0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)"},{"name":"4 no drift","ok":true,"detail":"/status sold=100, actual rows=100"},{"name":"5 responses = state","ok":true,"detail":"0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)"}],"replay":["S1 == buyer's final snapshot: True","confirmed (200) request_ids replayed: 100; mismatches: 0; replay transport errors: 0","unknown-outcome request_ids replayed: 14393 (of which hold a row in S1 = committed-but-unacknowledged: 0); mismatches: 0; replay transport errors: 0","S2 == S1 byte-for-byte (replays changed nothing): True","SQL audit: count(*)=100 sold_count=100 max(ticket_number)=100 (total 100) distinct ticket_number=100 distinct request_id=100 -> CONSISTENT","constraints present and validated: 7/7 -> OK","REPLAY VERDICT: PASS"]},{"name":"m11_E1_pause","label":"E1 \u00b7 pause","caption":"PostgreSQL frozen with docker pause for 10 s, after sell-out. Requests hang instead of failing.","T":65,"fault":"pause","rate":833.33,"requests":50000,"tickets":100,"totals":{"409":49868,"200":130,"no answer":2},"served_per_s":771.5,"p50":9198.5,"p99":21619.8,"per_second":[{"200":27},{"409":217,"200":96},{"409":1024},{"409":565,"200":1},{},{},{},{},{},{},{},{},{},{},{},{},{"409":467},{"409":900,"200":4},{"409":975},{"409":995},{"409":923},{"409":1016},{"409":942,"200":1},{"409":776,"200":1},{"409":753},{"409":860},{"409":1104},{"409":1075},{"409":949},{"409":865},{"409":1242},{"409":1237,"no answer":1},{"409":918},{"409":943},{"409":1078},{"409":1266},{"409":1024},{"409":1094},{"409":1068},{"409":1122},{"409":843},{"409":1180},{"409":1061},{"409":917},{"409":1003},{"409":1113},{"409":1178},{"409":1012},{"409":901},{"409":894},{"409":1089},{"409":885},{"409":843},{"409":855},{"409":797},{"409":1162},{"409":955},{"409":1015},{"409":1127,"no answer":1},{"409":1107},{"409":862},{"409":1036},{"409":1061},{"409":973},{"409":601},{}],"arrivals":[834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,0,0,0,0,0,0],"lat_p50":[632.3,1548.3,1413.8,1321.7,null,null,null,null,null,null,null,null,null,null,null,null,14157.5,14036.5,13877.2,13525.4,13447.7,13144.8,11420.5,13050.6,13050.3,13208.1,12753.5,12554.6,12235.4,12303.2,12010.5,11432.3,11207.8,11108.6,10892.7,10093.6,9690.6,9018.9,8639.2,8047.2,8365.3,7409.4,6971.3,6680.7,6399.6,6018.2,5581.6,5268.2,5031.6,5106.1,4933.8,4868.1,4730.6,4876.8,4975.5,4737.4,4583.8,4396.2,4112.0,3786.9,3688.1,3640.7,5605.2,6306.8,5671.6,null],"lat_p99":[909.6,1907.9,1841.6,3066.2,null,null,null,null,null,null,null,null,null,null,null,null,15639.9,17090.5,17731.1,18837.7,19560.8,19592.8,19928.4,21819.9,20838.3,22727.7,22522.7,22925.3,22826.4,23753.4,24865.5,22551.6,21520.3,23958.5,22144.7,20370.0,22386.2,19558.9,19646.6,19275.5,19953.1,20250.7,21483.3,18681.6,21527.8,24101.7,20483.6,20249.0,19988.6,20172.9,19795.4,22589.8,23338.5,20124.1,23190.9,23047.7,20549.9,23069.3,22804.1,22345.7,19913.9,21778.0,22679.9,25098.8,24820.3,null],"sold":[27,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100],"seller_answers":{"seller1":[14,109,346,200,0,0,0,0,0,0,0,0,0,0,0,0,155,292,312,319,251,357,306,270,261,286,347,357,328,285,416,393,354,382,424,491,390,411,406,418,317,458,410,355,410,380,392,339,300,299,363,295,281,282,268,388,318,338,375,369,289,341,218,0,0,0],"seller2":[1,96,353,182,0,0,0,0,0,0,0,0,0,0,0,0,159,301,343,341,327,330,324,261,273,251,387,359,307,268,413,455,277,274,339,401,311,356,332,367,239,380,318,267,352,379,398,331,283,298,360,326,296,270,193,399,317,334,391,332,266,292,409,492,357,0],"seller3":[12,108,325,184,0,0,0,0,0,0,0,0,0,0,0,0,153,311,320,335,345,329,313,246,219,323,370,359,314,312,413,389,287,287,315,374,323,327,330,337,287,342,333,295,241,354,388,342,318,297,366,264,266,303,336,375,320,343,361,406,307,403,434,481,244,0]},"lanes":{"PostgreSQL":["up","up","up","paused","paused","paused","paused","paused","paused","paused","paused","paused","paused","paused","paused","paused","paused","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up"],"nginx":["routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing"],"seller1":["serving","serving","serving","serving","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle","idle","idle"],"seller2":["serving","serving","serving","serving","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"],"seller3":["serving","serving","serving","serving","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","idle","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"]},"events":[{"t":3.676,"label":"docker pause"},{"t":16.424,"label":"docker unpause"},{"t":16.425,"label":"first 200/409 answer after PostgreSQL ready"},{"t":16.425,"label":"sustained service resumed (every later second answered)"}],"pg_down":3.676,"pg_ready":16.424,"nginx_window":null,"nginx_resets":0,"recovery":{"seller1":16.425,"seller2":16.427,"seller3":16.426},"checks":[{"name":"1 no oversell","ok":true,"detail":"100 tickets issued for 100 available"},{"name":"2 no duplicate ticket","ok":true,"detail":"0 ticket numbers issued >1 time (0 rows); 0 out of range"},{"name":"3 idempotency","ok":true,"detail":"0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)"},{"name":"4 no drift","ok":true,"detail":"/status sold=100, actual rows=100"},{"name":"5 responses = state","ok":true,"detail":"0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)"}],"replay":["S1 == buyer's final snapshot: True","confirmed (200) request_ids replayed: 100; mismatches: 0; replay transport errors: 0","unknown-outcome request_ids replayed: 2 (of which hold a row in S1 = committed-but-unacknowledged: 0); mismatches: 0; replay transport errors: 0","S2 == S1 byte-for-byte (replays changed nothing): True","SQL audit: count(*)=100 sold_count=100 max(ticket_number)=100 (total 100) distinct ticket_number=100 distinct request_id=100 -> CONSISTENT","constraints present and validated: 7/7 -> OK","REPLAY VERDICT: PASS"]},{"name":"m10_50k_833rps_3sellers_aiohttp_4buyer","label":"Baseline \u00b7 no fault","caption":"Valid 50k @ 833/s benchmark on the 3-seller cluster (M10). The reference for everything else.","T":61,"fault":null,"rate":833.33,"requests":50000,"tickets":100,"totals":{"409":49871,"200":129},"served_per_s":833.2,"p50":6.6,"p99":2641.5,"per_second":[{"200":5},{"409":42,"200":104},{"409":624,"200":14},{"409":1324,"200":6},{"409":1500},{"409":1253},{"409":958},{"409":831},{"409":833},{"409":835},{"409":820},{"409":842},{"409":837},{"409":834},{"409":833},{"409":831},{"409":833},{"409":836},{"409":833},{"409":834},{"409":829},{"409":838},{"409":832},{"409":834},{"409":831},{"409":836},{"409":832},{"409":835},{"409":832},{"409":833},{"409":833},{"409":834},{"409":836},{"409":830},{"409":835},{"409":834},{"409":833},{"409":830},{"409":837},{"409":832},{"409":829},{"409":838},{"409":834},{"409":833},{"409":833},{"409":834},{"409":829},{"409":838},{"409":833},{"409":831},{"409":832},{"409":833},{"409":837},{"409":834},{"409":833},{"409":831},{"409":835},{"409":832},{"409":831},{"409":835},{"409":7},{}],"arrivals":[834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,834,833,833,0,0],"lat_p50":[569.0,1298.7,1774.1,1768.7,1157.8,421.3,6.7,5.6,5.7,8.9,6.0,7.3,13.7,6.2,6.5,8.0,6.6,5.9,7.4,7.2,6.9,8.6,6.7,7.4,6.0,5.5,6.1,6.5,6.3,5.7,8.4,7.6,5.7,5.8,6.4,5.7,5.4,5.9,7.7,5.7,6.9,9.0,5.8,5.3,6.3,6.2,5.1,7.1,6.4,6.7,7.8,5.8,6.2,5.4,7.0,5.7,6.1,6.8,7.0,7.1,7.6,null],"lat_p99":[688.3,1889.1,2463.0,3667.2,4226.6,4197.2,847.7,9.9,9.7,22.1,19.7,28.2,67.1,16.5,20.4,22.5,13.5,10.5,37.3,29.3,14.2,32.7,21.3,20.7,13.5,12.0,10.2,10.8,18.0,10.3,38.0,23.6,63.7,13.5,14.6,9.5,8.9,14.5,17.2,9.9,16.5,68.6,15.6,9.5,9.2,12.5,8.6,17.6,29.7,22.5,17.9,9.5,24.2,13.2,33.7,14.3,12.6,13.3,18.8,15.3,9.2,null],"sold":[5,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100],"seller_answers":{"seller1":[2,65,216,448,494,419,299,277,278,278,273,281,279,278,278,277,278,278,277,279,276,279,278,278,277,279,277,278,277,278,277,279,278,277,278,279,277,276,280,277,276,280,278,277,278,278,276,280,277,277,278,278,278,278,278,277,278,278,277,278,2,0],"seller2":[2,39,186,452,495,424,346,277,278,278,274,281,278,278,277,277,278,279,278,277,277,279,277,278,277,278,278,279,277,278,278,277,279,277,278,278,278,277,278,277,276,280,278,278,278,278,276,279,278,277,278,277,279,278,278,276,279,277,278,278,2,0],"seller3":[1,42,236,430,511,410,313,277,277,279,273,280,280,278,278,277,277,279,278,278,276,280,277,278,277,279,277,278,278,277,278,278,279,276,279,277,278,277,279,278,277,278,278,278,277,278,277,279,278,277,276,278,280,278,277,278,278,277,276,279,3,0]},"lanes":{"PostgreSQL":["up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up","up"],"nginx":["routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing","routing"],"seller1":["serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"],"seller2":["serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"],"seller3":["serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","serving","idle"]},"events":[],"pg_down":null,"pg_ready":null,"nginx_window":null,"nginx_resets":0,"recovery":{},"checks":[{"name":"1 no oversell","ok":true,"detail":"100 tickets issued for 100 available"},{"name":"2 no duplicate ticket","ok":true,"detail":"0 ticket numbers issued >1 time (0 rows); 0 out of range"},{"name":"3 idempotency","ok":true,"detail":"0 request_ids hold >1 ticket (server rows); 0 request_ids told different numbers (responses)"},{"name":"4 no drift","ok":true,"detail":"/status sold=100, actual rows=100"},{"name":"5 responses = state","ok":true,"detail":"0 confirmed sales missing/wrong in /status; 0 told sold-out but hold a ticket; 0 rows for never-sent requests; (info) 0 late-confirmed sales (sent, no answer, but committed)"}],"replay":[]}];
+const css = n => getComputedStyle(document.querySelector('.viz-root')).getPropertyValue(n).trim();
+const RESP = [["409", "409 sold out", "--series-1"], ["200", "200 purchase", "--series-2"],
+              ["500", "500 seller error", "--series-3"], ["502", "502 nginx", "--series-4"]];
+const LAT = [["lat_p50", "p50", "--series-1"], ["lat_p99", "p99", "--series-2"]];
+const SEL = [["seller1", "seller1", "--series-1"], ["seller2", "seller2", "--series-2"], ["seller3", "seller3", "--series-3"]];
+const STATE = {  // status palette: state only, always with icon + label
+  up: ["--good", "✓", "up"], routing: ["--good", "✓", "routing"], serving: ["--good", "✓", "serving"],
+  paused: ["--warning", "‖", "paused"], recovering: ["--warning", "↻", "crash recovery"],
+  errors: ["--serious", "▲", "returning 500s"], resets: ["--serious", "▲", "connection resets"],
+  down: ["--critical", "✕", "down"], "no upstream": ["--critical", "✕", "no live upstreams"],
+  idle: ["--idle", "–", "no answers"] };
+let run = 0, t = 0, pinned = false, timer = null;
+const $ = id => document.getElementById(id);
+const fmt = n => n == null ? "–" : n >= 1000 ? n.toLocaleString() : (Math.round(n * 10) / 10).toString();
+const tip = $("tip");
+
+function tabs() {
+  $("tabs").innerHTML = DATA.map((r, i) =>
+    `<button role="tab" aria-selected="${i === run}" data-i="${i}">${r.label}</button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => { run = +b.dataset.i; stop(); t = defaultT(); render(); });
+}
+function defaultT() { const r = DATA[run]; return r.pg_down != null ? Math.min(r.T, Math.floor(r.pg_down) + 2) : 1; }
+function tiles(r) {
+  const tot = r.totals, e5 = (tot["500"] || 0) + (tot["502"] || 0);
+  const items = [["Requests", r.requests.toLocaleString(), `${r.rate}/s scheduled`],
+    ["Purchases (200)", (tot["200"] || 0).toLocaleString(), `${r.tickets} tickets; repeats of a request_id count again`],
+    ["Sold out (409)", (tot["409"] || 0).toLocaleString(), ""],
+    ["5xx", e5.toLocaleString(), `500: ${fmt(tot["500"] || 0)} · 502: ${fmt(tot["502"] || 0)}`],
+    ["No answer / not sent", ((tot["no answer"] || 0) + (tot["never sent"] || 0)).toLocaleString(), "timeouts, client-side"],
+    ["Latency p50 / p99", `${Math.round(r.p50).toLocaleString()} / ${Math.round(r.p99).toLocaleString()} ms`, "all answered requests"]];
+  $("tiles").innerHTML = items.map(([k, v, n]) => `<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
+}
+
+// ---- shared chart plumbing --------------------------------------------------------
+function frame(svg, h) {
+  const W = svg.clientWidth || 520, m = { l: 48, r: 12, t: 10, b: 24 };
+  svg.setAttribute("viewBox", `0 0 ${W} ${h}`); svg.innerHTML = "";
+  return { W, H: h, m, pw: W - m.l - m.r, ph: h - m.t - m.b };
+}
+const el = (svg, tag, attrs) => { const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; };
+function xAxis(svg, f, T, x) {
+  const step = T > 80 ? 20 : 10;
+  for (let s = 0; s <= T; s += step) {
+    el(svg, "line", { x1: x(s), x2: x(s), y1: f.m.t, y2: f.m.t + f.ph, stroke: css("--grid"), "stroke-width": 1 });
+    el(svg, "text", { x: x(s), y: f.H - 6, "text-anchor": "middle" }).textContent = `${s}s`;
+  }
+  el(svg, "line", { x1: f.m.l, x2: f.m.l + f.pw, y1: f.m.t + f.ph, y2: f.m.t + f.ph, stroke: css("--axis") });
+}
+function yGrid(svg, f, ticks, y, label) {
+  ticks.forEach(v => {
+    el(svg, "line", { x1: f.m.l, x2: f.m.l + f.pw, y1: y(v), y2: y(v), stroke: css("--grid") });
+    el(svg, "text", { x: f.m.l - 6, y: y(v) + 4, "text-anchor": "end" }).textContent = label(v);
+  });
+}
+function band(svg, f, r, x) {  // PostgreSQL-down window
+  if (r.pg_down == null) return;
+  const a = x(r.pg_down), b = x(r.pg_ready ?? r.T);
+  el(svg, "rect", { x: a, y: f.m.t, width: Math.max(1, b - a), height: f.ph, fill: css("--band") });
+  el(svg, "text", { x: a + 4, y: f.m.t + 12, fill: css("--band-ink") }).textContent =
+    r.fault === "pause" ? "PostgreSQL paused" : "PostgreSQL down";
+}
+function cursor(svg, f, x) {
+  el(svg, "line", { x1: x(t + 0.5), x2: x(t + 0.5), y1: f.m.t, y2: f.m.t + f.ph, stroke: css("--text-secondary"),
+    "stroke-width": 1, "stroke-dasharray": "3 3" });
+}
+function hover(svg, f, x0, T, tipHtml) {
+  const hit = el(svg, "rect", { x: f.m.l, y: f.m.t, width: f.pw, height: f.ph, fill: "transparent" });
+  hit.addEventListener("mousemove", ev => {
+    const bb = svg.getBoundingClientRect(), px = (ev.clientX - bb.left) * (f.W / bb.width);
+    const s = Math.max(0, Math.min(T, Math.floor(x0(px))));
+    if (!pinned) { t = s; update(); }
+    tip.innerHTML = tipHtml(s); tip.style.display = "block";
+    tip.style.left = Math.min(ev.clientX + 14, innerWidth - 220) + "px"; tip.style.top = (ev.clientY + 14) + "px";
+  });
+  hit.addEventListener("mouseleave", () => tip.style.display = "none");
+  hit.addEventListener("click", () => { pinned = !pinned; });
+}
+const nice = m => { const p = Math.pow(10, Math.floor(Math.log10(m || 1))); const r = m / p;
+  return (r <= 1 ? 1 : r <= 2 ? 2 : r <= 5 ? 5 : 10) * p; };
+const sw = c => `<span class="sw" style="background:${css(c)}"></span>`;
+
+function legend(id, items) { $(id).innerHTML = items.map(([, l, c]) => `<span><i style="background:${css(c)}"></i>${l}</span>`).join(""); }
+
+function respChart(r) {
+  const svg = $("c-resp"), f = frame(svg, 220), T = r.T;
+  const tot = r.per_second.map(c => RESP.reduce((a, [k]) => a + (c[k] || 0), 0));
+  const top = nice(Math.max(...tot)), x = s => f.m.l + s / (T + 1) * f.pw, x0 = px => (px - f.m.l) / f.pw * (T + 1);
+  const y = v => f.m.t + f.ph - v / top * f.ph;
+  yGrid(svg, f, [0, top / 2, top], y, v => v.toLocaleString()); band(svg, f, r, x); xAxis(svg, f, T, x);
+  const bw = Math.max(1, f.pw / (T + 1) - 2);
+  r.per_second.forEach((c, s) => { let acc = 0;
+    RESP.forEach(([k, , col]) => { const v = c[k] || 0; if (!v) return;
+      const y1 = y(acc + v), y2 = y(acc); acc += v;
+      el(svg, "rect", { x: x(s) + 1, y: y1, width: bw, height: Math.max(0.5, y2 - y1 - (acc < tot[s] ? 1 : 0)), fill: css(col) });
+    }); });
+  cursor(svg, f, x);
+  hover(svg, f, x0, T, s => `<b>t = ${s}–${s + 1} s</b><br>` + RESP.map(([k, l, c]) =>
+    `${sw(c)}${l}: <b>${fmt(r.per_second[s][k] || 0)}</b>`).join("<br>") +
+    (r.per_second[s]["no answer"] ? `<br>no answer: <b>${r.per_second[s]["no answer"]}</b>` : ""));
+}
+function lineChart(id, r, keys, getter, opts) {
+  const svg = $(id), f = frame(svg, 220), T = r.T;
+  const x = s => f.m.l + (s + 0.5) / (T + 1) * f.pw, x0 = px => (px - f.m.l) / f.pw * (T + 1) - 0.5;
+  const vals = keys.flatMap(([k]) => getter(k).filter(v => v != null));
+  let y, ticks, lab;
+  if (opts.log) { const lo = 1, hi = Math.pow(10, Math.ceil(Math.log10(Math.max(10, ...vals))));
+    y = v => f.m.t + f.ph - (Math.log10(Math.max(lo, v)) - 0) / Math.log10(hi) * f.ph;
+    ticks = []; for (let p = 1; p <= hi; p *= 10) ticks.push(p); lab = v => v >= 1000 ? (v / 1000) + "s" : v + "ms";
+  } else { const top = opts.max || nice(Math.max(1, ...vals)); y = v => f.m.t + f.ph - v / top * f.ph;
+    ticks = [0, top / 2, top]; lab = v => v.toLocaleString(); }
+  yGrid(svg, f, ticks, y, lab); band(svg, f, r, s => f.m.l + s / (T + 1) * f.pw); xAxis(svg, f, T, s => f.m.l + s / (T + 1) * f.pw);
+  const ends = [];
+  keys.forEach(([k, l, col]) => { const v = getter(k); let d = "", pen = false;
+    v.forEach((val, s) => { if (val == null) { pen = false; return; }
+      d += (pen ? "L" : "M") + x(s) + " " + y(val) + (opts.step ? " H" + (x(s) + f.pw / (T + 1)) : ""); pen = true; });
+    el(svg, "path", { d, fill: "none", stroke: css(col), "stroke-width": 2, "stroke-linejoin": "round" });
+    const last = v.map((val, s) => [val, s]).filter(p => p[0] != null).pop();
+    if (keys.length > 1 && last) ends.push({ y: y(last[0]) - 4, l });
+  });
+  // Direct end labels, spaced >= 12px apart so they never collide (order preserved).
+  ends.sort((a, b) => a.y - b.y).forEach((e, i, arr) => { if (i) e.y = Math.max(e.y, arr[i - 1].y + 12); });
+  const over = ends.length ? ends[ends.length - 1].y - (f.m.t + f.ph - 2) : 0;
+  ends.forEach(e => { el(svg, "text", { x: f.W - f.m.r - 2, y: e.y - Math.max(0, over), "text-anchor": "end",
+    fill: css("--text-secondary") }).textContent = e.l; });
+  cursor(svg, { ...f }, s => f.m.l + s / (T + 1) * f.pw);
+  hover(svg, f, x0, T, s => `<b>t = ${s}–${s + 1} s</b><br>` + keys.map(([k, l, c]) =>
+    `${keys.length > 1 ? sw(c) : ""}${l}: <b>${fmt(getter(k)[s])}${opts.unit || ""}</b>`).join("<br>"));
+}
+
+// ---- status lanes -----------------------------------------------------------------
+function lanes(r) {
+  const svg = $("lanes"), names = Object.keys(r.lanes), f = frame(svg, 24 + names.length * 24), T = r.T;
+  f.m.l = 86; f.pw = f.W - f.m.l - f.m.r;
+  const x = s => f.m.l + s / (T + 1) * f.pw, cw = f.pw / (T + 1);
+  names.forEach((n, i) => {
+    const y0 = f.m.t + i * 24;
+    el(svg, "text", { x: f.m.l - 8, y: y0 + 15, "text-anchor": "end", fill: css("--text-secondary") }).textContent = n;
+    r.lanes[n].forEach((st, s) => {
+      const c = el(svg, "rect", { x: x(s) + 0.5, y: y0 + 2, width: Math.max(1, cw - 1), height: 18, rx: 2, fill: css(STATE[st][0]) });
+      c.addEventListener("mousemove", ev => { if (!pinned) { t = s; update(); }
+        tip.innerHTML = `<b>${n}, t = ${s}–${s + 1} s</b><br>${STATE[st][1]} ${STATE[st][2]}`; tip.style.display = "block";
+        tip.style.left = Math.min(ev.clientX + 14, innerWidth - 220) + "px"; tip.style.top = (ev.clientY + 14) + "px"; });
+      c.addEventListener("mouseleave", () => tip.style.display = "none");
+      c.addEventListener("click", () => { pinned = !pinned; });
+    });
+  });
+  xAxis(svg, f, T, x);
+  el(svg, "line", { x1: x(t) + cw / 2, x2: x(t) + cw / 2, y1: f.m.t, y2: f.m.t + names.length * 24, stroke: css("--text-primary"), "stroke-width": 1.5 });
+  const used = [...new Set(Object.values(r.lanes).flat())];
+  $("laneLegend").innerHTML = used.map(k => `<span><i style="background:${css(STATE[k][0])}"></i>${STATE[k][1]} ${STATE[k][2]}</span>`).join("");
+}
+
+// ---- architecture -----------------------------------------------------------------
+function arch(r) {
+  const svg = $("arch"), W = svg.clientWidth || 600, H = 270; svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.innerHTML = "";
+  const st = n => r.lanes[n][t], col = n => css(STATE[st(n)][0]);
+  const cx = [W * 0.09, W * 0.33, W * 0.62, W * 0.9], ys = [60, 135, 210];
+  const node = (x, y, w, title, n, sub) => {
+    const s = n ? STATE[st(n)] : null;
+    el(svg, "rect", { x: x - w / 2, y: y - 24, width: w, height: 48, rx: 10, fill: css("--surface-1"),
+      stroke: n ? css(s[0]) : css("--axis"), "stroke-width": n ? 2.5 : 1 });
+    const a = el(svg, "text", { x, y: y - 5, "text-anchor": "middle", fill: css("--text-primary") }); a.textContent = title;
+    a.setAttribute("font-weight", "600"); a.setAttribute("font-size", "12");
+    const b = el(svg, "text", { x, y: y + 12, "text-anchor": "middle", fill: css("--text-secondary") });
+    b.textContent = n ? `${s[1]} ${s[2]}` : sub;
+  };
+  const edge = (x1, y1, x2, y2, label, dim) => {
+    el(svg, "line", { x1, y1, x2, y2, stroke: css(dim ? "--grid" : "--axis"), "stroke-width": dim ? 1 : 1.5 });
+    if (label) el(svg, "text", { x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 5, "text-anchor": "middle" }).textContent = label;
+  };
+  const c = r.per_second[t] || {};
+  edge(cx[0] + 44, 135, cx[1] - 44, 135, `${fmt(r.arrivals[t] || 0)}/s`);
+  ["seller1", "seller2", "seller3"].forEach((n, i) => {
+    const a = r.seller_answers[n][t] || 0;
+    edge(cx[1] + 44, 135, cx[2] - 50, ys[i], `${fmt(a)}/s`, a === 0);
+    edge(cx[2] + 50, ys[i], cx[3] - 50, 135, "", r.lanes.PostgreSQL[t] !== "up");
+  });
+  node(cx[0], 135, 88, "buyer", null, "50k arrivals");
+  node(cx[1], 135, 96, "nginx", "nginx");
+  ["seller1", "seller2", "seller3"].forEach((n, i) => node(cx[2], ys[i], 110, n, n));
+  node(cx[3], 135, 108, "PostgreSQL", "PostgreSQL");
+  const own = (c["502"] || 0);
+  if (own) el(svg, "text", { x: cx[1], y: 182, "text-anchor": "middle", fill: css("--text-secondary") }).textContent = `${fmt(own)} × 502 this second`;
+}
+
+function nowPanel(r) {
+  const c = r.per_second[t] || {}, rows = [
+    ["answers", RESP.map(([k, l]) => c[k] ? `${fmt(c[k])} × ${k}` : null).filter(Boolean).join(" · ") || "none"],
+    ["tickets sold so far", r.sold[t]],
+    ["latency p50 / p99", r.lat_p50[t] == null ? "–" : `${fmt(r.lat_p50[t])} / ${fmt(r.lat_p99[t])} ms`],
+    ...Object.keys(r.lanes).map(n => [n, `${STATE[r.lanes[n][t]][1]} ${STATE[r.lanes[n][t]][2]}`])];
+  const near = r.events.filter(e => e.t >= t && e.t < t + 1).map(e => e.label);
+  if (near.length) rows.push(["events", near.join("; ")]);
+  $("now").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+}
+
+function staticParts(r) {
+  $("caption").textContent = r.caption; tiles(r);
+  $("checks").innerHTML = r.checks.map(c => `<li><span class="${c.ok ? "ok" : "bad"}">${c.ok ? "✓ PASS" : "✕ FAIL"}</span> ${c.name}<br><span style="color:var(--text-secondary);font-size:12px">${c.detail}</span></li>`).join("");
+  $("replay").textContent = r.replay.length ? r.replay.join("\n") : "No replay check was run for this run (no-fault baseline).";
+  const ev = r.events.map(e => `<tr><td>${e.t.toFixed(3)}</td><td>${e.label}</td></tr>`);
+  if (r.nginx_window) ev.push(`<tr><td>${r.nginx_window[0]}–${r.nginx_window[1]}</td><td>nginx "no live upstreams" window (${r.nginx_resets} connection-reset 502s before it)</td></tr>`);
+  $("events").querySelector("tbody").innerHTML = ev.length ? ev.join("") : `<tr><td>–</td><td>no fault injected</td></tr>`;
+  const head = ["t", "arrivals", ...RESP.map(x => x[0]), "no answer", "sold", "p50 ms", "p99 ms", "seller1", "seller2", "seller3", ...Object.keys(r.lanes)];
+  const body = r.per_second.map((c, s) => [s, r.arrivals[s], ...RESP.map(([k]) => c[k] || 0), c["no answer"] || 0, r.sold[s],
+    fmt(r.lat_p50[s]), fmt(r.lat_p99[s]), r.seller_answers.seller1[s], r.seller_answers.seller2[s], r.seller_answers.seller3[s],
+    ...Object.keys(r.lanes).map(n => STATE[r.lanes[n][s]][2])]);
+  $("dtable").innerHTML = `<thead><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>` +
+    body.map(row => `<tr>${row.map(v => `<td>${v}</td>`).join("")}</tr>`).join("") + "</tbody>";
+  legend("lg-resp", RESP); legend("lg-lat", LAT); legend("lg-sel", SEL);
+}
+function update() {
+  const r = DATA[run]; $("t").value = t;
+  $("tlabel").textContent = `t = ${t}–${t + 1} s of ${r.T}` + (pinned ? " (pinned; click a chart to release)" : "");
+  arch(r); nowPanel(r); lanes(r); respChart(r);
+  lineChart("c-sold", r, [["sold", "tickets sold", "--series-1"]], k => r.sold, { step: true, max: r.tickets });
+  lineChart("c-lat", r, LAT, k => r[k], { log: true, unit: " ms" });
+  lineChart("c-sel", r, SEL, k => r.seller_answers[k], {});
+}
+function render() { tabs(); const r = DATA[run]; $("t").max = r.T; staticParts(r); update(); }
+function stop() { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; }
+$("t").oninput = e => { t = +e.target.value; pinned = true; update(); };
+$("play").onclick = () => { if (timer) return stop(); pinned = true; if (t >= DATA[run].T) t = 0;
+  $("play").textContent = "❚❚ Pause"; timer = setInterval(() => { if (t >= DATA[run].T) return stop(); t++; update(); }, 250); };
+addEventListener("resize", () => update());
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => render());
+t = defaultT(); render();
+</script>
+</body>
+</html>
