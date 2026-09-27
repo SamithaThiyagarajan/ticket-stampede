@@ -1,0 +1,103 @@
+=== fault timeline (t relative to buyer start) ===
+  t=  -3.188s  fault=kill offset=-1.15s duration=10s start_at=1790484438.531 db=c20d681fa533 volume=7f468edc5111 dryrun=0
+  t=  -0.769s  inject: docker kill -s SIGKILL issued
+  t=   2.400s  inject: docker kill returned
+  t=  13.112s  restore: docker start issued
+  t=  17.673s  restore: docker start returned
+  t=  20.391s  postgres accepting connections
+  t=  24.280s  db container unchanged (c20d681fa533)
+  t=  26.352s  db volume unchanged
+  t=   1.590s  docker event: kill
+  t=   2.130s  docker event: die
+  t=  17.307s  docker event: start
+
+=== outcomes per second, by answer time ===
+  t(s)              200            409            500            502
+     1               36              0            105            371
+     2                0              0              0            833
+     3                0              0              0            832
+     4                0              0              0            834
+     5                0              0              0            834
+     6                0              0              0            833
+     7                0              0              0            833
+     8                0              0              0            833
+     9                0              0              0            834
+    10                0              0              0            833
+    11                0              0              0            833
+    12                0              0              0            831
+    13                0              0              0            834
+    14                0              0              0            832
+    15                0              0              0            834
+    16                0              0              0            833
+    17                0              0              0            833
+    18                0              0              0            833
+    19                0              0              0            834
+    20                0              0              0            833
+    21                0              0              0            834
+    22               37              0              0            316
+
+=== outcome totals ===
+  {200: 123, 500: 105, 502: 17350, 409: 32422}
+  non-200/409 outcomes: 17455, first at t=1.615s, last at t=22.380s
+  5xx by upstream: {('172.22.0.3:8000', 500): 32, ('172.22.0.4:8000', 502): 1, ('172.22.0.5:8000', 502): 1, ('172.22.0.3:8000', 502): 1, ('172.22.0.5:8000', 500): 34, ('172.22.0.4:8000', 500): 39, ('sellers', 502): 17347}
+  first 200/409 answer per upstream after Postgres accepted connections (t=20.391s): 172.22.0.3:8000: t=22.463s, 172.22.0.4:8000: t=22.779s, 172.22.0.5:8000: t=22.381s
+
+=== latency by arrival window (ms, answered requests) ===
+  arrivals t= 0-5s: n= 4167  p50       2.6  p99   26569.0  max   28938.4
+  arrivals t= 5-10s: n= 4167  p50       2.3  p99       5.8  max      10.4
+  arrivals t=10-15s: n= 4166  p50       2.3  p99       5.7  max   13748.1
+  arrivals t=15-20s: n= 4167  p50       2.5  p99      15.3  max      34.3
+  arrivals t=20-25s: n= 4167  p50      37.7  p99    5046.0  max    7199.2
+  arrivals t=25-30s: n= 4166  p50     556.6  p99    3325.9  max    4782.4
+  arrivals t=30-35s: n= 4167  p50       8.2  p99     234.9  max     493.5
+  arrivals t=35-40s: n= 4167  p50       7.5  p99      77.2  max     176.7
+  arrivals t=40-45s: n= 4166  p50       8.3  p99      95.8  max     147.2
+  arrivals t=45-50s: n= 4167  p50       7.2  p99     100.0  max     151.8
+  arrivals t=50-55s: n= 4167  p50       8.8  p99     112.3  max     370.6
+  arrivals t=55-60s: n= 4166  p50       9.0  p99     128.0  max     354.9
+  queue wait (client-side backpressure): p50 0.1  p99 8.5  max 77.1 ms; QueueTimeouts: 0
+  100th 200-answer at t=23.321s
+
+=== pg sampler: 28 unreachable samples, t=9.4..26.4s (sampler clock), errors {'InterfaceError': 1, 'ConnectionRefusedError': 2, 'TimeoutError': 14, 'CannotConnectNowError': 11}
+
+=== seller logs: exception types ===
+  {'asyncpg.exceptions.ConnectionDoesNotExistError': 30, 'asyncpg.exceptions._base.InterfaceError': 30, 'ConnectionRefusedError': 75, 'ConnectionResetError': 1}
+
+=== nginx error log: 17350 line(s) ===
+  2026/09/27 04:47:20 [error] 30#30: *2511 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:47:20 [error] 30#30: *2514 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:47:20 [error] 30#30: *2511 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://172.22.0.
+  2026/09/27 04:47:20 [error] 30#30: *2521 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:47:20 [error] 30#30: *2522 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:47:20 [error] 30#30: *2523 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:47:20 [error] 30#30: *2524 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:47:20 [error] 30#30: *2525 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:47:20 [error] 30#30: *2526 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+  2026/09/27 04:47:20 [error] 30#30: *2527 no live upstreams while connecting to upstream, client: 172.22.0.8, server: , request: "POST /buy HTTP/1.1", upstream: "http://sellers/buy", host: "lb"
+
+=== Postgres log (this run) ===
+  
+  PostgreSQL Database directory appears to contain a database; Skipping initialization
+  
+  2026-09-27 04:47:35.984 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+  2026-09-27 04:47:35.985 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+  2026-09-27 04:47:35.985 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+  2026-09-27 04:47:35.998 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+  2026-09-27 04:47:36.016 UTC [29] LOG:  database system was interrupted; last known up at 2026-09-27 04:15:23 UTC
+  2026-09-27 04:47:36.158 UTC [30] FATAL:  the database system is starting up
+  2026-09-27 04:47:36.270 UTC [31] FATAL:  the database system is starting up
+  2026-09-27 04:47:36.380 UTC [32] FATAL:  the database system is starting up
+  2026-09-27 04:47:36.491 UTC [33] FATAL:  the database system is starting up
+  2026-09-27 04:47:36.608 UTC [34] FATAL:  the database system is starting up
+  2026-09-27 04:47:36.718 UTC [35] FATAL:  the database system is starting up
+  2026-09-27 04:47:36.829 UTC [36] FATAL:  the database system is starting up
+  2026-09-27 04:47:36.940 UTC [37] FATAL:  the database system is starting up
+  2026-09-27 04:47:37.050 UTC [38] FATAL:  the database system is starting up
+  2026-09-27 04:47:37.161 UTC [39] FATAL:  the database system is starting up
+  2026-09-27 04:47:37.214 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
+  2026-09-27 04:47:37.221 UTC [29] LOG:  redo starts at 0/46A1260
+  2026-09-27 04:47:37.225 UTC [29] LOG:  invalid record length at 0/46D0528: expected at least 24, got 0
+  2026-09-27 04:47:37.225 UTC [29] LOG:  redo done at 0/46D0500 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+  2026-09-27 04:47:37.271 UTC [40] FATAL:  the database system is not yet accepting connections
+  2026-09-27 04:47:37.271 UTC [40] DETAIL:  Consistent recovery state has not been yet reached.
+  2026-09-27 04:47:37.340 UTC [1] LOG:  database system is ready to accept connections

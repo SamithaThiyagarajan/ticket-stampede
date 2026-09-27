@@ -1,0 +1,17 @@
+kill event t=1.590s | die t=2.130s | Postgres 'ready to accept connections' t=18.809s
+  tickets first confirmed before the kill event: 33 -> #1..#33 at t=1.086..1.571s
+  tickets first confirmed between kill and Postgres ready: 1 -> #34..#34 at t=1.591..1.591s
+  tickets first confirmed after Postgres ready: 66 -> #35..#100 at t=22.443..23.395s
+
+request_ids that got a 500 near the kill AND hold a ticket row (every copy shown):
+  req-236 ticket #14: 200 answered t=1.353s (sent t=0.387s) via 172.22.0.4:8000 ticket #14; 500 answered t=1.686s (sent t=0.373s) via 172.22.0.5:8000
+  req-150 ticket #15: 200 answered t=1.365s (sent t=0.380s) via 172.22.0.5:8000 ticket #15; 500 answered t=1.843s (sent t=0.364s) via 172.22.0.4:8000
+  req-42 ticket #88: 500 answered t=1.731s (sent t=0.372s) via 172.22.0.4:8000; 200 answered t=23.280s (sent t=0.378s) via 172.22.0.4:8000 ticket #88
+  req-154 ticket #50: 500 answered t=1.789s (sent t=0.380s) via 172.22.0.4:8000; 200 answered t=22.792s (sent t=0.388s) via 172.22.0.5:8000 ticket #50
+  req-20 ticket #59: 500 answered t=1.712s (sent t=0.354s) via 172.22.0.3:8000; 200 answered t=22.890s (sent t=0.386s) via 172.22.0.5:8000 ticket #59
+  req-220 ticket #42: 500 answered t=1.734s (sent t=0.372s) via 172.22.0.4:8000; 200 answered t=22.693s (sent t=0.401s) via 172.22.0.5:8000 ticket #42
+
+per unique request_id:
+  (1) no committed ticket: 14492
+  (2) committed + acknowledged: 100
+  sold out only (409): 26966

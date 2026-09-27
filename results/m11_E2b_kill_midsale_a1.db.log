@@ -1,0 +1,27 @@
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2026-09-27 04:47:35.984 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-09-27 04:47:35.985 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-09-27 04:47:35.985 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-09-27 04:47:35.998 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-09-27 04:47:36.016 UTC [29] LOG:  database system was interrupted; last known up at 2026-09-27 04:15:23 UTC
+2026-09-27 04:47:36.158 UTC [30] FATAL:  the database system is starting up
+2026-09-27 04:47:36.270 UTC [31] FATAL:  the database system is starting up
+2026-09-27 04:47:36.380 UTC [32] FATAL:  the database system is starting up
+2026-09-27 04:47:36.491 UTC [33] FATAL:  the database system is starting up
+2026-09-27 04:47:36.608 UTC [34] FATAL:  the database system is starting up
+2026-09-27 04:47:36.718 UTC [35] FATAL:  the database system is starting up
+2026-09-27 04:47:36.829 UTC [36] FATAL:  the database system is starting up
+2026-09-27 04:47:36.940 UTC [37] FATAL:  the database system is starting up
+2026-09-27 04:47:37.050 UTC [38] FATAL:  the database system is starting up
+2026-09-27 04:47:37.161 UTC [39] FATAL:  the database system is starting up
+2026-09-27 04:47:37.214 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-09-27 04:47:37.221 UTC [29] LOG:  redo starts at 0/46A1260
+2026-09-27 04:47:37.225 UTC [29] LOG:  invalid record length at 0/46D0528: expected at least 24, got 0
+2026-09-27 04:47:37.225 UTC [29] LOG:  redo done at 0/46D0500 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-09-27 04:47:37.249 UTC [27] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-09-27 04:47:37.271 UTC [40] FATAL:  the database system is not yet accepting connections
+2026-09-27 04:47:37.271 UTC [40] DETAIL:  Consistent recovery state has not been yet reached.
+2026-09-27 04:47:37.327 UTC [27] LOG:  checkpoint complete: wrote 48 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.020 s, sync=0.033 s, total=0.083 s; sync files=39, longest=0.008 s, average=0.001 s; distance=188 kB, estimate=188 kB; lsn=0/46D0528, redo lsn=0/46D0528
+2026-09-27 04:47:37.340 UTC [1] LOG:  database system is ready to accept connections
