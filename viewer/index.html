@@ -44,6 +44,14 @@ nav.toc { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 12px 0 22px; fon
 nav.toc a { color: var(--text-secondary); text-decoration: none; border: 1px solid var(--border); border-radius: 999px;
   padding: 3px 10px; background: var(--surface-1); }
 nav.toc a:hover { color: var(--text-primary); }
+nav.toc a.optional { border-style: dashed; margin-left: 8px; }
+/* optional deep dive: visually separate from the main report */
+section.deepdive { border-top: 2px dashed var(--axis); padding: 22px 14px 14px; margin-top: 44px; border-radius: 0 0 14px 14px;
+  background: color-mix(in srgb, var(--surface-1) 55%, var(--page)); }
+.deepdive .kicker { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 2px; }
+.notice { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text-secondary); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px; margin: 0 0 12px; background: var(--surface-1); max-width: 860px; }
+.pick { font-size: 13px; color: var(--text-secondary); margin: 0 0 6px; }
 section.story { margin: 0 0 34px; scroll-margin-top: 12px; }
 section.story > h2 { font-size: 20px; margin: 0 0 4px; font-weight: 700; }
 section.story > h2 .num { color: var(--muted); font-weight: 600; margin-right: 8px; }
@@ -100,11 +108,11 @@ ul.plain { margin: 0 0 10px; padding-left: 20px; font-size: 14px; max-width: 860
 .tabs button[aria-selected="true"] { color: var(--text-primary); border-color: var(--text-secondary); font-weight: 600; }
 .row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
 @media (max-width: 820px) { .row { grid-template-columns: minmax(0, 1fr); } }
-.scrub { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.scrub input[type=range] { flex: 1; accent-color: var(--text-secondary); }
+.scrub { display: flex; align-items: center; gap: 8px 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.scrub input[type=range] { flex: 1 1 160px; min-width: 0; accent-color: var(--text-secondary); }
 .scrub button { font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 8px; cursor: pointer;
   border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
-.tlabel { font-variant-numeric: tabular-nums; font-size: 13px; min-width: 150px; color: var(--text-secondary); }
+.tlabel { font-variant-numeric: tabular-nums; font-size: 13px; min-width: 0; color: var(--text-secondary); }
 .now dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; font-size: 13px; }
 .now dt { color: var(--text-secondary); } .now dd { margin: 0; font-variant-numeric: tabular-nums; }
 .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
@@ -124,7 +132,7 @@ ul.plain { margin: 0 0 10px; padding-left: 20px; font-size: 14px; max-width: 860
     <a href="#idem">4 Idempotency</a><a href="#load">5 Load test</a><a href="#faults">6 Database failure</a>
     <a href="#cua">7 Committed-but-unacknowledged</a><a href="#sweep">8 Capacity sweep</a><a href="#soldout">9 After sell-out</a>
     <a href="#decisions">10 Decisions</a><a href="#limits">11 Limitations</a><a href="#future">12 Production extensions</a>
-    <a href="#evidence">13 Detailed evidence</a>
+    <a href="#evidence" class="optional">Optional: interactive replay ▶</a>
   </nav>
 </header>
 
@@ -219,7 +227,7 @@ request_id = B      →  another ticket</div>
 <section class="story" id="load">
   <h2><span class="num">5</span>Load test: 50,000 arrivals in about 60 seconds</h2>
   <p class="why">The load generator is <b>open-loop</b>: it sends requests on a fixed schedule — about 833 per second — whether or not earlier requests have finished, like real independent buyers. A run only counts if the load generator itself kept to its schedule; otherwise we would be measuring the client, not the service.</p>
-  <div class="callout">How to read the numbers: <b>throughput</b> = responses completed per second · <b>p50</b> = median latency (half the requests were faster) · <b>p99</b> = the latency of the slowest 1% of requests. In the reference run, most of the p99 came from requests arriving in the first seconds, while the 100 tickets were being sold through the lock (see the latency chart in section 13).</div>
+  <div class="callout">How to read the numbers: <b>throughput</b> = responses completed per second · <b>p50</b> = median latency (half the requests were faster) · <b>p99</b> = the latency of the slowest 1% of requests. In the reference run, most of the p99 came from requests arriving in the first seconds, while the 100 tickets were being sold through the lock (visible in the optional replay at the bottom of the page).</div>
   <div class="card"><h3>Every 833/s run of the assignment workload</h3>
     <p class="explain">Clean runs are listed first. Runs that failed a validity rule, or were disturbed by the intermittent nginx 502 issue (see Limitations), stay on the list with the reason — they are not averaged into the result.</p>
     <div class="tablewrap"><table id="benchTable"></table></div>
@@ -335,15 +343,18 @@ request_id = B      →  another ticket</div>
 </section>
 
 <!-- 13 -------------------------------------------------------------------------------------------->
-<section class="story" id="evidence">
-  <h2><span class="num">13</span>Detailed evidence: replay any run second by second</h2>
-  <p class="why">For a technical reviewer. Pick a run, then drag the slider or hover a chart: the architecture diagram shows what every component was doing in that second.</p>
+<section class="story deepdive" id="evidence">
+  <p class="kicker">Optional deep dive</p>
+  <h2>Interactive experiment replay</h2>
+  <p class="why">If you want to see what actually happened during a run, you can replay the recorded timeline below. This is optional — the sections above explain the results without requiring the replay.</p>
+  <div class="notice" role="note"><span aria-hidden="true">ⓘ</span><span><b>This replays data recorded during a past run.</b> Pressing Play steps through the saved per-second results embedded in this page; it does not contact the ticket service, start the backend or send any request.</span></div>
+  <p class="pick">Choose a recorded run:</p>
   <div class="tabs" role="tablist" id="tabs"></div>
   <p class="explain" id="caption" style="font-size:14px;color:var(--text-secondary)"></p>
   <div class="tiles" id="tiles"></div>
   <div class="scrub">
-    <button id="play" type="button">▶ Play</button>
-    <input type="range" id="t" min="0" max="60" value="0" step="1" aria-label="Time in seconds">
+    <button id="play" type="button">▶ Play recorded timeline</button>
+    <input type="range" id="t" min="0" max="60" value="0" step="1" aria-label="Recorded time in seconds">
     <span class="tlabel" id="tlabel"></span>
   </div>
   <div class="row">
@@ -367,7 +378,7 @@ request_id = B      →  another ticket</div>
       <div class="legend" id="lg-sel"></div><svg id="c-sel" width="100%" height="220"></svg></div>
   </div>
   <div class="row">
-    <div class="card checks"><h3>Five correctness checks</h3><p class="explain">Recomputed by verify() from the raw results.</p><ul id="checks"></ul></div>
+    <div class="card checks"><h3>Final correctness result for this run</h3><p class="explain">The five checks, recomputed by verify() from this run's saved results.</p><ul id="checks"></ul></div>
     <div class="card"><h3>Replay after recovery</h3><p class="explain">Every confirmed and every uncertain request replayed against the final state (fault runs only).</p><div class="mono" id="replay"></div></div>
   </div>
   <div class="card"><h3>Timeline</h3><table id="events"><thead><tr><th class="l">t (s)</th><th class="l">event</th></tr></thead><tbody></tbody></table></div>
@@ -661,7 +672,7 @@ function showTip(ev, html) { tip.innerHTML = html; tip.style.display = "block";
 function hideTip() { tip.style.display = "none"; }
 function tabs() {
   $("tabs").innerHTML = RUNS.map((r, i) => `<button role="tab" aria-selected="${i === run}" data-i="${i}">${r.label} <span style="color:var(--muted);font-size:11px">${r.id}</span></button>`).join("");
-  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => { run = +b.dataset.i; stop(); t = defaultT(); render(); });
+  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => { run = +b.dataset.i; t = defaultT(); pinned = false; stop(); render(); });
 }
 function defaultT() { const r = RUNS[run]; return r.pg_down != null ? Math.min(r.T, Math.floor(r.pg_down) + 2) : 1; }
 function tilesDetail(r) {
@@ -784,14 +795,15 @@ function rawTable() {
 }
 function update() {
   const r = RUNS[run]; $("t").value = t;
-  $("tlabel").textContent = `t = ${t}–${t + 1} s of ${r.T}` + (pinned ? " (pinned; click a chart to release)" : "");
+  $("tlabel").textContent = `recorded t = ${t}–${t + 1} s of ${r.T}` + (pinned && !timer ? " (paused; drag or click a chart)" : "");
   arch(r); nowPanel(r); lanesInto(r, "lanes", "laneLegend", t); respChart(r);
   lineChart("c-sold", r, [["sold", "tickets sold", "--series-1"]], k => r.sold, { step: true, max: r.tickets });
   lineChart("c-lat", r, LAT, k => r[k], { log: true, unit: " ms" });
   lineChart("c-sel", r, SEL, k => r.seller_answers[k], {});
 }
 function render() { tabs(); const r = RUNS[run]; $("t").max = r.T; staticParts(r); update(); }
-function stop() { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; }
+function stop() { clearInterval(timer); timer = null;
+  $("play").textContent = t >= RUNS[run].T ? "↺ Replay recorded timeline again" : "▶ Play recorded timeline"; }
 $("t").oninput = e => { t = +e.target.value; pinned = true; update(); };
 $("play").onclick = () => { if (timer) return stop(); pinned = true; if (t >= RUNS[run].T) t = 0;
   $("play").textContent = "❚❚ Pause"; timer = setInterval(() => { if (t >= RUNS[run].T) return stop(); t++; update(); }, 250); };
