@@ -40,11 +40,10 @@ body { margin: 0; background: var(--page); }
 h1 { font-size: 26px; margin: 0 0 4px; font-weight: 700; }
 .lede { font-size: 17px; color: var(--text-primary); margin: 8px 0 6px; max-width: 820px; }
 .sub { color: var(--text-secondary); font-size: 13px; margin: 0 0 14px; }
-nav.toc { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 12px 0 22px; font-size: 13px; }
-nav.toc a { color: var(--text-secondary); text-decoration: none; border: 1px solid var(--border); border-radius: 999px;
-  padding: 3px 10px; background: var(--surface-1); }
-nav.toc a:hover { color: var(--text-primary); }
-nav.toc a.optional { border-style: dashed; margin-left: 8px; }
+nav.toc { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 10px 0 26px; font-size: 13.5px; color: var(--muted); }
+nav.toc a { color: var(--text-secondary); text-decoration: underline; text-decoration-color: var(--axis); text-underline-offset: 3px; }
+nav.toc a:hover { color: var(--text-primary); text-decoration-color: currentColor; }
+nav.toc a.optional { color: var(--muted); }
 /* optional deep dive: visually separate from the main report */
 section.deepdive { border-top: 2px dashed var(--axis); padding: 22px 14px 14px; margin-top: 44px; border-radius: 0 0 14px 14px;
   background: color-mix(in srgb, var(--surface-1) 55%, var(--page)); }
@@ -126,19 +125,15 @@ ul.plain { margin: 0 0 10px; padding-left: 20px; font-size: 14px; max-width: 860
 <header>
   <h1>Ticket Stampede</h1>
   <p class="lede">A ticket-selling service designed to sell <b>exactly 100 tickets</b>, safely, when tens of thousands of purchase requests arrive within about a minute — and to stay correct when its database fails.</p>
-  <p class="sub">An evidence report: every number on this page is computed from saved experiment results by <code>scripts/build_viewer.py</code>. Works offline; no server, no external libraries.</p>
-  <nav class="toc" aria-label="Contents">
-    <a href="#overview">1 Overview</a><a href="#correct">2 What “correct” means</a><a href="#race">3 The concurrency problem</a>
-    <a href="#idem">4 Idempotency</a><a href="#load">5 Load test</a><a href="#faults">6 Database failure</a>
-    <a href="#cua">7 Committed-but-unacknowledged</a><a href="#sweep">8 Capacity sweep</a><a href="#soldout">9 After sell-out</a>
-    <a href="#decisions">10 Decisions</a><a href="#limits">11 Limitations</a><a href="#future">12 Production extensions</a>
-    <a href="#evidence" class="optional">Optional: interactive replay ▶</a>
+  <p class="sub">Every number on this page comes from saved experiment results. Read it top to bottom; each section answers one question.</p>
+  <nav class="toc" aria-label="Jump to">
+    <a href="#overview">What is this?</a><span aria-hidden="true">·</span><a href="#correct">How does it stay correct?</a><span aria-hidden="true">·</span><a href="#load">What did we test?</a><span aria-hidden="true">·</span><a href="#sweep">What did we learn?</a><span aria-hidden="true">·</span><a href="#decisions">Decisions &amp; limits</a><span aria-hidden="true">·</span><a href="#evidence" class="optional">Optional replay ▶</a>
   </nav>
 </header>
 
 <!-- 1 --------------------------------------------------------------------------------------------->
 <section class="story" id="overview">
-  <h2><span class="num">1</span>Overview</h2>
+  <h2>What problem are we solving?</h2>
   <p class="why">A flash sale: far more people want a ticket than there are tickets, and they all click at almost the same moment. The service must sell each of the 100 tickets exactly once, answer everyone else clearly, and never contradict itself.</p>
   <div class="grid2">
     <div class="card"><h3>How it is built</h3>
@@ -154,7 +149,7 @@ ul.plain { margin: 0 0 10px; padding-left: 20px; font-size: 14px; max-width: 860
 
 <!-- 2 --------------------------------------------------------------------------------------------->
 <section class="story" id="correct">
-  <h2><span class="num">2</span>What does “correct” mean?</h2>
+  <h2>What does “correct” mean?</h2>
   <p class="why">“It didn't crash” is not enough. Every run is checked against five rules, recomputed independently from the raw request log and the final database state — not taken from the service's own claims.</p>
   <ol class="inv">
     <li><b>No overselling</b> — never more than 100 tickets are issued.</li>
@@ -168,7 +163,7 @@ ul.plain { margin: 0 0 10px; padding-left: 20px; font-size: 14px; max-width: 860
 
 <!-- 3 --------------------------------------------------------------------------------------------->
 <section class="story" id="race">
-  <h2><span class="num">3</span>The concurrency problem</h2>
+  <h2>Why does the naive version fail — and how does the final one fix it?</h2>
   <p class="why">The obvious implementation works perfectly when requests arrive one at a time — and breaks badly when they arrive together.</p>
   <div class="grid2">
     <div class="card"><h3>Naive version (built first, on purpose)</h3>
@@ -203,7 +198,7 @@ COMMIT                       (lock released)</div>
 
 <!-- 4 --------------------------------------------------------------------------------------------->
 <section class="story" id="idem">
-  <h2><span class="num">4</span>Idempotency: retries must not buy twice</h2>
+  <h2>What if the same purchase is sent twice?</h2>
   <p class="why">Networks fail and people double-click, so the same purchase request can arrive more than once. Every request carries a <code>request_id</code> chosen by the buyer; the service promises that one <code>request_id</code> produces at most one ticket.</p>
   <div class="grid2">
     <div class="card"><h3>The rule</h3>
@@ -225,7 +220,7 @@ request_id = B      →  another ticket</div>
 
 <!-- 5 --------------------------------------------------------------------------------------------->
 <section class="story" id="load">
-  <h2><span class="num">5</span>Load test: 50,000 arrivals in about 60 seconds</h2>
+  <h2>What happened under 50,000 arrivals?</h2>
   <p class="why">The load generator is <b>open-loop</b>: it sends requests on a fixed schedule — about 833 per second — whether or not earlier requests have finished, like real independent buyers. A run only counts if the load generator itself kept to its schedule; otherwise we would be measuring the client, not the service.</p>
   <div class="callout">How to read the numbers: <b>throughput</b> = responses completed per second · <b>p50</b> = median latency (half the requests were faster) · <b>p99</b> = the latency of the slowest 1% of requests. In the reference run, most of the p99 came from requests arriving in the first seconds, while the 100 tickets were being sold through the lock (visible in the optional replay at the bottom of the page).</div>
   <div class="card"><h3>Every 833/s run of the assignment workload</h3>
@@ -237,7 +232,7 @@ request_id = B      →  another ticket</div>
 
 <!-- 6 --------------------------------------------------------------------------------------------->
 <section class="story" id="faults">
-  <h2><span class="num">6</span>What happens when PostgreSQL fails?</h2>
+  <h2>What happened when PostgreSQL failed?</h2>
   <p class="why">All sellers depend on the one database. These experiments deliberately broke it during the assignment workload and then checked that nothing was oversold, duplicated or lost. They test specific failures — not every possible one.</p>
   <div class="callout warn">Three different things happen in each experiment and should not be confused: <b>(1) expected database errors</b> — sellers answer HTTP 500 while PostgreSQL is gone; <b>(2) nginx 502 “no live upstreams”</b> — the load balancer takes sellers out of rotation after connection errors and keeps them out for a while; <b>(3) correctness after recovery</b> — the five checks plus a replay of every uncertain request.</div>
   <div id="faultCards"></div>
@@ -245,7 +240,7 @@ request_id = B      →  another ticket</div>
 
 <!-- 7 --------------------------------------------------------------------------------------------->
 <section class="story" id="cua">
-  <h2><span class="num">7</span>The committed-but-unacknowledged purchase</h2>
+  <h2>What if a purchase commits but the response is lost?</h2>
   <p class="why">The subtlest failure: <b>PostgreSQL commits the purchase successfully, but the confirmation never reaches the buyer.</b> The buyer sees an error — yet they own a ticket. A random crash almost never lands in this sub-millisecond window, so we created it deliberately.</p>
   <div class="grid2">
     <div class="card"><h3>The scenario</h3>
@@ -268,7 +263,7 @@ request_id = B      →  another ticket</div>
 
 <!-- 8 --------------------------------------------------------------------------------------------->
 <section class="story" id="sweep">
-  <h2><span class="num">8</span>Arrival-rate sweep: where does it start to saturate?</h2>
+  <h2>Where did the system saturate?</h2>
   <p class="why">The 833/s benchmark shows the required load is handled; it does not show how much headroom there is. So the offered rate was raised step by step (60 s each), with validity rules fixed before running.</p>
   <div class="card"><h3>Answered rate vs offered rate</h3>
     <p class="explain">Each marker is one run. Points on the dashed line answered everything that arrived; points below it fell behind. The shape shows the verdict, so it does not depend on colour.</p>
@@ -286,7 +281,7 @@ request_id = B      →  another ticket</div>
 
 <!-- 9 --------------------------------------------------------------------------------------------->
 <section class="story" id="soldout">
-  <h2><span class="num">9</span>What happens after sell-out?</h2>
+  <h2>What happens after the tickets sell out?</h2>
   <p class="why">Once all 100 tickets are gone, nearly every later request only needs to learn “sold out”. Making each of them queue for the inventory lock would waste the lock on a question whose answer cannot change — tickets are never returned during a sale in this design.</p>
   <div class="grid2">
     <div class="card"><h3>The sold-out fast path</h3>
@@ -305,7 +300,7 @@ request_id = B      →  another ticket</div>
 
 <!-- 10 -------------------------------------------------------------------------------------------->
 <section class="story" id="decisions">
-  <h2><span class="num">10</span>Architecture decisions</h2>
+  <h2>Which decisions did we make?</h2>
   <p class="why">Each choice below was made for a reason we can defend, and each is separated into what this submission implements and what a production system would add.</p>
   <div class="card tablewrap"><table class="dec">
     <thead><tr><th class="l">Decision</th><th class="l">What we implemented</th><th class="l">In production</th></tr></thead>
@@ -324,14 +319,14 @@ request_id = B      →  another ticket</div>
 
 <!-- 11 -------------------------------------------------------------------------------------------->
 <section class="story" id="limits">
-  <h2><span class="num">11</span>Limitations — what the evidence does and does not establish</h2>
+  <h2>What are the limitations?</h2>
   <p class="why">These are specific, not disclaimers: each says exactly where the evidence stops.</p>
   <div class="card"><ul class="plain" id="limitsList"></ul></div>
 </section>
 
 <!-- 12 -------------------------------------------------------------------------------------------->
 <section class="story" id="future">
-  <h2><span class="num">12</span>Production extensions (not implemented)</h2>
+  <h2>What would production add? (not implemented)</h2>
   <p class="why">What a production deployment would add. None of this is part of the submission.</p>
   <div class="card"><ul class="plain">
     <li><b>Highly available PostgreSQL:</b> synchronous replication to a quorum of standbys, fenced leader election, and clients routed only to the current primary.</li>
@@ -498,7 +493,7 @@ function idem() {
     <div class="card tile"><div class="k">request_ids served by more than one seller</div><div class="v">${i.ids_multi_instance}</div><div class="n">of ${i.request_ids}</div></div>
     <div class="card tile"><div class="k">Ticket holders: all copies got the same ticket</div><div class="v">${i.holders_same_ticket} / ${i.holders}</div><div class="n">${i.tickets} tickets for sale</div></div></div>
     <p class="explain">Example: <code>${ex.request_id}</code> was sent ${ex.copies} times, answered by ${ex.upstreams.length} different sellers — every copy returned ticket <b>${ex.ticket}</b>.</p>
-    <p class="explain">Five checks for this run: ${i.checks.every(c => c.ok) ? "<b>all passed</b>" : "see detail"}. The committed-but-unacknowledged experiment (section 7) tests idempotency after a lost confirmation.</p>`;
+    <p class="explain">Five checks for this run: ${i.checks.every(c => c.ok) ? "<b>all passed</b>" : "see detail"}. The lost-response experiment further down tests idempotency after a lost confirmation.</p>`;
 }
 
 // ---- 5 benchmark ------------------------------------------------------------------------------------
@@ -526,7 +521,7 @@ function faults() {
     const ready = f.pg_ready, sus = find("sustained service resumed");
     const timing = name === "m11_E1_pause" || name === "m11_E2_kill"
       ? `<p class="explain"><b>Limitation of this run:</b> the fault took effect after the 100th ticket was sold (Docker applies the fault ~2 s after the command), so no purchase was in flight at the moment of the fault.</p>` : "";
-    const mid = name === "m11_E2b_kill_midsale_a1" ? `<p class="explain"><b>The purchase in progress at the crash:</b> tickets #${f.tickets_pre[0]}–#${f.tickets_pre[1]} were confirmed before the kill; #${f.tickets_gap.map(g => g[0]).join(", ")} was confirmed ${f.tickets_gap.map(g => g[1]).join(", ")} ms after the kill, so its commit had already completed; #${f.tickets_post[0]}–#${f.tickets_post[1]} were sold only after recovery. The seller logs show ${f.in_tx_lock_wait} requests waiting for the lock and <b>${f.in_tx_insert} holding it, mid-INSERT, before COMMIT</b> — that purchase (the next ticket, #${f.tickets_post[0]}) was <b>rolled back</b>, and #${f.tickets_post[0]} was later sold normally. The ambiguous window (committed but unconfirmed) was <b>not</b> hit by this random kill — see section 7.</p>` : "";
+    const mid = name === "m11_E2b_kill_midsale_a1" ? `<p class="explain"><b>The purchase in progress at the crash:</b> tickets #${f.tickets_pre[0]}–#${f.tickets_pre[1]} were confirmed before the kill; #${f.tickets_gap.map(g => g[0]).join(", ")} was confirmed ${f.tickets_gap.map(g => g[1]).join(", ")} ms after the kill, so its commit had already completed; #${f.tickets_post[0]}–#${f.tickets_post[1]} were sold only after recovery. The seller logs show ${f.in_tx_lock_wait} requests waiting for the lock and <b>${f.in_tx_insert} holding it, mid-INSERT, before COMMIT</b> — that purchase (the next ticket, #${f.tickets_post[0]}) was <b>rolled back</b>, and #${f.tickets_post[0]} was later sold normally. The ambiguous window (committed but unconfirmed) was <b>not</b> hit by this random kill — the next section creates it deliberately.</p>` : "";
     return `<div class="card"><h3>${title}<span class="idtag">${id}</span></h3>
       <p class="explain"><b>What we did:</b> ${what} <b>Expected:</b> ${expect}</p>
       <div class="legend" id="fl-${name}"></div><svg id="fs-${name}" width="100%" height="150" role="img" aria-label="${title} component states"></svg>
@@ -807,6 +802,18 @@ function stop() { clearInterval(timer); timer = null;
 $("t").oninput = e => { t = +e.target.value; pinned = true; update(); };
 $("play").onclick = () => { if (timer) return stop(); pinned = true; if (t >= RUNS[run].T) t = 0;
   $("play").textContent = "❚❚ Pause"; timer = setInterval(() => { if (t >= RUNS[run].T) return stop(); t++; update(); }, 250); };
+// In-page links. Plain fragment navigation fails when this file is shown as a data: URL (some
+// previewers do this): "#x" resolves to a navigation to data:…#x, which browsers block silently.
+// So scroll to the section by id ourselves; the href stays as a fallback without JavaScript.
+document.addEventListener("click", ev => {
+  const a = ev.target.closest('a[href^="#"]');
+  const target = a && document.getElementById(a.getAttribute("href").slice(1));
+  if (!target) return;
+  ev.preventDefault();
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  try { history.replaceState(null, "", a.getAttribute("href")); } catch (e) { /* not allowed for data: URLs; harmless */ }
+});
 function renderAll() { overview(); headline(); raceChart(); idem(); bench(); faults(); cua(); sweep(); fastpath(); limits(); rawTable(); render(); }
 addEventListener("resize", () => { overview(); raceChart(); cua(); sweep(); faults(); update(); });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => renderAll());
